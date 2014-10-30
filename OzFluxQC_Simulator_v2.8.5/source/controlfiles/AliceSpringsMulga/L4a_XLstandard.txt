@@ -1,0 +1,13 @@
+[General]
+    InputLevel = L4_MetFilled
+    OutputLevel = L4_MetFilled
+
+[Files]
+    [[L4_MetFilled]]
+        in_file_path = ../AliceSpringsMulga/level4/
+        in_filename = ASM_EC_2013_L4_MetFilled.nc
+        out_file_path = ../AliceSpringsMulga/level4/
+        out_filename = ASM_EC_2013_L4_MetFilled.xls
+
+[Output]
+    DefaultXl = False

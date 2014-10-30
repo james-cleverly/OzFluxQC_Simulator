@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/svn/!svn/ver/59/OzFluxQC_Simulator_v2.8.5/source/scripts
+END
+pysolar.py
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/51/OzFluxQC_Simulator_v2.8.5/source/scripts/pysolar.py
+END
+qcts.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/59/OzFluxQC_Simulator_v2.8.5/source/scripts/qcts.py
+END
+qcio.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/59/OzFluxQC_Simulator_v2.8.5/source/scripts/qcio.py
+END
+constants.py
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/!svn/ver/54/OzFluxQC_Simulator_v2.8.5/source/scripts/constants.py
+END
+meteorologicalfunctions.py
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/!svn/ver/54/OzFluxQC_Simulator_v2.8.5/source/scripts/meteorologicalfunctions.py
+END
+cfg.py
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/svn/!svn/ver/54/OzFluxQC_Simulator_v2.8.5/source/scripts/cfg.py
+END
+qcck.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/54/OzFluxQC_Simulator_v2.8.5/source/scripts/qcck.py
+END
+qcls.py
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/!svn/ver/59/OzFluxQC_Simulator_v2.8.5/source/scripts/qcls.py
+END
+qcplot.py
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/!svn/ver/54/OzFluxQC_Simulator_v2.8.5/source/scripts/qcplot.py
+END
+qcutils.py
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/!svn/ver/59/OzFluxQC_Simulator_v2.8.5/source/scripts/qcutils.py
+END
