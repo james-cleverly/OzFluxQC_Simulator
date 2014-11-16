@@ -131,6 +131,16 @@ def l3qc(cf,ds2):
     # put the control file name into the global attributes
     ds3.globalattributes['controlfile_name'] = cf['controlfile_name']
     
+    # calculate NDVI
+    if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='NDVI') and cf['Functions']['NDVI'] == 'True':
+        try:
+            ds3.globalattributes['L3Functions'] = ds3.globalattributes['L3Functions']+', calculateNDVI'
+        except:
+            ds3.globalattributes['L3Functions'] = 'calculateNDVI'
+        
+        log.info(' Calculating NDVI from component reflectances ...')
+        qcts.CalculateNDVI(cf,ds3)
+    
     # bypass soil temperature correction for Sws (when Ts bad)
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='BypassSwsTcorr') and cf['Functions']['BypassSwsTcorr'] == 'True':
         try:

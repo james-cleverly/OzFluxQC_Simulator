@@ -13,8 +13,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import sys, os
+import mutils
 
 sys.path.append(os.path.abspath('scripts'))
 
@@ -108,8 +110,6 @@ class qcgui(Tkinter.Frame):
         self.plotstartEntry = Tkinter.Entry(self)
         self.plotstartEntry.grid(row=6,column=6,columnspan=2)
         
-        self.reloadcfButton = Tkinter.Button (self, text="Re-load controlfile", command=self.do_reloadcf )
-        self.reloadcfButton.grid(row=7,column=0,columnspan=1)
         self.plotendLabel = Tkinter.Label(self, text='End date   (YYYY-MM-DD)')
         self.plotendLabel.grid(row=7,column=4,columnspan=2)
         self.plotendEntry = Tkinter.Entry(self)
@@ -869,7 +869,13 @@ class qcgui(Tkinter.Frame):
         self.cf = qcio.load_controlfile(path='controlfiles')
         if len(self.cf)==0: self.do_progress(text='Waiting for input ...'); return
         self.do_progress(text='Re/Loading L3 NetCDF Data ...')
-        self.ds3 = qcio.nc_read_series(self.cf,'L3')
+        infilename = qcio.get_infilename_from_cf(self.cf,'L2')
+        self.ds2 = qcio.nc_read_series(infilename)
+        try:
+            infilename = qcio.get_infilename_from_cf(self.cf,'L3',fail=True)
+        except:
+            infilename = qcio.get_outfilename_from_cf(self.cf,'L3')
+        self.ds3 = qcio.nc_read_series(infilename)
         self.update_startenddate(str(self.ds3.series['DateTime']['Data'][0]),
                                  str(self.ds3.series['DateTime']['Data'][-1]))
         log.info(' Finished Re/Loading L3 NetCDF Data')
@@ -882,8 +888,16 @@ class qcgui(Tkinter.Frame):
         self.cf = qcio.load_controlfile(path='controlfiles')
         if len(self.cf)==0: self.do_progress(text='Waiting for input ...'); return
         self.do_progress(text='Re/Loading L4 NetCDF Data ...')
-        self.ds3 = qcio.nc_read_series(self.cf,'L3')
-        self.ds4 = qcio.nc_read_series(self.cf,'L4')
+        try:
+            infilename = qcio.get_infilename_from_cf(self.cf,'L3')
+        except:
+            infilename = qcio.get_outfilename_from_cf(self.cf,'L3')
+        self.ds3 = qcio.nc_read_series(infilename)
+        try:
+            infilename = qcio.get_infilename_from_cf(self.cf,'L4')
+        except:
+            infilename = qcio.get_outfilename_from_cf(self.cf,'L4')
+        self.ds4 = qcio.nc_read_series(infilename)
         self.update_startenddate(str(self.ds4.series['DateTime']['Data'][0]),
                                  str(self.ds4.series['DateTime']['Data'][-1]))
         log.info(' Finished Re/Loading L4 NetCDF Data')

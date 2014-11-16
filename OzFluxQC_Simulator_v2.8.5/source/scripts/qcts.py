@@ -533,6 +533,22 @@ def CalculateMeteorologicalVariables(ds,Ta_name='Ta',Tv_name='Tv_CSAT',ps_name='
         qcutils.CreateSeries(ds,'SHD',SHD,FList=[Ta_name,Ah_name],Attr=attr)
     
 
+def CalculateNDVI(cf,ds):
+    red_in,f1,a = qcutils.GetSeriesasMA(ds,'red_in')
+    red_ref,f2,a = qcutils.GetSeriesasMA(ds,'red_ref')
+    nIR_in,f3,a = qcutils.GetSeriesasMA(ds,'nIR_in')
+    nIR_ref,f4,a = qcutils.GetSeriesasMA(ds,'nIR_ref')
+    timeindex = numpy.ma.where((ds.series['Hdh']['Data'] < 9) | (ds.series['Hdh']['Data'] > 15))[0]
+    badindex = numpy.ma.where((numpy.mod(f1,10)!=0)|(numpy.mod(f2,10)!=0)|(numpy.mod(f3,10)!=0)|(numpy.mod(f4,10)!=0))[0]
+    goodindex = numpy.ma.where((red_in!=0)&(red_ref!=0)&(nIR_in!=0)&(nIR_ref!=0))[0]
+    NDVI = numpy.ma.zeros(len(red_in),dtype=numpy.float64) + numpy.float64(c.missing_value)
+    NDVI[goodindex] = ((nIR_ref[goodindex]/nIR_in[goodindex])-(red_ref[goodindex]/red_in[goodindex]))/((nIR_ref[goodindex]/nIR_in[goodindex])+(red_ref[goodindex]/red_in[goodindex]))
+    NDVI[badindex] = numpy.float64(c.missing_value)
+    NDVI[timeindex] = numpy.float64(c.missing_value)
+    attr = qcutils.MakeAttributeDictionary(long_name='normalised vegetation difference index (NDVI)',units='none',standard_name='not defined')
+    qcutils.CreateSeries(ds,'NDVI',NDVI,FList=['red_in','red_ref','nIR_in','nIR_ref'],Attr=attr)
+    ds.series['NDVI']['Flag'][timeindex] = numpy.int32(9)     # bad time flag
+
 def CalculateNetRadiation(ds,Fn_out,Fsd_in,Fsu_in,Fld_in,Flu_in):
     """
         Calculate the net radiation from the 4 components of the surface
@@ -3462,7 +3478,7 @@ def get_soilaverages(Data):
         """
     li = numpy.ma.where(abs(Data-numpy.float64(c.missing_value))>c.eps)
     Num = numpy.size(li)
-    if Num > 33:
+    if Num > 28:
         Av = numpy.ma.mean(Data[li])
     else:
         Av = c.missing_value

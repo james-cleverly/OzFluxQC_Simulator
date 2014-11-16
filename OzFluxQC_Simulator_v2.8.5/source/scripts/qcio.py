@@ -470,19 +470,23 @@ def get_filename_dialog(path='.',title='Choose a file'):
     root.destroy()
     return str(FileName)
 
-def get_infilename_from_cf(cf,InLevel):
+def get_infilename_from_cf(cf,InLevel,fail=False):
     filename = ""
-    if "Files" in cf.keys():
-        if "in_file_path" in cf['Files'][InLevel].keys():
-            if "in_filename" in cf['Files'][InLevel].keys():
-                filename = cf['Files'][InLevel]['in_file_path']+cf['Files'][InLevel]['in_filename']
-            else:
-                log.error("get_infilename_from_cf: 'in_filename' key not found in 'Files' section of control file")
-        else:
-            log.error("get_infilename_from_cf: 'file_path' key not found in 'Files' section of control file")
+    if fail == True:
+        filename = cf['Files'][InLevel]['in_file_path']+cf['Files'][InLevel]['in_filename']
+        return str(filename)
     else:
-        log.error("get_infilename_from_cf: 'Files' section not found in control file")
-    return str(filename)
+        if "Files" in cf.keys():
+            if "in_file_path" in cf['Files'][InLevel].keys():
+                if "in_filename" in cf['Files'][InLevel].keys():
+                    filename = cf['Files'][InLevel]['in_file_path']+cf['Files'][InLevel]['in_filename']
+                else:
+                    log.error("get_infilename_from_cf: 'in_filename' key not found in 'Files' section of control file")
+            else:
+                log.error("get_infilename_from_cf: 'file_path' key not found in 'Files' section of control file")
+        else:
+            log.error("get_infilename_from_cf: 'Files' section not found in control file")
+        return str(filename)
 
 def get_outfilename_from_cf(cf,OutLevel):
     try:
