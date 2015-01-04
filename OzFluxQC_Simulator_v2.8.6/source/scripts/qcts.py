@@ -569,7 +569,7 @@ def CalculateNetRadiation(ds,Fn_out,Fsd_in,Fsu_in,Fld_in,Flu_in):
         Fld,f,a = qcutils.GetSeriesasMA(ds,Fld_in)
         Flu,f,a = qcutils.GetSeriesasMA(ds,Flu_in)
         Fn = (Fsd - Fsu) + (Fld - Flu)
-        attr = qcutils.MakeAttributeDictionary(long_name='Calculated net radiation using '+Fsd_in+','+Fsu_in+','+Fld_in+','+Flu_in,units='W/m2',standard_name='surface_net_allwave_radiation')
+        attr = qcutils.MakeAttributeDictionary(long_name='Calculated net radiation using '+Fsd_in+','+Fsu_in+','+Fld_in+','+Flu_in,units='W/m2',standard_name='surface_net_downwawrd_radiative_flux')
         qcutils.CreateSeries(ds,Fn_out,Fn,FList=[Fsd_in,Fsu_in,Fld_in,Flu_in],Attr=attr)
         if "Variables" in cf:
             if Fn_out in cf["Variables"]:
@@ -580,7 +580,7 @@ def CalculateNetRadiation(ds,Fn_out,Fsd_in,Fsu_in,Fld_in,Flu_in):
         Fn = numpy.array([c.missing_value]*nRecs,dtype=numpy.float64)
         flag = numpy.ones(nRecs,dtype=numpy.int32)
         attr = qcutils.MakeAttributeDictionary(long_name='Calculated net radiation (one or more components missing)',
-                             standard_name='surface_net_allwave_radiation',units='W/m2')
+                             standard_name='surface_net_downwawrd_radiative_flux',units='W/m2')
         qcutils.CreateSeries(ds,Fn_out,Fn,Flag=flag,Attr=attr)
 
 def CalculateSpecificHumidityProfile(cf,ds):
@@ -705,7 +705,7 @@ def CalculateSpecificHumidityProfile(cf,ds):
         qcutils.CreateSeries(ds,mr_vars[i],mr,FList=[ps_in,e_vars[i]],Attr=attr)
         attr = qcutils.MakeAttributeDictionary(long_name=Tv_attrs[i],units='C',standard_name='virtual_temperature')
         qcutils.CreateSeries(ds,Tv_vars[i],Tv,FList=[ps_in,Ta_in[i]],Attr=attr)
-        attr = qcutils.MakeAttributeDictionary(long_name=Tvp_attrs[i],units='C')
+        attr = qcutils.MakeAttributeDictionary(long_name=Tvp_attrs[i],units='C',standard_name='air_potential_temperature')
         qcutils.CreateSeries(ds,Tvp_vars[i],Tvp,FList=[ps_in,e_vars[i],Ta_in[i]],Attr=attr)
     
     log.info(' q and T profile computed')
@@ -1110,16 +1110,16 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 Re_LRF_mmol[NEEmaxindex] = 0.
                 Re_n_mmol[nightindex] = Re_mmol[nightindex]
                 Re_NEEmax_mmol[NEEmaxindex] = Re_mmol[NEEmaxindex]
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2',standard_name='gross_primary_productivity_of_carbon')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2')
                 qcutils.CreateSeries(ds,'GPP_mmol',GPP_mmol,FList=[GPPIn[0]],Attr=attr)
                 attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gC/m2',standard_name='gross_primary_productivity_of_carbon')
                 qcutils.CreateSeries(ds,'GPP_gC',GPP_gC,FList=[GPPIn[0]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gCO2/m2',standard_name='gross_primary_productivity_of_carbon')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gCO2/m2')
                 qcutils.CreateSeries(ds,'GPP_gCO2',GPP_gCO2,FList=[GPPIn[0]],Attr=attr)
                 attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='mmol/m2')
                 qcutils.CreateSeries(ds,'Re_mmol',Re_mmol,FList=[GPPIn[1]],Attr=attr)
                 attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gC/m2')
-                qcutils.CreateSeries(ds,'Re_gC',Re_gC,FList=[GPPIn[1]],Attr=attr)
+                qcutils.CreateSeries(ds,'Re_gC',Re_gC,FList=[GPPIn[1]],Attr=attr,standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
                 attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gCO2/m2')
                 qcutils.CreateSeries(ds,'Re_gCO2',Re_gCO2,FList=[GPPIn[1]],Attr=attr)
                 attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2')
@@ -1143,7 +1143,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
             Fc_gCO2 = Fco2 * 1800 / 1000                        # g/m2-30min for summing
             attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='mmol/m2',standard_name='surface_upward_mole_flux_of_carbon_dioxide')
             qcutils.CreateSeries(ds,'NEE_mmol',Fc_mmol,FList=['NEE'],Attr=attr)
-            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='mmol/m2')
+            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='mmol/m2',standard_name='surface_downward_mole_flux_of_carbon_dioxide')
             qcutils.CreateSeries(ds,'NEP_mmol',Fcp_mmol,FList=['NEP'],Attr=attr)
             attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='gC/m2')
             qcutils.CreateSeries(ds,'Fc_g',Fc_gC,FList=['Fc_c'],Attr=attr)
@@ -1500,11 +1500,11 @@ def ConvertFc(cf,ds,Fco2_in='Fc'):
             ds.series[ThisOne]['Attr']['standard_name'] = 'not defined'
     
     if 'Fc_co2' in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='mgCO2/m2/s',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='mgCO2/m2/s')
         qcutils.CreateSeries(ds,'Fc_co2',Fc_co2,FList=[Fco2_in],Attr=attr)
         ds.series['Fc_co2']['Attr']['long_name'] = 'Fc_co2 (Flux of carbon dioxide), '+attr_hist
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='Fc_co2 (Flux of carbon dioxide), '+attr_hist,units='mgCO2/m2/s',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+        attr = qcutils.MakeAttributeDictionary(long_name='Fc_co2 (Flux of carbon dioxide), '+attr_hist,units='mgCO2/m2/s')
         qcutils.CreateSeries(ds,'Fc_co2',Fc_co2,FList=[Fco2_in],Attr=attr)
     
     if 'Fc_c' in ds.series.keys():
@@ -1532,11 +1532,11 @@ def ConvertFc(cf,ds,Fco2_in='Fc'):
         qcutils.CreateSeries(ds,'NEP',NEP,FList=[Fco2_in],Attr=attr)
     
     if 'Fc' in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='mgCO2/m2/s',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='mgCO2/m2/s')
         qcutils.CreateSeries(ds,'Fc',Fc_co2,FList=[Fco2_in],Attr=attr)
         ds.series['Fc']['Attr']['long_name'] = 'Fc (Flux of carbon dioxide), '+attr_hist
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='Fc (Flux of carbon dioxide), '+attr_hist,units='mgCO2/m2/s',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+        attr = qcutils.MakeAttributeDictionary(long_name='Fc (Flux of carbon dioxide), '+attr_hist,units='mgCO2/m2/s')
         qcutils.CreateSeries(ds,'Fc',Fc_co2,FList=[Fco2_in],Attr=attr)
     
 
@@ -3280,7 +3280,7 @@ def get_leafresistance(cf,ds,rinverted):
                         LAI_expanded[i] = LAI[z]
                         LAI_flag[i] = dsLAI.series['LAI']['Flag'][z]
         
-        attr = qcutils.MakeAttributeDictionary(long_name='Leaf area index, spline-fit interpolation from MODIS product',units='m2/m2')
+        attr = qcutils.MakeAttributeDictionary(long_name='Leaf area index, spline-fit interpolation from MODIS product',units='m2/m2',standard_name='leaf_area_index')
         qcutils.CreateSeries(ds,'LAI',LAI_expanded,Flag=0,Attr=attr)
         ds.series['LAI']['Flag'] = LAI_flag
     else:
