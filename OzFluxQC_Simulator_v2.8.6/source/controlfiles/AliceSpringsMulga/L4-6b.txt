@@ -11,20 +11,25 @@
     L5_keys = GapFillUsingSOLO
     L6_offline = True
     L6_keys = Cleverlyetal2013JGRBiogeosciences
-    InterpolateOverMissing = True
-    UstarFromFh = True
     
-    # L4 services
-    MergeSeriesWS = True
-    PenmanMonteith = True
-    Sums = L6    #L6
-    CalculateMetVars = True
-    CalculateET = True
+    Sums = L6    # L4 L5 L6 False
     convertFc = True
-    climatology = False
-    footprint = True
+    climatology = False    # L4 L5 L6 False
     UpdateCF = False
     FlagStats = True
+    
+    # L4 services
+    CalculateMetVars = True
+    MergeSeriesWS = True
+    InterpolateOverMissing = True
+    
+    # L5 services
+    UstarFromFh = True
+    CalculateET = True
+    PenmanMonteith = True
+    
+    # L6 services
+    footprint = True
 
 [Files]
     [[L3]]

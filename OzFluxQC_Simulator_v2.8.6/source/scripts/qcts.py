@@ -304,7 +304,7 @@ def CalculateAhHMP(cf,ds,e_name='e',Ta_name='Ta_HMP',Ah_name='Ah_HMP'):
     Ta,f,a = qcutils.GetSeriesasMA(ds,Ta_name)
     e,f,a = qcutils.GetSeriesasMA(ds,e_name)
     Ah = mf.absolutehumidity(Ta,e)
-    attr = qcutils.MakeAttributeDictionary(long_name='Absolute humidity (HMP)',units='g/m3',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Absolute humidity (HMP)',units='g/m3',standard_name='mass_concentration_of_water_vapor_in_air')
     qcutils.CreateSeries(ds,Ah_name,Ah,FList=[Ta_name,e_name],Attr=attr)
 
 def CalculateAvailableEnergy(ds,Fa_out='Fa',Fn_in='Fn',Fg_in='Fg'):
@@ -331,13 +331,13 @@ def CalculateET(cf,ds,level,Fe_in='Fe'):
     Lv,f,a = qcutils.GetSeriesasMA(ds,'Lv')
     ET = Fe * 60 * 30 * 1000 / (Lv * c.rho_water)  # mm/30min for summing
     if 'ET' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Evapotranspiration Flux',units='mm/30min',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Evapotranspiration Flux',units='mm/30min',standard_name='lwe_water_evaporation_rate')
         qcutils.CreateSeries(ds,'ET',ET,FList=[Fe_in],Attr=attr)
         ds.series['ET']['Attr']['Level'] = level
     elif ds.series['ET']['Attr']['Level'] == level:
         log.warn('   ET already in dataset at level '+level+': ET not re-computed')
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='mm/30min',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='mm/30min',standard_name='lwe_water_evaporation_rate')
         qcutils.CreateSeries(ds,'ET',ET,FList=[Fe_in],Attr=attr)
         ds.series['ET']['Attr']['Level'] = level
 
@@ -400,7 +400,7 @@ def CalculateFluxes(cf,ds,Ta_name='Ta',ps_name='ps',Ah_name='Ah',wT_in='wT',wA_i
     if wC_in in ds.series.keys():
         wC,f,a = qcutils.GetSeriesasMA(ds,wC_in)
         Fc = wC
-        attr = qcutils.MakeAttributeDictionary(long_name='rotated to natural wind coordinates'+long_name,units='mg/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='rotated to natural wind coordinates'+long_name,units='mg/m2/s')
         qcutils.CreateSeries(ds,Fc_out,Fc,FList=[wC_in],Attr=attr)
         flagindex = numpy.where(numpy.mod(ds.series[Fc_out]['Flag'],10)!=0)[0]
         ds.series[Fc_out]['Data'][flagindex] = numpy.float64(c.missing_value)
@@ -413,9 +413,9 @@ def CalculateFluxes(cf,ds,Ta_name='Ta',ps_name='ps',Ah_name='Ah',wT_in='wT',wA_i
             vs = uw*uw + vw*vw
             Fm = rhom * numpy.ma.sqrt(vs)
             us = numpy.ma.sqrt(numpy.ma.sqrt(vs))
-            attr = qcutils.MakeAttributeDictionary(long_name='rotated to natural wind coordinates'+long_name,units='kg/m/s2',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='rotated to natural wind coordinates'+long_name,units='kg/m/s2')
             qcutils.CreateSeries(ds,Fm_out,Fm,FList=['rhom',uw_in,vw_in],Attr=attr)
-            attr = qcutils.MakeAttributeDictionary(long_name='rotated to natural wind coordinates'+long_name,units='m/s',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='rotated to natural wind coordinates'+long_name,units='m/s')
             qcutils.CreateSeries(ds,ustar_out,us,FList=[uw_in,vw_in],Attr=attr)
             for ThisOne in [Fm_out,ustar_out]:
                 flagindex = numpy.where(numpy.mod(ds.series[ThisOne]['Flag'],10)!=0)[0]
@@ -440,7 +440,7 @@ def CalculateLongwave(ds,Fl_out,Fl_in,Tbody_in):
     Fl_raw,f,a = qcutils.GetSeriesasMA(ds,Fl_in)
     Tbody,f,a = qcutils.GetSeriesasMA(ds,Tbody_in)
     Fl = Fl_raw + c.sb*(Tbody + 273.15)**4
-    attr = qcutils.MakeAttributeDictionary(long_name='Calculated longwave radiation using '+Fl_in+','+Tbody_in,units='W/m2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Calculated longwave radiation using '+Fl_in+','+Tbody_in,units='W/m2')
     qcutils.CreateSeries(ds,Fl_out,Fl,FList=[Fl_in,Tbody_in],Attr=attr)
 
 def CalculateMeteorologicalVariables(ds,Ta_name='Ta',Tv_name='Tv_CSAT',ps_name='ps',q_name="q",Ah_name='Ah',RH_name='RH',Cc_name='Cc'):
@@ -477,12 +477,12 @@ def CalculateMeteorologicalVariables(ds,Ta_name='Ta',Tv_name='Tv_CSAT',ps_name='
         esat,f,a = qcutils.GetSeriesasMA(ds,'esat')
     else:
         esat = mf.es(Ta)
-        attr = qcutils.MakeAttributeDictionary(long_name='Saturation vapour pressure (HMP)',units='kPa',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Saturation vapour pressure (HMP)',units='kPa')
         qcutils.CreateSeries(ds,'esat',esat,FList=[Ta_name],Attr=attr)
     
     if 'rhod' not in ds.series.keys():
         rhod = mf.densitydryair(Ta,ps,e)
-        attr = qcutils.MakeAttributeDictionary(long_name='Density of dry air',units='kg/m3',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Density of dry air',units='kg/m3')
         qcutils.CreateSeries(ds,'rhod',rhod,FList=[Ta_name,ps_name],Attr=attr)
     
     if 'rhom' not in ds.series.keys():
@@ -492,7 +492,7 @@ def CalculateMeteorologicalVariables(ds,Ta_name='Ta',Tv_name='Tv_CSAT',ps_name='
     
     if 'Lv' not in ds.series.keys():
         Lv = mf.Lv(Ta)
-        attr = qcutils.MakeAttributeDictionary(long_name='Latent heat of vapourisation',units='J/kg',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Latent heat of vapourisation',units='J/kg')
         qcutils.CreateSeries(ds,'Lv',Lv,FList=[Ta_name],Attr=attr)
     
     if 'mr' not in ds.series.keys():
@@ -524,12 +524,12 @@ def CalculateMeteorologicalVariables(ds,Ta_name='Ta',Tv_name='Tv_CSAT',ps_name='
     
     if 'Cpm' not in ds.series.keys():
         Cpm = mf.specificheatmoistair(q)
-        attr = qcutils.MakeAttributeDictionary(long_name='Specific heat of moist air',units='J/kg-K',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Specific heat of moist air',units='J/kg-K')
         qcutils.CreateSeries(ds,'Cpm',Cpm,FList=[Ta_name,ps_name,Ah_name],Attr=attr)
     
     if 'SHD' not in ds.series.keys():
         SHD = qsat - q
-        attr = qcutils.MakeAttributeDictionary(long_name='Specific humidity deficit',units='kg/kg',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Specific humidity deficit',units='kg/kg')
         qcutils.CreateSeries(ds,'SHD',SHD,FList=[Ta_name,Ah_name],Attr=attr)
     
 
@@ -545,7 +545,7 @@ def CalculateNDVI(cf,ds):
     NDVI[goodindex] = ((nIR_ref[goodindex]/nIR_in[goodindex])-(red_ref[goodindex]/red_in[goodindex]))/((nIR_ref[goodindex]/nIR_in[goodindex])+(red_ref[goodindex]/red_in[goodindex]))
     NDVI[badindex] = numpy.float64(c.missing_value)
     NDVI[timeindex] = numpy.float64(c.missing_value)
-    attr = qcutils.MakeAttributeDictionary(long_name='normalised vegetation difference index (NDVI)',units='none',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='normalised vegetation difference index (NDVI)',units='none',standard_name='normalized_difference_vegetation_index')
     qcutils.CreateSeries(ds,'NDVI',NDVI,FList=['red_in','red_ref','nIR_in','nIR_ref'],Attr=attr)
     ds.series['NDVI']['Flag'][timeindex] = numpy.int32(9)     # bad time flag
 
@@ -697,7 +697,7 @@ def CalculateSpecificHumidityProfile(cf,ds):
         Tvp = mf.virtualtheta(Tv,mr)
         attr = qcutils.MakeAttributeDictionary(long_name=q_attrs[i],units='kg/kg',standard_name='specific_humidity')
         qcutils.CreateSeries(ds,q_vars[i],q,FList=[ps_in,e_vars[i]],Attr=attr)
-        attr = qcutils.MakeAttributeDictionary(long_name=qsat_attrs[i],units='kg/kg',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name=qsat_attrs[i],units='kg/kg')
         qcutils.CreateSeries(ds,qsat_vars[i],qsat,FList=[ps_in,esat_vars[i]],Attr=attr)
         attr = qcutils.MakeAttributeDictionary(long_name=VPD_attrs[i],units='kPa',standard_name='water_vapor_saturation_deficit_in_air')
         qcutils.CreateSeries(ds,VPD_vars[i],VPD,FList=[ps_in,e_vars[i],esat_vars[i]],Attr=attr)
@@ -705,7 +705,7 @@ def CalculateSpecificHumidityProfile(cf,ds):
         qcutils.CreateSeries(ds,mr_vars[i],mr,FList=[ps_in,e_vars[i]],Attr=attr)
         attr = qcutils.MakeAttributeDictionary(long_name=Tv_attrs[i],units='C',standard_name='virtual_temperature')
         qcutils.CreateSeries(ds,Tv_vars[i],Tv,FList=[ps_in,Ta_in[i]],Attr=attr)
-        attr = qcutils.MakeAttributeDictionary(long_name=Tvp_attrs[i],units='C',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name=Tvp_attrs[i],units='C')
         qcutils.CreateSeries(ds,Tvp_vars[i],Tvp,FList=[ps_in,e_vars[i],Ta_in[i]],Attr=attr)
     
     log.info(' q and T profile computed')
@@ -1050,7 +1050,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 else:
                     Lv = c.Lv
                 ET = Fe * 60 * 30 * 1000 / (Lv * c.rho_water)  # mm/30min for summing
-                attr = qcutils.MakeAttributeDictionary(long_name='Evapotranspiration Flux',units='mm/30min',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Evapotranspiration Flux',units='mm/30min',standard_name='lwe_water_evaporation_rate')
                 qcutils.CreateSeries(ds,'ET',ET,FList=[Fe_in],Attr=attr)
             
             SumOutList.append('ET')
@@ -1116,17 +1116,17 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 qcutils.CreateSeries(ds,'GPP_gC',GPP_gC,FList=[GPPIn[0]],Attr=attr)
                 attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gCO2/m2',standard_name='gross_primary_productivity_of_carbon')
                 qcutils.CreateSeries(ds,'GPP_gCO2',GPP_gCO2,FList=[GPPIn[0]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='mmol/m2',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='mmol/m2')
                 qcutils.CreateSeries(ds,'Re_mmol',Re_mmol,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gC/m2',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gC/m2')
                 qcutils.CreateSeries(ds,'Re_gC',Re_gC,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gCO2/m2',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gCO2/m2')
                 qcutils.CreateSeries(ds,'Re_gCO2',Re_gCO2,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2')
                 qcutils.CreateSeries(ds,'Re_LRF_mmol',Re_LRF_mmol,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, nocturnal accumulation',units='mmol/m2',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, nocturnal accumulation',units='mmol/m2')
                 qcutils.CreateSeries(ds,'Re_n_mmol',Re_n_mmol,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2')
                 qcutils.CreateSeries(ds,'Re_NEEmax_mmol',Re_NEEmax_mmol,FList=[GPPIn[1]],Attr=attr)
                 GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','Re_mmol','Re_gC','Re_gCO2','Re_LRF_mmol','Re_n_mmol','Re_NEEmax_mmol']
                 for listindex in range(0,9):
@@ -1143,11 +1143,11 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
             Fc_gCO2 = Fco2 * 1800 / 1000                        # g/m2-30min for summing
             attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='mmol/m2',standard_name='surface_upward_mole_flux_of_carbon_dioxide')
             qcutils.CreateSeries(ds,'NEE_mmol',Fc_mmol,FList=['NEE'],Attr=attr)
-            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='mmol/m2',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='mmol/m2')
             qcutils.CreateSeries(ds,'NEP_mmol',Fcp_mmol,FList=['NEP'],Attr=attr)
-            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='gC/m2',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='gC/m2')
             qcutils.CreateSeries(ds,'Fc_g',Fc_gC,FList=['Fc_c'],Attr=attr)
-            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='gCO2/m2',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Flux',units='gCO2/m2')
             qcutils.CreateSeries(ds,'Fco2_g',Fc_gCO2,FList=['Fc_co2'],Attr=attr)
             COut = ['NEE_mmol','NEP_mmol','Fc_g','Fco2_g']
             for listindex in range(0,4):
@@ -1164,7 +1164,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 if 'GSv_1layer' in ds.series.keys():
                     Gst_1layer_mmol,f,a = qcutils.GetSeriesasMA(ds,'GSv_1layer')   # mmol/m2-s
                     Gst_1layer_mol =  Gst_1layer_mmol * 1800 / 1000                 # mol/m2-30min for summing
-                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Bulk Stomatal Conductance, 1-layer Ce method Penman-Monteith',units='mol/m2',standard_name='not defined')
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Bulk Stomatal Conductance, 1-layer Ce method Penman-Monteith',units='mol/m2')
                     qcutils.CreateSeries(ds,'GSv_1layer_mol',Gst_1layer_mol,FList=['GSv_1layer'],Attr=attr)
                     OutList.append('GSv_1layer_mol')
                     if 'GSv_1layer_mol' in SubSumList:
@@ -1179,7 +1179,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                         Gst_2layer_mmol,f,a = qcutils.GetSeriesasMA(ds,ThisOne)   # mmol/m2-s
                         Gst_2layer_mol =  Gst_2layer_mmol * 1800 / 1000                 # mol/m2-30min for summing
                         newvar = ThisOne + '_mol'
-                        attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Bulk Stomatal Conductance, 2-layer Ce method Penman-Monteith',units='mol/m2',standard_name='not defined')
+                        attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Bulk Stomatal Conductance, 2-layer Ce method Penman-Monteith',units='mol/m2')
                         qcutils.CreateSeries(ds,newvar,Gst_2layer_mol,FList=[ThisOne],Attr=attr)
                         OutList.append(newvar)
                         if newvar in SubSumList:
@@ -1192,7 +1192,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 if 'GSm' in ds.series.keys():
                     Gc_mmol,f,a = qcutils.GetSeriesasMA(ds,'GSm')   # mmol/m2-s
                     Gc_mol =  Gc_mmol * 1800 / 1000                 # mol/m2-30min for summing
-                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Canopy Conductance',units='mol/m2',standard_name='not defined')
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Canopy Conductance',units='mol/m2')
                     qcutils.CreateSeries(ds,'GSm_mol',Gc_mol,FList=['GSm'],Attr=attr)
                     OutList.append('GSm_mol')
                     if 'GSm_mol' in SubSumList:
@@ -1209,7 +1209,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 for j in range(len(index)):
                     if rain[index[j]] > 0:
                         rainhr[index[j]] = 0.5
-            attr = qcutils.MakeAttributeDictionary(long_name='Hourly rainfall occurrence (1) or absence (0)',units='hr',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Hourly rainfall occurrence (1) or absence (0)',units='hr')
             qcutils.CreateSeries(ds,'rainhrs',rainhr,FList=['Precip'],Attr=attr)
             OutList.append('rainhrs')
             SumOutList.append('rainhrs')
@@ -1423,31 +1423,31 @@ def CoordRotation2D(cf,ds):
     uw = UxUz*ce*(ct**2-st**2) - 2*UxUy*ct*st*ce*se + UyUz*se*(ct**2-st**2) - UxUx*ct*st*ce**2 - UyUy*ct*st*se**2 + UzUz*ct*st    # covariance(w,x) in natural wind coordinate system
     vw = UyUz*ct*ce - UxUz*ct*se - UxUy*st*(ce**2-se**2) + UxUx*st*ce*se - UyUy*st*ce*se    # covariance(w,y) in natural wind coordinate system
     # store the rotated quantities in the nc object
-    attr = qcutils.MakeAttributeDictionary(long_name='Horizontal rotation angle',units='deg',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Horizontal rotation angle',units='deg')
     qcutils.CreateSeries(ds,'eta',eta,FList=['Ux','Uy','Uz'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Vertical rotation angle',units='deg',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Vertical rotation angle',units='deg')
     qcutils.CreateSeries(ds,'theta',theta,FList=['Ux','Uy','Uz'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Longitudinal component of wind-speed in natural wind coordinates',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Longitudinal component of wind-speed in natural wind coordinates',units='m/s')
     qcutils.CreateSeries(ds,'u',u,FList=['Ux','Uy','Uz'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Lateral component of wind-speed in natural wind coordinates',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Lateral component of wind-speed in natural wind coordinates',units='m/s')
     qcutils.CreateSeries(ds,'v',v,FList=['Ux','Uy','Uz'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Vertical component of wind-speed in natural wind coordinates',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Vertical component of wind-speed in natural wind coordinates',units='m/s')
     qcutils.CreateSeries(ds,'w',w,FList=['Ux','Uy','Uz'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Kinematic heat flux, rotated to natural wind coordinates',units='mC/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Kinematic heat flux, rotated to natural wind coordinates',units='mC/s')
     qcutils.CreateSeries(ds,'wT',wT,FList=['Ux','Uy','Uz','UxT','UyT','UzT'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Kinematic vapour flux, rotated to natural wind coordinates',units='g/m2/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Kinematic vapour flux, rotated to natural wind coordinates',units='g/m2/s')
     qcutils.CreateSeries(ds,'wA',wA,FList=['Ux','Uy','Uz','UxA','UyA','UzA'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Kinematic CO2 flux, rotated to natural wind coordinates',units='mg/m2/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Kinematic CO2 flux, rotated to natural wind coordinates',units='mg/m2/s')
     qcutils.CreateSeries(ds,'wC',wC,FList=['Ux','Uy','Uz','UxC','UyC','UzC'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Momentum flux X component, rotated to natural wind coordinates',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Momentum flux X component, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'uw',uw,FList=['Ux','Uy','Uz','UxUz','UxUx','UxUy'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Momentum flux Y component, rotated to natural wind coordinates',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Momentum flux Y component, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'vw',vw,FList=['Ux','Uy','Uz','UyUz','UxUy','UyUy'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Variance of streamwise windspeed, rotated to natural wind coordinates',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Variance of streamwise windspeed, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'uu',uu,FList=['Ux','Uy','Uz','UxUx','UxUy','UxUz'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Variance of crossstream windspeed, rotated to natural wind coordinates',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Variance of crossstream windspeed, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'vv',vv,FList=['Ux','Uy','Uz','UyUy','UxUy'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Variance of vertical windspeed, rotated to natural wind coordinates',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Variance of vertical windspeed, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'ww',ww,FList=['Ux','Uy','Uz','UzUz','UxUz','UyUz'],Attr=attr)
     if qcutils.cfkeycheck(cf,Base='General',ThisOne='RotateFlag') and cf['General']['RotateFlag'] == 'True':
         keys = ['eta','theta','u','v','w','wT','wA','wC','uw','vw','uu','vv','ww']
@@ -1508,27 +1508,27 @@ def ConvertFc(cf,ds,Fco2_in='Fc'):
         qcutils.CreateSeries(ds,'Fc_co2',Fc_co2,FList=[Fco2_in],Attr=attr)
     
     if 'Fc_c' in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='mgC/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='mgC/m2/s')
         qcutils.CreateSeries(ds,'Fc_c',Fc_c,FList=[Fco2_in],Attr=attr)
         ds.series['Fc_c']['Attr']['long_name'] = 'Fc_c (Flux of carbon), '+attr_hist
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='Fc_c (Flux of carbon), '+attr_hist,units='mgC/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Fc_c (Flux of carbon), '+attr_hist,units='mgC/m2/s')
         qcutils.CreateSeries(ds,'Fc_c',Fc_c,FList=[Fco2_in],Attr=attr)
     
     if 'NEE' in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='umol/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='umol/m2/s',standard_name='surface_upward_mole_flux_of_carbon_dioxide')
         qcutils.CreateSeries(ds,'NEE',NEE,FList=[Fco2_in],Attr=attr)
         ds.series['NEE']['Attr']['long_name'] = 'NEE (Net ecosystem exchange of carbon), '+attr_hist
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='NEE (Net ecosystem exchange of carbon), '+attr_hist,units='umol/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='NEE (Net ecosystem exchange of carbon), '+attr_hist,units='umol/m2/s',standard_name='surface_upward_mole_flux_of_carbon_dioxide')
         qcutils.CreateSeries(ds,'NEE',NEE,FList=[Fco2_in],Attr=attr)
     
     if 'NEP' in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='umol/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='umol/m2/s',standard_name='surface_downward_mole_flux_of_carbon_dioxide')
         qcutils.CreateSeries(ds,'NEP',NEP,FList=[Fco2_in],Attr=attr)
         ds.series['NEP']['Attr']['long_name'] = 'NEP (Net ecosystem photosynthesis), '+attr_hist
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='NEP (Net ecosystem photosynthesis), '+attr_hist,units='umol/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='NEP (Net ecosystem photosynthesis), '+attr_hist,units='umol/m2/s',standard_name='surface_downward_mole_flux_of_carbon_dioxide')
         qcutils.CreateSeries(ds,'NEP',NEP,FList=[Fco2_in],Attr=attr)
     
     if 'Fc' in ds.series.keys():
@@ -1572,11 +1572,11 @@ def ConvertFcJason(cf,ds,Fco2_in='Fc'):
         attr_hist = attr_hist + ', SOLO ANN gapfilled'
     
     if 'Fc' in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='umol/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='umol/m2/s')
         qcutils.CreateSeries(ds,'Fc',NEE,FList=[Fco2_in],Attr=attr)
         ds.series['Fc']['Attr']['long_name'] = 'Fc (Flux of carbon), '+attr_hist
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='Fc (Flux of carbon), '+attr_hist,units='umol/m2/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Fc (Flux of carbon), '+attr_hist,units='umol/m2/s')
         qcutils.CreateSeries(ds,'Fc',NEE,FList=[Fco2_in],Attr=attr)
 
 def CorrectFcForStorage(cf,ds,Fc_out='Fc',Fc_in='Fc',Fc_storage_in='Fc_storage'):
@@ -1713,9 +1713,9 @@ def CorrectFgForStorage(cf,ds,Fg_out='Fg',Fg_in='Fg',Ts_in='Ts',Sws_in='Sws',dTs
     Fg_o = Fg + S
     attr = qcutils.MakeAttributeDictionary(long_name='Soil heat flux corrected for storage',units='W/m2',standard_name='downward_heat_flux_in_soil')
     qcutils.CreateSeries(ds,Fg_out,Fg_o,FList=[Fg_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Soil heat flux storage',units='W/m2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Soil heat flux storage',units='W/m2')
     qcutils.CreateSeries(ds,'S',S,FList=[Fg_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Specific heat capacity',units='J/m3/K',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Specific heat capacity',units='J/m3/K')
     qcutils.CreateSeries(ds,'Cs',Cs,FList=[Fg_in],Attr=attr)
 
 def CorrectSWC(cf,ds):
@@ -1928,7 +1928,7 @@ def do_bulkRichardson(cf,ds):
         n = len(varw)
         sigmaw = numpy.zeros(n,dtype=numpy.float64)
         sigmaw[windex] = numpy.sqrt(varw[windex])
-        attr = qcutils.MakeAttributeDictionary(long_name='standard deviation of vertical windspeed',units='m^.5/s^.5',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='standard deviation of vertical windspeed',units='m^.5/s^.5')
         qcutils.CreateSeries(ds,'sigmaw',sigmaw,FList=['ww'],Attr=attr)
     
     # calculate layer values
@@ -1950,11 +1950,11 @@ def do_bulkRichardson(cf,ds):
         RiB[badUindex] = (9.8 * delta_Tvp[badUindex] * delta_z) / (Tvp_bar[badUindex] * (delta_U[badUindex] ** 2))
         RiB[Uindex] = numpy.float64(c.missing_value)
         RiB_flag = numpy.zeros(len(RiB),dtype=numpy.float64)
-        attr = qcutils.MakeAttributeDictionary(long_name='U_upper less U_lower',units='m/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='U_upper less U_lower',units='m/s')
         qcutils.CreateSeries(ds,IncludeHeightList[4],delta_U,FList=[IncludeHeightList[1],IncludeHeightList[2],IncludeHeightList[3],'Fc'],Attr=attr)
-        attr = qcutils.MakeAttributeDictionary(long_name='Tvp_upper less Tvp_lower',units='m/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Tvp_upper less Tvp_lower',units='m/s')
         qcutils.CreateSeries(ds,IncludeHeightList[5],delta_Tvp,FList=[IncludeHeightList[1],IncludeHeightList[2],IncludeHeightList[3],'Fc'],Attr=attr)
-        attr = qcutils.MakeAttributeDictionary(long_name='Bulk Richardson number',units='none',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Bulk Richardson number',units='none')
         qcutils.CreateSeries(ds,IncludeHeightList[6],RiB,FList=[IncludeHeightList[1],IncludeHeightList[2],IncludeHeightList[3],'Fc'],Attr=attr)
         ds.series[IncludeHeightList[6]]['Flag'][Uindex] = numpy.int32(171)
         flaglist = [IncludeHeightList[4],IncludeHeightList[5],IncludeHeightList[6]]
@@ -2041,7 +2041,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
         zeta[zetaindex] = zmd / L[zetaindex]
         zf = numpy.zeros(n,dtype=numpy.int32) + Lf
         zf[zetaflagindex] = numpy.int32(22) 
-        attr = qcutils.MakeAttributeDictionary(long_name='stability coefficient, (z-d)/L',units='unitless',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='stability coefficient, (z-d)/L',units='unitless')
         qcutils.CreateSeries(ds,'zeta',zeta,Flag=zf,Attr=attr)
     else:
         zeta,zf,zeta_attr = qcutils.GetSeriesasMA(ds,'zeta')
@@ -2049,9 +2049,9 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     #Lf[Lmask] = numpy.int(22)
     Lf[badw] = 9999
     Lf[badv] = 9999
-    attr = qcutils.MakeAttributeDictionary(long_name='standard deviation of vertical windspeed',units='m^.5/s^.5',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='standard deviation of vertical windspeed',units='m^.5/s^.5')
     qcutils.CreateSeries(ds,'sigmaw',sigmaw,FList=['ww'],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='standard deviation of crosswind speed (after rotation to natural wind coordinates)',units='m^.5/s^.5',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='standard deviation of crosswind speed (after rotation to natural wind coordinates)',units='m^.5/s^.5')
     qcutils.CreateSeries(ds,'sigmav',sigmav,FList=['vv'],Attr=attr)
     if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='AnalysisDates'):
         ldt = ds.series['DateTime']['Data']
@@ -2244,7 +2244,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
                 if labels[i] == 'fc_NegFc':
                     footprint_matrix_out(filenames[1][i],fc_x2d,fc_y2d,fc_c3_2d)
         
-    attr = qcutils.MakeAttributeDictionary(long_name='integrated footprint in the direction of the wind',units='m',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='integrated footprint in the direction of the wind',units='m')
     qcutils.CreateSeries(ds,'xr',xr,FList=['L','ww','vv','ustar'],Attr=attr)
     flag_index = numpy.ma.where((xr == 0) & (numpy.mod(ds.series['xr']['Flag'],10)==0))[0]
     ustar_index = numpy.ma.where(ustar < 0.2)[0]
@@ -2474,9 +2474,9 @@ def Fc_WPLcov(cf,ds,Fc_wpl_out='Fc',wC_out='wC',wC_in='wC',Fh_in='Fh',wA_in='wA'
     # unit check:  [mg/m2/s] + ([g/m3] / [kg/m3]) * [g/m2/s] + ([mg/m3] * [mC/s]) / K; [mg/m2/s] + [g2/kg/m2/s] + [mg/m2/s]
     # unit check:  [g2/kg/m2/s] * [kg/1000g]; [g/m2/s] * [1000mg/g]; [mg/m2/s]
     Fc_wpl_data = wC + (c.mu * (Ccg / rhod) * wA) + ((1 + (c.mu * sigma_wpl)) * (Cc / TaK) * wT)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='mg/m2/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='mg/m2/s')
     qcutils.CreateSeries(ds,Fc_wpl_out,Fc_wpl_data,FList=[wC_in,Fh_in,wA_in,Ta_in,Ah_in,Cc_in,ps_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='mg/m2/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='mg/m2/s')
     qcutils.CreateSeries(ds,wC_out,Fc_wpl_data,FList=[wC_in,Fh_in,wA_in,Ta_in,Ah_in,Cc_in,ps_in],Attr=attr)
     if qcutils.cfkeycheck(cf,Base='General',ThisOne='WPLFlag') and cf['General']['WPLFlag'] == 'True':
         keys = [Fc_wpl_out,wC_out]
@@ -2606,7 +2606,7 @@ def Fe_WPLcov(cf,ds,Fe_wpl_out='Fe',wA_in='wA',Fh_in='Fh',Ta_in='Ta',Ah_in='Ah',
     wAwpl = Fe_wpl_data / (Lv * c.g2kg)
     attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='W/m2',standard_name='surface_upward_latent_heat_flux')
     qcutils.CreateSeries(ds,Fe_wpl_out,Fe_wpl_data,FList=[wA_in,Fh_in,Ta_in,Ah_in,ps_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='g/(m2 s)',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='WPL',units='g/(m2 s)')
     qcutils.CreateSeries(ds,wA_out,wAwpl,FList=[wA_in,Fh_in,Ta_in,Ah_in,ps_in],Attr=attr)
     if qcutils.cfkeycheck(cf,Base='General',ThisOne='WPLFlag') and cf['General']['WPLFlag'] == 'True':
         keys = [Fe_wpl_out,wA_out]
@@ -2679,7 +2679,7 @@ def FhvtoFh(cf,ds,Ta_in='Ta',Fh_in='Fh',Tv_in='Tv_CSAT',Fe_in='Fe',ps_in='ps',Ah
     
     attr = qcutils.MakeAttributeDictionary(long_name='converted from virtual heat flux',units='W/m2',standard_name='surface_upward_sensible_heat_flux')
     qcutils.CreateSeries(ds,Fh_out,Fh_o,FList=[Ta_in, Fh_in, Tv_in, Fe_in, ps_in, Ah_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='converted from virtual heat flux',units='mC/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='converted from virtual heat flux',units='mC/s')
     qcutils.CreateSeries(ds,wT_out,wT,FList=[Ta_in, Fh_in, Tv_in, Fe_in, ps_in, Ah_in],Attr=attr)
     if qcutils.cfkeycheck(cf,Base='General',ThisOne='FhvtoFhFlag') and cf['General']['FhvtoFhFlag'] == 'True':
         for ThisOne in [Fh_out,wT_out]:
@@ -3191,11 +3191,11 @@ def get_canopyresistance(cf,ds,Uavg,uindex,PMin,Level,critFsd,critFe):
     gamma = mf.gamma(ps,Cpm,Lv)
     delta = mf.delta(Ta)
     if 'gamma' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Psychrometric coefficient',units='kPa/C',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Psychrometric coefficient',units='kPa/C')
         qcutils.CreateSeries(ds,'gamma',gamma,FList=[PMin[3],'Cpm','Lv'],Attr=attr)
     
     if 'delta' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Slope of the saturation vapour pressure v temperature curve',units='kPa/C',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Slope of the saturation vapour pressure v temperature curve',units='kPa/C')
         qcutils.CreateSeries(ds,'delta',delta,FList=[PMin[1]],Attr=attr)
     
     Feindex = numpy.ma.where(Fe < critFe)[0]
@@ -3208,19 +3208,19 @@ def get_canopyresistance(cf,ds,Uavg,uindex,PMin,Level,critFsd,critFe):
     rcindex = numpy.ma.where(rc < 0)[0]
     Gc = (1 / rc) * (Ah * 1000) / 18
     if 'ram' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance from drag coefficient, Allen/Jensen formulation, '+Level,units='s/m',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance from drag coefficient, Allen/Jensen formulation, '+Level,units='s/m')
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
     qcutils.CreateSeries(ds,'ram',ra,FList=flagList,Attr=attr)
     if 'rSm' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Canopy resistance from Penman-Monteith inversion, Allen/Jensen formulation, '+Level,units='s/m',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Canopy resistance from Penman-Monteith inversion, Allen/Jensen formulation, '+Level,units='s/m')
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
     qcutils.CreateSeries(ds,'rSm',rc,FList=flagList,Attr=attr)
     if 'GSm' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Canopy conductance from Penman-Monteith inversion, Allen/Jensen formulation, '+Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Canopy conductance from Penman-Monteith inversion, Allen/Jensen formulation, '+Level,units='mmolH2O/(m2ground s)')
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)')
     qcutils.CreateSeries(ds,'GSm',Gc,FList=flagList,Attr=attr)
     
     Label = ['ram','rSm','GSm']
@@ -3280,7 +3280,7 @@ def get_leafresistance(cf,ds,rinverted):
                         LAI_expanded[i] = LAI[z]
                         LAI_flag[i] = dsLAI.series['LAI']['Flag'][z]
         
-        attr = qcutils.MakeAttributeDictionary(long_name='Leaf area index, spline-fit interpolation from MODIS product',units='m2/m2',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Leaf area index, spline-fit interpolation from MODIS product',units='m2/m2')
         qcutils.CreateSeries(ds,'LAI',LAI_expanded,Flag=0,Attr=attr)
         ds.series['LAI']['Flag'] = LAI_flag
     else:
@@ -3454,11 +3454,11 @@ def get_rstGst(cf,ds,PMin,rav):
     gamma = mf.gamma(ps,Cpm,Lv)
     delta = mf.delta(Ta)
     if 'gamma' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Psychrometric coefficient',units='kPa/C',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Psychrometric coefficient',units='kPa/C')
         qcutils.CreateSeries(ds,'gamma',gamma,FList=[PMin[3],'Cpm','Lv'],Attr=attr)
     
     if 'delta' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='Slope of the saturation vapour pressure v temperature curve',units='kPa/C',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Slope of the saturation vapour pressure v temperature curve',units='kPa/C')
         qcutils.CreateSeries(ds,'delta',delta,FList=[PMin[1]],Attr=attr)
     
     rst = ((((((delta * (Fn - Fg) / (Lv)) + (rhom * Cpm * (VPD / ((Lv) * rav)))) / (Fe / (Lv))) - delta) / gamma) - 1) * rav
@@ -3574,8 +3574,7 @@ def get_synthetic_fsd(ds):
     Fsd_syn = numpy.ma.array(Fsd_syn)
     nRecs = len(Fsd_syn)
     flag = numpy.zeros(nRecs,dtype=numpy.int32)
-    attr = qcutils.MakeAttributeDictionary(long_name='Synthetic downwelling shortwave radiation',\
-                                           units='W/m2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Synthetic downwelling shortwave radiation',units='W/m2',standard_name='surface_downwelling_shortwave_flux_in_air')
     qcutils.CreateSeries(ds,"Fsd_syn",Fsd_syn,Flag=flag,Attr=attr)
 
 def InvertSign(ds,ThisOne):
@@ -3681,7 +3680,7 @@ def MassmanStandard(cf,ds,Ta_in='Ta',Ah_in='Ah',ps_in='ps',ustar_in='ustar',usta
     wA,f,a = qcutils.GetSeriesasMA(ds,wA_in)
     if ustar_in not in ds.series.keys():
         ustarm = numpy.ma.sqrt(numpy.ma.sqrt(uw ** 2 + vw ** 2))
-        attr = qcutils.MakeAttributeDictionary(long_name='Friction velocity: Raw uncorrected',units='m/s',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Friction velocity: Raw uncorrected',units='m/s')
         qcutils.CreateSeries(ds,ustar_in,ustarm,FList=[uw_in,vw_in],Attr=attr)
         ustarm,f,a = qcutils.GetSeriesasMA(ds,ustar_in)
         ustar_attr = ''
@@ -3690,7 +3689,7 @@ def MassmanStandard(cf,ds,Ta_in='Ta',Ah_in='Ah',ps_in='ps',ustar_in='ustar',usta
         ustar_attr = ''
     if L_in not in ds.series.keys():
         Lm = mf.molen(Ta, Ah, ps, ustarm, wT, fluxtype='kinematic')
-        attr = qcutils.MakeAttributeDictionary(long_name='Obukhov Length: Raw uncorrected',units='m',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='Obukhov Length: Raw uncorrected',units='m')
         qcutils.CreateSeries(ds,L_in,Lm,FList=[Ta_in,Ah_in,ps_in,ustar_in,wT_in],Attr=attr)
         Lm,Lflag,a = qcutils.GetSeriesasMA(ds,L_in)
         L_attr = ''
@@ -3706,10 +3705,10 @@ def MassmanStandard(cf,ds,Ta_in='Ta',Ah_in='Ah',ps_in='ps',ustar_in='ustar',usta
     newindex = numpy.where((zoLm==c.missing_value)&(numpy.mod(zetaflag,10)==0))[0]
     zetaflag[newindex] = numpy.int32(22)
     if 'zeta' not in ds.series.keys():
-        attr = qcutils.MakeAttributeDictionary(long_name='stability coefficient, (z-d)/L',units='unitless',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='stability coefficient, (z-d)/L',units='unitless')
         qcutils.CreateSeries(ds,'zeta',zoLm,Flag=zetaflag,Attr=attr)
     else:
-        attr = qcutils.MakeAttributeDictionary(long_name='',units='unitless',standard_name='not defined')
+        attr = qcutils.MakeAttributeDictionary(long_name='',units='unitless')
         qcutils.CreateSeries(ds,'zeta',zoLm,Flag=zetaflag,Attr=attr)
     # start calculating the correction coefficients for approximate corrections
     #  create nxMom, nxScalar and alpha series with their unstable values by default
@@ -3741,11 +3740,11 @@ def MassmanStandard(cf,ds,Ta_in='Ta',Ah_in='Ah',ps_in='ps',ustar_in='ustar',usta
     # these to calculate the final corrections
     #  first, get the 2nd pass corrected friction velocity and Monin-Obukhov length
     ustarm = numpy.ma.sqrt(numpy.ma.sqrt(uwm ** 2 + vwm ** 2))
-    attr = qcutils.MakeAttributeDictionary(long_name='',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='',units='m/s')
     qcutils.CreateSeries(ds,ustar_in,ustarm,FList=[uw_in,vw_in,ustar_in],Attr=attr)
     ustarm,f,a = qcutils.GetSeriesasMA(ds,ustar_in)
     Lm = mf.molen(Ta, Ah, ps, ustarm, wTm, fluxtype='kinematic')
-    attr = qcutils.MakeAttributeDictionary(long_name='',units='m',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='',units='m')
     qcutils.CreateSeries(ds,L_in,Lm,FList=[Ta_in,Ah_in,ps_in,ustar_in,wT_in],Attr=attr)
     Lm,Lflag,a = qcutils.GetSeriesasMA(ds,L_in)
     nxMom, nxScalar, alpha = qcutils.nxMom_nxScalar_alpha(zoLm)
@@ -3768,11 +3767,11 @@ def MassmanStandard(cf,ds,Ta_in='Ta',Ah_in='Ah',ps_in='ps',ustar_in='ustar',usta
     wCM = wC / rwIRGA
     wAM = wA / rwIRGA
     ustarM = numpy.ma.sqrt(numpy.ma.sqrt(uwM ** 2 + vwM ** 2))
-    attr = qcutils.MakeAttributeDictionary(long_name='',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='',units='m/s')
     qcutils.CreateSeries(ds,ustar_in,ustarM,FList=[uw_in,vw_in,ustar_in],Attr=attr)
     ustarM,f,a = qcutils.GetSeriesasMA(ds,ustar_in)
     LM = mf.molen(Ta, Ah, ps, ustarM, wTM, fluxtype='kinematic')
-    attr = qcutils.MakeAttributeDictionary(long_name='',units='m',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='',units='m')
     qcutils.CreateSeries(ds,L_in,LM,FList=[Ta_in,Ah_in,ps_in,ustar_in,wT_in],Attr=attr)
     LM,Lflag,a = qcutils.GetSeriesasMA(ds,L_in)
     zetaindex = numpy.where(LM != 0)[0]
@@ -3782,24 +3781,24 @@ def MassmanStandard(cf,ds,Ta_in='Ta',Ah_in='Ah',ps_in='ps',ustar_in='ustar',usta
     zetaflag = numpy.zeros(len(LM),dtype=numpy.int32) + Lflag
     newindex = numpy.where((zeta==c.missing_value)&(numpy.mod(zetaflag,10)==0))[0]
     zetaflag[newindex] = numpy.int32(22)
-    attr = qcutils.MakeAttributeDictionary(long_name='',units='unitless',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='',units='unitless')
     qcutils.CreateSeries(ds,'zeta',zeta,Flag=zetaflag,Attr=attr)
     # write the 2nd pass Massman corrected covariances to the data structure
-    attr = qcutils.MakeAttributeDictionary(long_name=ustar_attr,units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name=ustar_attr,units='m/s')
     qcutils.CreateSeries(ds,ustar_out,ustarM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name=L_attr+', rotated to natural wind coordinates, frequency response corrected',units='m',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name=L_attr+', rotated to natural wind coordinates, frequency response corrected',units='m')
     qcutils.CreateSeries(ds,L_out,LM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
     L_flagindex = numpy.where(numpy.mod(ds.series[L_out]['Flag'],10)!=0)[0]
     ds.series[L_out]['Data'][L_flagindex] = numpy.float64(c.missing_value)
-    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='m2/s2')
     qcutils.CreateSeries(ds,uw_out,uwM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='m2/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='m2/s2')
     qcutils.CreateSeries(ds,vw_out,vwM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='mC/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='mC/s')
     qcutils.CreateSeries(ds,wT_out,wTM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='g/m2/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='g/m2/s')
     qcutils.CreateSeries(ds,wA_out,wAM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='mg/m2/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='frequency response corrected',units='mg/m2/s')
     qcutils.CreateSeries(ds,wC_out,wCM,FList=[Ta_in,Ah_in,ps_in,u_in,uw_in,vw_in,wT_in,wC_in,wA_in],Attr=attr)
     # *** Massman_2ndpass ends here ***
     
@@ -3941,24 +3940,24 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
         rst, rstindex, Gst, Gstindex = get_rstGst(cf,ds,PMin,rav)
         flagList = [PMin[0],PMin[1],PMin[2],PMin[3],PMin[4],PMin[5],PMin[6],PMin[7],qList[0],qList[1]]
         if outList[0] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[0],Ce,FList=flagList,Attr=attr)
         if outList[1] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[1],rav,FList=flagList,Attr=attr)
         if outList[2] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[2],rst,FList=flagList,Attr=attr)
         if outList[3] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+Level,units='mmolH2O/(m2ground s)')
         qcutils.CreateSeries(ds,outList[3],Gst,FList=flagList,Attr=attr)
         for listindex in range(0,4):
             ds.series[outList[listindex]]['Attr']['InputSeries'] = PMin
@@ -3978,9 +3977,9 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
         if qcutils.cfkeycheck(cf,Base='PenmanMonteith',ThisOne='rlvCe') and cf['PenmanMonteith']['rlvCe'] == 'True':
             rlv, flag = get_leafresistance(cf,ds,outList[2])
             if 'rLv_1layer' in ds.series.keys():
-                attr = qcutils.MakeAttributeDictionary(long_name='',units='s/m',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='',units='s/m')
             else:
-                attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, Ce-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, Ce-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m')
             qcutils.CreateSeries(ds,'rLv_1layer',rlv,Flag=0,Attr=attr)
             ds.series['rLv_1layer']['Flag'] = flag
     
@@ -4036,79 +4035,79 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
         rst_full, rstindex_full, Gst_full, Gstindex_full = get_rstGst(cf,ds,PMin,rav_full)
         rst, rstindex, Gst, Gstindex = get_rstGst(cf,ds,PMin,rav)
         if outList[0] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+'base layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+'base layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[0],Ce_base,FList=flagListBase,Attr=attr)
         if outList[1] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+'base layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+'base layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[1],rav_base,FList=flagListBase,Attr=attr)
         if outList[2] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+'base layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+'base layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[2],rst_base,FList=flagListBase,Attr=attr)
         if outList[3] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+'base layer, '+Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+'base layer, '+Level,units='mmolH2O/(m2ground s)')
         qcutils.CreateSeries(ds,outList[3],Gst_base,FList=flagListBase,Attr=attr)
         if outList[4] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+'top layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+'top layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[4],Ce_top,FList=flagListTop,Attr=attr)
         if outList[5] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+'top layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+'top layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[5],rav_top,FList=flagListTop,Attr=attr)
         if outList[6] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+'top layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+'top layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[6],rst_top,FList=flagListTop,Attr=attr)
         if outList[7] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+'top layer, '+Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+'top layer, '+Level,units='mmolH2O/(m2ground s)')
         qcutils.CreateSeries(ds,outList[7],Gst_top,FList=flagListTop,Attr=attr)
         if outList[8] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+'full layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Bulk transfer coefficient, '+attribute+'full layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[8],Ce_full,FList=flagListFull,Attr=attr)
         if outList[9] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+'full layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+'full layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[9],rav_full,FList=flagListFull,Attr=attr)
         if outList[10] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+'full layer, '+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+'full layer, '+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[10],rst_full,FList=flagListFull,Attr=attr)
         if outList[11] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+'full layer, '+Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+'full layer, '+Level,units='mmolH2O/(m2ground s)')
         qcutils.CreateSeries(ds,outList[11],Gst_full,FList=flagListFull,Attr=attr)
         if outList[12] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Stomatal resistance from Penman-Monteith inversion, '+attribute+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[12],rst,FList=flagList,Attr=attr)
         if outList[13] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='mmolH2O/(m2ground s)')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+Level,units='mmolH2O/(m2ground s)',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Conductance from Penman-Monteith inversion, '+attribute+Level,units='mmolH2O/(m2ground s)')
         qcutils.CreateSeries(ds,outList[13],Gst,FList=flagList,Attr=attr)
         if outList[14] in ds.series.keys():
-            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name=Level,units='s/m')
         else:
-            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+Level,units='s/m',standard_name='not defined')
+            attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance, '+attribute+Level,units='s/m')
         qcutils.CreateSeries(ds,outList[14],rav,FList=flagList,Attr=attr)
         for listindex in range(0,15):
             ds.series[outList[listindex]]['Attr']['InputSeries'] = PMin
@@ -4201,9 +4200,9 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
         if qcutils.cfkeycheck(cf,Base='PenmanMonteith',ThisOne='rlv2layer') and cf['PenmanMonteith']['rlv2layer'] == 'True':
             rlv, flag = get_leafresistance(cf,ds,outList[12])
             if 'rLv_2layer' in ds.series.keys():
-                attr = qcutils.MakeAttributeDictionary(long_name='',units='s/m',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='',units='s/m')
             else:
-                attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, 2layer Ce-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, 2layer Ce-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m')
             qcutils.CreateSeries(ds,'rLv_2layer',rlv,Flag=0,Attr=attr)
             ds.series['rLv_2layer']['Flag'] = flag
     
@@ -4215,9 +4214,9 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
         if qcutils.cfkeycheck(cf,Base='PenmanMonteith',ThisOne='rlm') and cf['PenmanMonteith']['rlm'] == 'True':
             rlm, flag = get_leafresistance(cf,ds,'rSm')
             if 'rLm' in ds.series.keys():
-                attr = qcutils.MakeAttributeDictionary(long_name='',units='s/m',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='',units='s/m')
             else:
-                attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, Cd-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m',standard_name='not defined')
+                attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, Cd-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m')
             qcutils.CreateSeries(ds,'rLm',rlm,Flag=0,Attr=attr)
             ds.series['rLm']['Flag'] = flag
     
@@ -4228,7 +4227,7 @@ def PT100(ds,T_out,R_in,m):
     R,f,a = qcutils.GetSeriesasMA(ds,R_in)
     R = m*R
     T = (-c.PT100_alpha+numpy.sqrt(c.PT100_alpha**2-4*c.PT100_beta*(-R/100+1)))/(2*c.PT100_beta)
-    attr = qcutils.MakeAttributeDictionary(long_name='Calculated PT100 temperature using '+str(R_in),units='degC',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Calculated PT100 temperature using '+str(R_in),units='degC')
     qcutils.CreateSeries(ds,T_out,T,FList=[R_in],Attr=attr)
 
 def ReplaceOnDiff(cf,ds,series=''):
@@ -4450,16 +4449,16 @@ def UstarFromFh(cf,ds,us_out='ustar', L_out='L', Fm_out='Fm', T_in='Ta', Ah_in='
         #else:
     us[badindex] = numpy.float64(c.missing_value)
     us_flag[badindex] = numpy.int32(81)
-    attr = qcutils.MakeAttributeDictionary(long_name='ustar from (Fh,Ta,Ah,p,u)',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='ustar from (Fh,Ta,Ah,p,u)',units='m/s')
     qcutils.CreateSeries(ds,'uscalc',us,Flag=us_flag,Attr=attr)
     MergeSeries(cf,ds,us_out,[0,10,20,30,40,50,60,70,80,90,100,110,120,130,140,150,160,170,180])
     us_filled,us_filled_flag,us_filled_attr = qcutils.GetSeriesasMA(ds,us_out)
     Fm = numpy.square(us_filled) * rhom
-    attr = qcutils.MakeAttributeDictionary(long_name='Fm from gapfilled ustar',units='kg/m/s2',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='Fm from gapfilled ustar',units='kg/m/s2')
     qcutils.CreateSeries(ds,Fm_out,Fm,FList=['rhom',us_out],Attr=attr)
     i = numpy.where((abs(ds.series[T_in]['Data']-numpy.float64(c.missing_value))>c.eps)&(abs(ds.series[Ah_in]['Data']-numpy.float64(c.missing_value))>c.eps)&(abs(ds.series[p_in]['Data']-numpy.float64(c.missing_value))>c.eps)&(abs(ds.series[Fh_in]['Data']-numpy.float64(c.missing_value))>c.eps)&(abs(ds.series[u_in]['Data']-numpy.float64(c.missing_value))>c.eps))
     L[i] = mf.molen(T[i], Ah[i], p[i], ds.series[us_out]['Data'][i], Fh[i], fluxtype='sensible')
-    attr = qcutils.MakeAttributeDictionary(long_name='',units='m',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='',units='m')
     qcutils.CreateSeries(ds,L_in,L,FList=[T_in,Ah_in,p_in,us_out,Fh_in],Attr=attr)
     L,Lflag,a = qcutils.GetSeriesasMA(ds,L_in)
     zetaindex = numpy.where(L != 0)[0]
@@ -4468,9 +4467,9 @@ def UstarFromFh(cf,ds,us_out='ustar', L_out='L', Fm_out='Fm', T_in='Ta', Ah_in='
     zeta[zetaindex] = zmd / L[zetaindex]
     zf = numpy.zeros(nRecs,dtype=numpy.int32) + Lflag
     zf[zetaflagindex] = numpy.int32(22)
-    attr = qcutils.MakeAttributeDictionary(long_name='L from gapfilled ustar',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='L from gapfilled ustar',units='m/s')
     qcutils.CreateSeries(ds,L_out,L,FList=[T_in,Ah_in,p_in,Fh_in,us_out],Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='zeta from gapfilled L',units='m/s',standard_name='not defined')
+    attr = qcutils.MakeAttributeDictionary(long_name='zeta from gapfilled L',units='m/s')
     qcutils.CreateSeries(ds,'zeta',zeta,Flag=zf,Attr=attr)
     #return us_in, us_out
     return

@@ -18,16 +18,16 @@
     license_type = "TERN-BY-SA_NC"
     license_url = "http://www.tern.org.au/datalicence/TERN-BY-SA-NC/1.0"
     canopy_height = "6.5m"
-    comment = "CF convention version, updated and audited 28-30 Oct 2013"
     comment02 = "Re-analysis 31 July 2013:  Cross-sensor sigma-v re-defined to crosswind sigma-v.  Correction to crosswind footprint distribution and rotation of covariances contributing to momentum transfer."
     comment04 = "27 Aug 2013:  Penman-Monteith inversion variables consistent with reference3"
     comment05 = "Re-analysis 26 Sep 2013:  Units error in WPL corrected.  Error resulted in < 1% bias error in Fc and < 0.5% in Fe"
     comment06 = "Re-analysis 28 Oct 2013:  Correction of error in computation of rhod (error:  computing total density of air, not partial density of the dry component)"
     comment07 = "30 Oct 2013:  Carbon flux outputs converted at L3 and L4:  Fc [mgC m-2 s-1], Fco2 [mgCO2 m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
     comment10 = "1 Jan 2014:  Units for Fc and Fco2 corrected"
-    comment11 = "17 July 2014:  Carbon flux outputs converted at L3 and L4:  Fc [mgCO2 m-2 s-1], Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE    conventions = "CF-1.6"
+    comment11 = "17 July 2014:  Carbon flux outputs converted at L3 and L4:  Fc [mgCO2 m-2 s-1], Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
+    conventions = "CF-1.6"
+    conventions_names = "CF convention standard names table version 27, 28 Nov 2013, audited 4 Jan 2015"
     data_url = "http://data.ozflux.org.au"
-    history = "OzFluxQC Simulator v.2.8.5, http://code.google.com/p/ozflux-qc/source/browse/#svn%2FOzFluxQC_Simulator_v2.8.5"
     institution = "University of Technology Sydney"
     latitude = -22.283
     longitude = 133.249
@@ -56,6 +56,8 @@
     vegetation2 = "C3 understorey forbs and shrubs:  Psydrax latifolia, Eremophila gilesii, E. latrobei ssp glabra (Crimson turkey bush), Sida and Abutilon spp, and Solanum ellipticum (Potato bush)"
     vegetation3 = "C3 understorey grass:  perennial Thyridolepsis mitchelliana (Window mulga-grass)"
     vegetation4 = "C4 understorey grasses:  perennial Eragrostis eriopoda (Naked woolybutt) and annual Eriachne pulchella ssp pulchella (Pretty wanderrie)"
+    version = "OzFluxQC Simulator v.2.8.6, https://github.com/james-cleverly/OzFluxQC_Simulator"
+    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.5, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13686"
 
 [Output]
     DefaultXl = False
@@ -301,7 +303,7 @@
             ancillary_variables = "Ah_7500_Av QC flag"
             long_name = "Absolute humidity (7500)"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[Ah_HMP]]
         [[[xl]]]
             sheet    = slow_core
@@ -310,7 +312,7 @@
             ancillary_variables = "Ah_HMP QC flag"
             long_name = "Absolute humidity (HMP) at 11.67 m height"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[Ah_200cm]]
         [[[xl]]]
             sheet    = slow_core
@@ -319,7 +321,7 @@
             ancillary_variables = "Ah_200cm QC flag"
             long_name = "Absolute humidity (HMP) at 2m"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[Ah_425cm]]
         [[[xl]]]
             sheet    = slow_core
@@ -328,7 +330,7 @@
             ancillary_variables = "Ah_425cm QC flag"
             long_name = "Absolute humidity (HMP) at 4.25m"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[Ah_657cm]]
         [[[xl]]]
             sheet    = slow_core
@@ -337,7 +339,7 @@
             ancillary_variables = "Ah_657cm QC flag"
             long_name = "Absolute humidity (HMP) at 6.57m"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[Tv_CSAT]]
         [[[xl]]]
             sheet    = slow_core
@@ -346,7 +348,7 @@
             ancillary_variables = "Tv_CSAT QC flag"
             long_name = "Virtual air temperature (CSAT)"
             units    = "C"
-            standard_name = "air_potential_temperature"
+            standard_name = "virtual_temperature"
     [[Ta_HMP]]
         [[[xl]]]
             sheet    = slow_core
@@ -814,7 +816,7 @@
             ancillary_variables = "H_ppt QC flag"
             long_name = "H2O molar concentration (ppt)"
             units    = "mmol/mol"
-            standard_name = "not defined"
+            standard_name = "mole_concentration_of_water_vapor_in_air"
     [[esat]]
         [[[xl]]]
             sheet    = slow_core
