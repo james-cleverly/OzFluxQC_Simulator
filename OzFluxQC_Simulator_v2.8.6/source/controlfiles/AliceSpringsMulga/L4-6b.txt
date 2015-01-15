@@ -45,7 +45,7 @@
         flag_file_path = ../AliceSpringsMulga/level5/flagstats/
     [[L6]]
         xlSumFilePath = ../AliceSpringsMulga/level6_summaries/
-        xlSumFileName = ASM_EC_2013_dailysums.xls
+        xlSumFileName = ASM_EC_2013_Daily.xls
         in_file_path = ncData/ASM/
         in_filename = ASM_EC_2013_L6int.nc
         out_file_path = ncData/ASM/

@@ -59,7 +59,7 @@
     vegetation3 = "C3 understorey grass:  perennial Thyridolepsis mitchelliana (Window mulga-grass)"
     vegetation4 = "C4 understorey grasses:  perennial Eragrostis eriopoda (Naked woolybutt) and annual Eriachne pulchella ssp pulchella (Pretty wanderrie)"
     version = "OzFluxQC Simulator v.2.8.6, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.5, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13686"
+    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.6, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13730"
 
 [Output]
     DefaultXl = False
@@ -100,7 +100,7 @@
             ancillary_variables = "Fc_co2 QC flag"
             long_name = "Fc_co2 (Flux of carbon dioxide), Flux of carbon, Raw uncorrected, rotated to natural wind coordinates, frequency response corrected, WPL, SOLO ANN gapfilled"
             units    = "mg/(m2 s)"
-            standard_name = "surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources"
+            standard_name = "not defined"
     [[Fe]]
         [[[xl]]]
             sheet    = Data
@@ -137,7 +137,7 @@
             long_name = "Net radiation"
             units    = "W/m2"
             instrument = "Kipp and Zonen CNR1"
-            standard_name = "not defined"
+            standard_name = "surface_net_downwawrd_radiative_flux"
     [[Fa]]
         [[[xl]]]
             sheet    = Data
@@ -807,7 +807,7 @@
             ancillary_variables = "Ah QC flag"
             long_name = "Absolute humidity (HMP)"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[q]]
         [[[xl]]]
             sheet    = Data
@@ -924,7 +924,7 @@
             ancillary_variables = "Ah_200cm QC flag"
             long_name = "Absolute humidity (HMP) at 2m"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[e_200cm]]
         [[[xl]]]
             sheet    = Data
@@ -969,7 +969,7 @@
             ancillary_variables = "Ah_425cm QC flag"
             long_name = "Absolute humidity (HMP) at 4.25m"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[e_425cm]]
         [[[xl]]]
             sheet    = Data
@@ -1014,7 +1014,7 @@
             ancillary_variables = "Ah_657cm QC flag"
             long_name = "Absolute humidity (HMP) at 6.57m"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[e_657cm]]
         [[[xl]]]
             sheet    = Data
@@ -1113,7 +1113,7 @@
             ancillary_variables = "Ah_7500_Av QC flag"
             long_name = "Absolute humidity (7500)"
             units    = "g/m3"
-            standard_name = "not defined"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
     [[H_ppt]]
         [[[xl]]]
             sheet    = Data
@@ -1302,7 +1302,7 @@
             ancillary_variables = "GPP QC flag"
             long_name = "Gross primary production, determined as Re - Fc (day)"
             units    = "umol/(m2 s)"
-            standard_name = "gross_primary_productivity_of_carbon"
+            standard_name = "not defined"
     [[Ta_1147cm]]
         [[[xl]]]
             sheet    = Data

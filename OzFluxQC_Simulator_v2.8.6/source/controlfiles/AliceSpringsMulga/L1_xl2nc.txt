@@ -57,7 +57,7 @@
     vegetation3 = "C3 understorey grass:  perennial Thyridolepsis mitchelliana (Window mulga-grass)"
     vegetation4 = "C4 understorey grasses:  perennial Eragrostis eriopoda (Naked woolybutt) and annual Eriachne pulchella ssp pulchella (Pretty wanderrie)"
     version = "OzFluxQC Simulator v.2.8.6, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.5, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13686"
+    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.6, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13730"
 
 [Output]
     DefaultXl = False
@@ -82,7 +82,7 @@
             long_name = "Net radiation"
             units    = "W/m2"
             instrument = "Kipp and Zonen CNR1"
-            standard_name = "not defined"
+            standard_name = "surface_net_downwawrd_radiative_flux"
     [[Flu]]
         [[[xl]]]
             sheet    = slow_core
@@ -131,7 +131,7 @@
             ancillary_variables = "Fc QC flag"
             long_name = "Flux of carbon, Raw uncorrected"
             units    = "mg/(m2 s)"
-            standard_name = "surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources"
+            standard_name = "not defined"
     [[Fe]]
         [[[xl]]]
             sheet    = slow_core

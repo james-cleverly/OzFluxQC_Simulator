@@ -4525,7 +4525,11 @@ def write_sums(cf,ds,ThisOne,xlCol,xlSheet,DoSum='False',DoMinMax='False',DoMean
         xlSheet.write(xlRow,xlCol,ThisOne+'_neg')
         xlSheet.write(xlRow-1,xlCol,Units)
     
-    data = numpy.ma.masked_where(abs(ds.series[ThisOne]['Data']-numpy.float64(c.missing_value))<c.eps,ds.series[ThisOne]['Data'])
+    data,f,a = qcutils.GetSeriesasMA(ds,ThisOne)
+    #data0,f,a = qcutils.GetSeriesasMA(ds,ThisOne)
+    #data = numpy.zeros(len(data0), dtype=numpy.float64) + data0
+    #data = numpy.ma.masked_where(abs(ds.series[ThisOne]['Data']-numpy.float64(c.missing_value))<c.eps,ds.series[ThisOne]['Data'])
+    #data.dtype = numpy.float64
     for month in range(M1st,M2nd+1):
         if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12:
             dRan = 31
@@ -4559,7 +4563,7 @@ def write_sums(cf,ds,ThisOne,xlCol,xlSheet,DoSum='False',DoMinMax='False',DoMean
                 for i in range(nRecs):
                     index = di[i]
                     check[i] = ds.series['Day']['Data'][index]
-                if len(check) < 48:
+                if len(check) < 47:
                     di = []
             
             if DoSoil == 'True':
