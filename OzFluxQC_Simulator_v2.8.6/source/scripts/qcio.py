@@ -448,10 +448,8 @@ def get_controlfilename(path=''):
 
 def get_ncdtype(Series):
     sd = Series.dtype.name
-    dt = 'f'
-    if sd=='float64': dt = 'd'
-    if sd=='int32': dt = 'i'
-    if sd=='int64': dt = 'l'
+    dt = 'f8'
+    if sd=='int32' or sd== 'int64': dt = 'i4'
     return dt
 
 def get_filename_dialog(path='.',title='Choose a file'):
@@ -787,13 +785,7 @@ def nc_read_var(ncFile,ThisOne):
         raise Exception(msg)
     if nDims==1:
         # single dimension
-        data0 = ncFile.variables[ThisOne][:]
-        if type(data0[0]) == 'float32':
-            data = numpy.zeros(len(data0),dtype=numpy.float64) + data0
-        elif type(data0[0]) == 'int' or type(data0[0]) == 'int16':
-            data = numpy.zeros(len(data0),dtype=numpy.int32) + data0
-        else:
-            data = numpy.zeros(len(data0)) + data0
+        data = ncFile.variables[ThisOne][:]
         # netCDF4 returns a masked array if the "missing_variable" attribute has been set
         # for the variable, here we trap this and force the array in ds.series to be ndarray
         if numpy.ma.isMA(data): data,dummy = qcutils.MAtoSeries(data)
@@ -807,13 +799,7 @@ def nc_read_var(ncFile,ThisOne):
             flag = numpy.zeros(nRecs,dtype=numpy.int32)
     elif nDims==3:
         # 3 dimensions
-        data0 = ncFile.variables[ThisOne][:,0,0]
-        if type(data0[0]) == 'float32':
-            data = numpy.zeros(len(data0),dtype=numpy.float64) + data0
-        elif type(data0[0]) == 'int' or type(data0[0]) == 'int16':
-            data = numpy.zeros(len(data0),dtype=numpy.int32) + data0
-        else:
-            data = numpy.zeros(len(data0)) + data0
+        data = ncFile.variables[ThisOne][:,0,0]
         # netCDF4 returns a masked array if the "missing_variable" attribute has been set
         # for the variable, here we trap this and force the array in ds.series to be ndarray
         if numpy.ma.isMA(data): data,dummy = qcutils.MAtoSeries(data)

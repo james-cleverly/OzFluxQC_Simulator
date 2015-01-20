@@ -65,7 +65,7 @@ def get_ticks(start, end):
     return loc,fmt
 
 def get_yarray(ds,ThisOne,si=0,ei=-1):
-    yarray = numpy.ma.masked_where(abs(ds.series[ThisOne]['Data'][si:ei]-numpy.float64(c.missing_value))<c.eps,
+    yarray = numpy.ma.masked_where(abs(ds.series[ThisOne]['Data'][si:ei]-c.missing_value)<c.eps,
                                         ds.series[ThisOne]['Data'][si:ei])
     nRecs = numpy.ma.size(yarray)
     nNotM = numpy.ma.count(yarray)
