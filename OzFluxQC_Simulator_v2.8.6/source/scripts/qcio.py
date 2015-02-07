@@ -1124,6 +1124,8 @@ def xl_write_series(ds, xlfullname, outputlist=None):
     # open the Excel file
     log.info(' Opening and writing Excel file '+xlfullname)
     xlfile = xlwt.Workbook(encoding="latin-1")
+    # set the datemode
+    xlfile.dates_1904 = numpy.int32(ds.globalattributes['xl_datemode'])
     # add sheets to the Excel file
     xlAttrSheet = xlfile.add_sheet('Attr')
     xlDataSheet = xlfile.add_sheet('Data')
@@ -1174,9 +1176,9 @@ def xl_write_series(ds, xlfullname, outputlist=None):
             xlAttrSheet.write(xlrow,xlcol_attrvalue,str(ds.series[ThisOne]['Attr'][Attr]))
             xlrow = xlrow + 1
     # write the Excel date/time to the data and the QC flags as the first column
-    datemode = numpy.int32(ds.globalattributes['xl_datemode'])
-    if datemode==1: xlfile.dates_1904 = True
     ldt = ds.series["DateTime"]["Data"]
+    # get the datemode of the original spreadsheet
+    datemode = numpy.int32(ds.globalattributes['xl_datemode'])
     xlDateTime = qcutils.get_xldate_from_datetime(ldt,datemode=datemode)
     log.info(' Writing the datetime to Excel file '+xlfullname)
     d_xf = xlwt.easyxf(num_format_str='dd/mm/yyyy hh:mm')
@@ -1245,6 +1247,8 @@ def xl_write_series_unsorted(ds, xlfullname, outputlist=None):
     # open the Excel file
     log.info(' Opening and writing Excel file '+xlfullname)
     xlfile = xlwt.Workbook(encoding="latin-1")
+    # set the datemode
+    xlfile.dates_1904 = numpy.int32(ds.globalattributes['xl_datemode'])
     # add sheets to the Excel file
     xlDataSheet = xlfile.add_sheet('Data')
     xlFlagSheet = xlfile.add_sheet('Flag')
@@ -1260,9 +1264,9 @@ def xl_write_series_unsorted(ds, xlfullname, outputlist=None):
         if len(outputlist)==0:
             outputlist = variablelist
     # write the xl date/time value to the first column of the worksheets
-    datemode = numpy.int32(ds.globalattributes['xl_datemode'])
-    if datemode==1: xlfile.dates_1904 = True
     ldt = ds.series["DateTime"]["Data"]
+    # get the datemode of the original spreadsheet
+    datemode = numpy.int32(ds.globalattributes['xl_datemode'])
     xlDateTime = qcutils.get_xldate_from_datetime(ldt,datemode=datemode)
     log.info(' Writing the datetime to Excel file '+xlfullname)
     d_xf = xlwt.easyxf(num_format_str='dd/mm/yyyy hh:mm')

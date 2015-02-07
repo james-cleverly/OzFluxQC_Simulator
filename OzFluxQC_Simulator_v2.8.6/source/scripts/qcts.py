@@ -290,19 +290,26 @@ def BypassTcorr(cf,ds):
                 attr = qcutils.MakeAttributeDictionary(long_name=ds.series[ThisOne]['Attr']['long_name'],units='frac',standard_name='soil_moisture_content')
                 qcutils.CreateSeries(ds,ThisOne,Sws_bypass,FList=[ThisOne],Attr=attr)
 
-def CalculateAhHMP(cf,ds,e_name='e',Ta_name='Ta_HMP',Ah_name='Ah_HMP'):
+def CalculateAhHMP(cf,ds,e_name='e',Ta_name='Ta',Ah_name='Ah',RH_name='RH'):
     """
         Calculate the absolute humidity from vapour pressure and temperature.
         
         """
-    log.info(' Calculating Ah from vapour pressure and air temperature')
+    log.info('  Calculating Ah from vapour pressure and air temperature')
     if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='AhVars'):
         vars = ast.literal_eval(cf['FunctionArgs']['AhVars'])
         e_name = vars[0]
         Ta_name = vars[1]
         Ah_name = vars[2]
     Ta,f,a = qcutils.GetSeriesasMA(ds,Ta_name)
-    e,f,a = qcutils.GetSeriesasMA(ds,e_name)
+    RH,f,a = qcutils.GetSeriesasMA(ds,RH_name)
+    if e_name in ds.series.keys():
+        e,f,a = qcutils.GetSeriesasMA(ds,e_name)
+    else:
+        e = mf.efromrh(RH,Ta)
+        attr = qcutils.MakeAttributeDictionary(long_name='Vapour pressure',units='kPa',standard_name='water_vapor_partial_pressure_in_air')
+        qcutils.CreateSeries(ds,e_name,e,FList=[Ta_name,RH_name],Attr=attr)
+    
     Ah = mf.absolutehumidity(Ta,e)
     attr = qcutils.MakeAttributeDictionary(long_name='Absolute humidity (HMP)',units='g/m3',standard_name='mass_concentration_of_water_vapor_in_air')
     qcutils.CreateSeries(ds,Ah_name,Ah,FList=[Ta_name,e_name],Attr=attr)

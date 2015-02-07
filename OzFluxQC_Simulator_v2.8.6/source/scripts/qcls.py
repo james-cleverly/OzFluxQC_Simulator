@@ -460,8 +460,18 @@ def l4qc(cf,ds3,InLevel,x):
             ds4.globalattributes['L4Functions'] = cf['Functions']['L4_keys']
         x=x+1
     
+    # determine HMP Ah if not output by datalogger
+    if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='CalculateAh') and cf['Functions']['CalculateAh'] == 'True':
+        try:
+            ds4.globalattributes['L4Functions'] = ds4.globalattributes['L4Functions']+', CalculateAh'
+        except:
+            ds4.globalattributes['L4Functions'] = 'CalculateAh'
+        
+        log.info(' Adding HMP Ah to database')
+        qcts.CalculateAhHMP(cf,ds4)
+    
     # add relevant meteorological values to L4 data
-    if InLevel != 'L3':
+    if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='CalculateMetVars') and cf['Functions']['CalculateMetVars'] == 'True':
         try:
             ds4.globalattributes['L4Functions'] = ds4.globalattributes['L4Functions']+', CalculateMetVars'
         except:
@@ -539,6 +549,9 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
             qcts.ReplaceWhereMissing (Ustar)
             qcck.do_qcchecks
         """
+    if AttrLevel == 'False':
+        ds3.globalattributes['Functions'] = ''
+        AttrLevel = InLevel
     # check to ensure L4 functions are defined in controlfile
     if qcutils.cfkeycheck(cf,Base='Functions'):
         x=0
@@ -616,12 +629,17 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
-    ds4,x = l4qc(cf,ds4x,InLevel,x)
-    qcutils.get_coverage_individual(ds4)
-    qcutils.get_coverage_groups(ds4)
-    qcio.get_seriesstats(cf,ds4)
+    if InLevel == 'L4' or InLevel == 'L3':
+        ds4,x = l4qc(cf,ds4x,InLevel,x)
+        qcutils.get_coverage_individual(ds4)
+        qcutils.get_coverage_groups(ds4)
+        if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='FlagStats') and cf['Functions']['FlagStats'] == 'True':
+            qcio.get_seriesstats(cf,ds4)
     if OutLevel == 'L5' or OutLevel == 'L6':
-        ds4y = copy.deepcopy(ds4)
+        try:
+            ds4y = copy.deepcopy(ds4)
+        except:
+            ds4y = copy.deepcopy(ds4x)
         for ThisOne in ['NEE','NEP','Fc','Fc_c','Fc_co2','Fc_c','Fe','Fh']:
             var, var_flag, var_attr = qcutils.GetSeriesasMA(ds3x,ThisOne)
             qcutils.CreateSeries(ds4y,ThisOne,var,Flag=var_flag,Attr=var_attr)
@@ -629,7 +647,8 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         ds5,y = l5qc(cf,ds4y,y)
         qcutils.get_coverage_individual(ds5)
         qcutils.get_coverage_groups(ds5)
-        qcio.get_seriesstats(cf,ds5)
+        if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='FlagStats') and cf['Functions']['FlagStats'] == 'True':
+            qcio.get_seriesstats(cf,ds5)
     if OutLevel == 'L6':
         ds5z = copy.deepcopy(ds5)
         for ThisOne in ['GPP','Re']:
@@ -638,7 +657,8 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         ds6,z = l6qc(cf,ds5z,z)
         qcutils.get_coverage_individual(ds6)
         qcutils.get_coverage_groups(ds6)
-        qcio.get_seriesstats(cf,ds6)
+        if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='FlagStats') and cf['Functions']['FlagStats'] == 'True':
+            qcio.get_seriesstats(cf,ds6)
     
     # calculate daily statistics
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='Sums'):
@@ -699,7 +719,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
             
             qcts.do_climatology(cf,ds4)
         
-    if OutLevel == 'L4':
+    if OutLevel == 'L4' and (InLevel == 'L3' or InLevel == 'L4'):
         if x == 0:
             ds4.globalattributes['Functions'] = ds4.globalattributes['Functions'] + ', No further L4 gapfilling'
             try:
@@ -711,18 +731,18 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         return ds4
     elif OutLevel == 'L5':
         if x == 0:
-            ds4.globalattributes['Functions'] = ds4.globalattributes['Functions'] + ', No further L4 gapfilling'
+            if InLevel == 'L3' or InLevel == 'L4':
+                ds4.globalattributes['Functions'] = ds4.globalattributes['Functions'] + ', No further L4 gapfilling'
+                try:
+                    ds4.globalattributes['L4Functions'] = ds4.globalattributes['L4Functions'] + ', No further L4 gapfilling'
+                except:
+                    ds4.globalattributes['L4Functions'] = 'No further L4 gapfilling'
+                log.warn('  L4:  no record of gapfilling functions')
             ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', No further L4 gapfilling'
-            try:
-                ds4.globalattributes['L4Functions'] = ds4.globalattributes['L4Functions'] + ', No further L4 gapfilling'
-            except:
-                ds4.globalattributes['L4Functions'] = 'No further L4 gapfilling'
             try:
                 ds5.globalattributes['L4Functions'] = ds5.globalattributes['L4Functions'] + ', No further L4 gapfilling'
             except:
                 ds5.globalattributes['L4Functions'] = 'No further L4 gapfilling'
-            
-            log.warn('  L4:  no record of gapfilling functions')
         if y == 0:
             ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', No further L5 gapfilling'
             try:
@@ -731,48 +751,58 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
                 ds5.globalattributes['L5Functions'] = 'No further L5 gapfilling'
             
             log.warn('  L5:  no record of gapfilling functions')
-        return ds4,ds5
+        if InLevel == 'L3' or InLevel == 'L4':
+            return ds4,ds5
+        else:
+            return ds5,ds5
     elif OutLevel == 'L6':
         if x == 0:
-            ds4.globalattributes['Functions'] = ds4.globalattributes['Functions'] + ', No further L4 gapfilling'
-            ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', No further L4 gapfilling'
+            if InLevel == 'L3' or InLevel == 'L4':
+                ds4.globalattributes['Functions'] = ds4.globalattributes['Functions'] + ', No further L4 gapfilling'
+                try:
+                    ds4.globalattributes['L4Functions'] = ds4.globalattributes['L4Functions'] + ', No further L4 gapfilling'
+                except:
+                    ds4.globalattributes['L4Functions'] = 'No further L4 gapfilling'
+                log.warn('  L4:  no record of gapfilling functions')
+            if InLevel == 'L3' or InLevel == 'L4' or InLevel == 'L5':
+                ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', No further L4 gapfilling'
+                try:
+                    ds5.globalattributes['L4Functions'] = ds5.globalattributes['L4Functions'] + ', No further L4 gapfilling'
+                except:
+                    ds5.globalattributes['L4Functions'] = 'No further L4 gapfilling'
+                log.warn('  L4:  no record of gapfilling functions')
             ds6.globalattributes['Functions'] = ds6.globalattributes['Functions'] + ', No further L4 gapfilling'
-            try:
-                ds4.globalattributes['L4Functions'] = ds4.globalattributes['L4Functions'] + ', No further L4 gapfilling'
-            except:
-                ds4.globalattributes['L4Functions'] = 'No further L4 gapfilling'
-            try:
-                ds5.globalattributes['L4Functions'] = ds5.globalattributes['L4Functions'] + ', No further L4 gapfilling'
-            except:
-                ds5.globalattributes['L4Functions'] = 'No further L4 gapfilling'
             try:
                 ds6.globalattributes['L4Functions'] = ds6.globalattributes['L4Functions'] + ', No further L4 gapfilling'
             except:
                 ds6.globalattributes['L4Functions'] = 'No further L4 gapfilling'
-            
-            log.warn('  L4:  no record of gapfilling functions')
+        
         if y == 0:
-            ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', No further L5 gapfilling'
+            if InLevel == 'L3' or InLevel == 'L4' or InLevel == 'L5':
+                ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', No further L5 gapfilling'
+                try:
+                    ds5.globalattributes['L5Functions'] = ds5.globalattributes['L5Functions'] + ', No further L5 gapfilling'
+                except:
+                    ds5.globalattributes['L5Functions'] = 'No further L5 gapfilling'
+                log.warn('  L5:  no record of gapfilling functions')
             ds6.globalattributes['Functions'] = ds6.globalattributes['Functions'] + ', No further L5 gapfilling'
-            try:
-                ds5.globalattributes['L5Functions'] = ds5.globalattributes['L5Functions'] + ', No further L5 gapfilling'
-            except:
-                ds5.globalattributes['L5Functions'] = 'No further L5 gapfilling'
             try:
                 ds6.globalattributes['L5Functions'] = ds6.globalattributes['L5Functions'] + ', No further L5 gapfilling'
             except:
                 ds6.globalattributes['L5Functions'] = 'No further L5 gapfilling'
-            
-            log.warn('  L5:  no record of gapfilling functions')
         if z == 0:
             ds6.globalattributes['Functions'] = ds6.globalattributes['Functions'] + ', No further L6 partitioning'
             try:
                 ds6.globalattributes['L6Functions'] = ds5.globalattributes['L6Functions'] + ', No further L6 partitioning'
             except:
                 ds6.globalattributes['L6Functions'] = 'No further L6 partitioning'
-            
             log.warn('  L6:  no record of gapfilling functions')
-        return ds4,ds5,ds6
+        if InLevel == 'L3' or InLevel == 'L4':
+            return ds4,ds5,ds6
+        elif InLevel == 'L5':
+            return ds5,ds5,ds6
+        else:
+            return ds6,ds6,ds6
     
 
 def l5qc(cf,ds4,y):
@@ -824,7 +854,10 @@ def l5qc(cf,ds4,y):
         except:
             ds5.globalattributes['L5Functions'] = 'do_qccheck(RangeCheck, diurnalcheck, excludedates, excludehours)'
     
-    ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', ' + ds5.globalattributes['L5Functions']
+    try:
+        ds5.globalattributes['Functions'] = ds5.globalattributes['Functions'] + ', ' + ds5.globalattributes['L5Functions']
+    except:
+        ds5.globalattributes['Functions'] = ds5.globalattributes['Functions']
     
     return ds5,y
 

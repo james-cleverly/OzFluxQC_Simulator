@@ -358,7 +358,10 @@ class qcgui(Tkinter.Frame):
             OutLevel = self.cf['General']['OutputLevel']
         else:
             OutLevel = 'L6'
-        infilename = qcio.get_infilename_from_cf(self.cf,AttrLevel)
+        try:
+            infilename = qcio.get_infilename_from_cf(self.cf,AttrLevel)
+        except:
+            infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
         if len(infilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
         if not qcutils.file_exists(infilename): self.do_progress(text='An error occurred, check the console ...'); return
         self.ds3 = qcio.nc_read_series(infilename)
@@ -628,7 +631,10 @@ class qcgui(Tkinter.Frame):
             InLevel = 'L2'
             OutLevel = 'L2'
         
-        infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
+        if 'in_file_path' in self.cf['Files'][OutLevel]:
+            infilename = qcio.get_infilename_from_cf(self.cf,OutLevel)
+        else:
+            infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
         if len(infilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
         outfilename = qcio.get_outfilename_from_cf(self.cf,OutLevel)
         if len(outfilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
@@ -686,7 +692,10 @@ class qcgui(Tkinter.Frame):
             InLevel = 'L3'
             OutLevel = 'L3'
         
-        infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
+        if 'in_file_path' in self.cf['Files'][OutLevel]:
+            infilename = qcio.get_infilename_from_cf(self.cf,OutLevel)
+        else:
+            infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
         if len(infilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
         outfilename = qcio.get_outfilename_from_cf(self.cf,OutLevel)
         if len(outfilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
@@ -744,7 +753,10 @@ class qcgui(Tkinter.Frame):
             InLevel = 'L4'
             OutLevel = 'L4'
         
-        infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
+        if 'in_file_path' in self.cf['Files'][OutLevel]:
+            infilename = qcio.get_infilename_from_cf(self.cf,OutLevel)
+        else:
+            infilename = qcio.get_infilename_from_cf(self.cf,InLevel)
         if len(infilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
         outfilename = qcio.get_outfilename_from_cf(self.cf,OutLevel)
         if len(outfilename)==0: self.do_progress(text='An error occurred, check the console ...'); return

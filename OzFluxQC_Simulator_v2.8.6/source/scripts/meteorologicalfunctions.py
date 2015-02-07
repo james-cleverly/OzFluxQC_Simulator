@@ -68,6 +68,13 @@ def densitymoistair(Ta,ps,Ah):
     rhom = (ps-vp)*1000/((Ta+273.15)*c.Rd) + vp*1000/((Ta+273.15)*c.Rv)
     return rhom
 
+def efromrh(RH, T):
+    # Vapour pressure (kPa) from relative humidity and temperature
+    #  RH is the relative humidity, %
+    #  T is the air temperature, C
+    eRH = 0.01 * RH * es(T)
+    return eRH
+
 def es(T):
     # Saturation vapour pressure.
     #  T is the air temperature, C
