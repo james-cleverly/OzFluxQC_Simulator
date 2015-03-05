@@ -629,7 +629,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
-    if InLevel == 'L4' or InLevel == 'L3':
+    if InLevel == 'L4' or AttrLevel == 'L3':
         ds4,x = l4qc(cf,ds4x,InLevel,x)
         qcutils.get_coverage_individual(ds4)
         qcutils.get_coverage_groups(ds4)
