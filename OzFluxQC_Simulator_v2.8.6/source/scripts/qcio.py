@@ -31,6 +31,7 @@ import time
 import Tkinter, tkFileDialog
 import xlrd
 import xlwt
+import xlsxwriter
 import netCDF4
 import logging
 import qcts
@@ -151,16 +152,27 @@ def copy_datastructure(cf,ds_in):
                         pass
     return ds_out
 
-def nc_2xls(ncfilename,xlfilename,outputlist=None,sortoption=True):
+def nc_2xls(cf,ncfilename,xlfilename,outputlist=None,sortoption=True):
     # read the netCDF file
     ds = nc_read_series(ncfilename)
     # write the variables to the Excel 97/2003 file
     xlfilename= xlfilename.replace('.nc','.xls')
+    if "nc_nrecs" in ds.globalattributes.keys():
+        nRecs = numpy.int32(ds.globalattributes["nc_nrecs"])
+    else:
+        variablelist = ds.series.keys()
+        nRecs = len(ds.series[variablelist[0]]["Data"])
     # write the variables to the Excel file
     if sortoption == False:
-        xl_write_series_unsorted(ds,xlfilename,outputlist=outputlist)
+        if nRecs<65535:
+            xl_write_series_unsorted(cf,ds,xlfilename,outputlist=outputlist)
+        else:
+            xlsx_write_series_unsorted(ds,xlfilename,outputlist=outputlist)
     else:
-        xl_write_series(ds,xlfilename,outputlist=outputlist)
+        if nRecs<65535:
+            xl_write_series(ds,xlfilename,outputlist=outputlist)
+        else:
+            xlsx_write_series(ds,xlfilename,outputlist=outputlist)
 
 def read_eddypro_full(csvname):
     ds = DataStructure()
@@ -242,8 +254,12 @@ def xl2nc(cf,InLevel):
     qcutils.get_datetimefromxldate(ds)
     # get series of UTC datetime
     qcutils.get_UTCfromlocaltime(ds)
+    if ((qcutils.cfkeycheck(cf,Base='General',ThisOne='FixTimeGaps')) and (cf['General']['FixTimeGaps'] == 'False')):
+        ftype = 'skip'
+    else:
+        ftype = 'gaps'
     #check for gaps in the Excel datetime series
-    has_gaps = qcutils.CheckTimeStep(ds,fix='gaps')
+    has_gaps = qcutils.CheckTimeStep(ds,fix=ftype)
     # write the processing level to a global attribute
     ds.globalattributes['nc_level'] = str(InLevel)
     # get the start and end date from the datetime series unless they were
@@ -1140,7 +1156,10 @@ def xl_write_series(ds, xlfullname, outputlist=None):
     globalattrlist.sort()
     for ThisOne in sorted([x for x in globalattrlist if 'Flag' not in x]):
         xlAttrSheet.write(xlrow,xlcol,ThisOne)
-        xlAttrSheet.write(xlrow,xlcol+1,ds.globalattributes[ThisOne])
+        try:
+            xlAttrSheet.write(xlrow,xlcol+1,ds.globalattributes[ThisOne])
+        except:
+            xlAttrSheet.write(xlrow,xlcol+1,int(ds.globalattributes[ThisOne]))
         xlrow = xlrow + 1
     for ThisOne in sorted([x for x in globalattrlist if 'Flag' in x]):
         xlAttrSheet.write(xlrow,xlcol,ThisOne)
@@ -1238,7 +1257,125 @@ def xl_write_series(ds, xlfullname, outputlist=None):
     log.info(' Saving the Excel file '+xlfullname)
     xlfile.save(xlfullname)
 
-def xl_write_series_unsorted(ds, xlfullname, outputlist=None):
+def xlsx_write_series(ds, xlsxfullname, outputlist=None):
+    if "nc_nrecs" in ds.globalattributes.keys():
+        nRecs = numpy.int32(ds.globalattributes["nc_nrecs"])
+    else:
+        variablelist = ds.series.keys()
+        nRecs = len(ds.series[variablelist[0]]["Data"])
+    # open the Excel file
+    log.info(' Opening and writing Excel file '+xlsxfullname)
+    if int(ds.globalattributes["xl_datemode"])==1:
+        xlfile = xlsxwriter.Workbook(xlsxfullname, {'date_1904': True})
+    else:
+        xlfile = xlsxwriter.Workbook(xlsxfullname, {'date_1904': False})
+    # set the datemode
+    xlfile.dates_1904 = numpy.int32(ds.globalattributes['xl_datemode'])
+    # add sheets to the Excel file
+    xlAttrSheet = xlfile.add_worksheet('Attr')
+    xlDataSheet = xlfile.add_worksheet('Data')
+    xlFlagSheet = xlfile.add_worksheet('Flag')
+    # write the global attributes
+    log.info(' Writing the global attributes to Excel file '+xlsxfullname)
+    xlcol = 0
+    xlrow = 0
+    xlAttrSheet.write(xlrow,xlcol,'Global attributes')
+    xlrow = xlrow + 1
+    globalattrlist = ds.globalattributes.keys()
+    globalattrlist.sort()
+    for ThisOne in sorted([x for x in globalattrlist if 'Flag' not in x]):
+        xlAttrSheet.write(xlrow,xlcol,ThisOne)
+        xlAttrSheet.write(xlrow,xlcol+1,ds.globalattributes[ThisOne])
+        xlrow = xlrow + 1
+    for ThisOne in sorted([x for x in globalattrlist if 'Flag' in x]):
+        xlAttrSheet.write(xlrow,xlcol,ThisOne)
+        xlAttrSheet.write(xlrow,xlcol+1,str(ds.globalattributes[ThisOne]))
+        xlrow = xlrow + 1
+    # write the variable attributes
+    log.info(' Writing the variable attributes to Excel file '+xlsxfullname)
+    xlrow = xlrow + 1
+    xlAttrSheet.write(xlrow,xlcol,'Variable attributes')
+    xlrow = xlrow + 1
+    xlcol_varname = 0
+    xlcol_attrname = 1
+    xlcol_attrvalue = 2
+    variablelist = ds.series.keys()
+    if outputlist==None:
+        outputlist = variablelist
+    else:
+        for ThisOne in outputlist:
+            if ThisOne not in variablelist:
+                log.warn(' Requested series '+ThisOne+' not found in data structure')
+                outputlist.remove(ThisOne)
+        if len(outputlist)==0:
+            outputlist = variablelist
+    outputlist.sort()
+    for ThisOne in ["DateTime","DateTime_UTC"]:
+        if ThisOne in outputlist: outputlist.remove(ThisOne)
+    for ThisOne in outputlist:
+        xlAttrSheet.write(xlrow,xlcol_varname,ThisOne)
+        attributelist = ds.series[ThisOne]['Attr'].keys()
+        attributelist.sort()
+        for Attr in attributelist:
+            xlAttrSheet.write(xlrow,xlcol_attrname,Attr)
+            xlAttrSheet.write(xlrow,xlcol_attrvalue,str(ds.series[ThisOne]['Attr'][Attr]))
+            xlrow = xlrow + 1
+    # write the Excel date/time to the data and the QC flags as the first column
+    ldt = ds.series["DateTime"]["Data"]
+    # get the datemode of the original spreadsheet
+    datemode = numpy.int32(ds.globalattributes['xl_datemode'])
+    xlDateTime = qcutils.get_xldate_from_datetime(ldt,datemode=datemode)
+    log.info(' Writing the datetime to Excel file '+xlsxfullname)
+    dt_format = xlfile.add_format({'num_format': 'dd/mm/yyyy hh:mm'})
+    xlDataSheet.write(2,xlcol,'xlDateTime')
+    for j in range(nRecs):
+        xlDataSheet.write_datetime(j+3,xlcol,ldt[j],dt_format)
+        xlFlagSheet.write_datetime(j+3,xlcol,ldt[j],dt_format)
+    if "xlDateTime" in outputlist: outputlist.remove("xlDateTime")
+    if "xlDateTime_UTC" in outputlist: outputlist.remove("xlDateTime_UTC")
+    # now start looping over the other variables in the xl file
+    xlcol = xlcol + 1
+    # loop over variables to be output to xl file
+    for ThisOne in outputlist:
+        # put up a progress message
+        log.info(' Writing '+ThisOne+' into column '+str(xlcol)+' of the Excel file')
+        d_xf = xlwt.easyxf()
+        # write the units and the variable name to the header rows in the xl file
+        attrlist = ds.series[ThisOne]['Attr'].keys()
+        if 'long_name' in attrlist:
+            longname = ds.series[ThisOne]['Attr']['long_name']
+        elif 'Description' in attrlist:
+            longname = ds.series[ThisOne]['Attr']['Description']
+        else:
+            longname = None
+        if 'units' in attrlist:
+            units = ds.series[ThisOne]['Attr']['units']
+        elif 'Units' in attrlist:
+            units = ds.series[ThisOne]['Attr']['Units']
+        else:
+            units = None
+        xlDataSheet.write(0,xlcol,longname)
+        xlDataSheet.write(1,xlcol,units)
+        xlDataSheet.write(2,xlcol,ThisOne)
+        # loop over the values in the variable series (array writes don't seem to work)
+        for j in range(nRecs):
+            xlDataSheet.write(j+3,xlcol,numpy.float64(ds.series[ThisOne]['Data'][j]))
+        # check to see if this variable has a quality control flag
+        if 'Flag' in ds.series[ThisOne].keys():
+            # write the QC flag name to the xk file
+            xlFlagSheet.write(2,xlcol,ThisOne)
+            # specify the format of the QC flag (integer)
+            d_xf = xlwt.easyxf(num_format_str='0')
+            # loop over QV flag values and write to xl file
+            for j in range(nRecs):
+                xlFlagSheet.write(j+3,xlcol,numpy.int32(ds.series[ThisOne]['Flag'][j]),d_xf)
+        # increment the column pointer
+        xlcol = xlcol + 1
+    
+    log.info(' Saving the Excel file '+xlsxfullname)
+    xlfile.close()
+
+def xl_write_series_unsorted(cf, ds, xlfullname, outputlist=None):
     if "nc_nrecs" in ds.globalattributes.keys():
         nRecs = numpy.int32(ds.globalattributes["nc_nrecs"])
     else:
@@ -1276,7 +1413,10 @@ def xl_write_series_unsorted(ds, xlfullname, outputlist=None):
     xlDataSheet.write(9,xlCol,'TIMESTAMP')
     xlDataSheet.write(0,xlCol+1,'Dataset not licensed for distribution.  For internal use only.')
     xlDataSheet.write(1,xlCol,'Site:')
-    xlDataSheet.write(1,xlCol+1,ds.globalattributes['site'])
+    try:
+        xlDataSheet.write(1,xlCol+1,ds.globalattributes['site'])
+    except:
+        xlDataSheet.write(1,xlCol+1,ds.globalattributes['site_name'])
     xlDataSheet.write(3,xlCol,'Institution:')
     xlDataSheet.write(3,xlCol+1,ds.globalattributes['institution'])
     xlDataSheet.write(2,xlCol,'Latitude:')
@@ -1286,109 +1426,112 @@ def xl_write_series_unsorted(ds, xlfullname, outputlist=None):
     xlDataSheet.write(4,xlCol,'Contact:')
     xlDataSheet.write(4,xlCol+1,ds.globalattributes['contact'])
     xlFlagSheet.write(0,xlCol,'0:')
-    xlFlagSheet.write(0,xlCol+1,ds.globalattributes['Flag000'])
-    xlFlagSheet.write(0,xlCol+2,'1:')
-    xlFlagSheet.write(0,xlCol+3,ds.globalattributes['Flag001'])
-    xlFlagSheet.write(0,xlCol+4,'2:')
-    xlFlagSheet.write(0,xlCol+5,ds.globalattributes['Flag002'])
-    xlFlagSheet.write(0,xlCol+6,'3:')
-    xlFlagSheet.write(0,xlCol+7,ds.globalattributes['Flag003'])
-    xlFlagSheet.write(0,xlCol+8,'4:')
-    xlFlagSheet.write(0,xlCol+9,ds.globalattributes['Flag004'])
-    xlFlagSheet.write(0,xlCol+10,'5:')
-    xlFlagSheet.write(0,xlCol+11,ds.globalattributes['Flag005'])
-    xlFlagSheet.write(0,xlCol+12,'6:')
-    xlFlagSheet.write(0,xlCol+13,ds.globalattributes['Flag006'])
-    xlFlagSheet.write(0,xlCol+14,'7:')
-    xlFlagSheet.write(0,xlCol+15,ds.globalattributes['Flag007'])
-    xlFlagSheet.write(0,xlCol+16,'8:')
-    xlFlagSheet.write(0,xlCol+17,ds.globalattributes['Flag008'])
-    xlFlagSheet.write(0,xlCol+18,'9:')
-    xlFlagSheet.write(0,xlCol+19,ds.globalattributes['Flag009'])
-    xlFlagSheet.write(1,xlCol,'10:')
-    xlFlagSheet.write(1,xlCol+1,ds.globalattributes['Flag010'])
-    xlFlagSheet.write(1,xlCol+2,'11:')
-    xlFlagSheet.write(1,xlCol+3,ds.globalattributes['Flag011'])
-    xlFlagSheet.write(1,xlCol+4,'12:')
-    xlFlagSheet.write(1,xlCol+5,ds.globalattributes['Flag012'])
-    xlFlagSheet.write(1,xlCol+6,'13:')
-    xlFlagSheet.write(1,xlCol+7,ds.globalattributes['Flag013'])
-    xlFlagSheet.write(1,xlCol+8,'14:')
-    xlFlagSheet.write(1,xlCol+9,ds.globalattributes['Flag014'])
-    xlFlagSheet.write(1,xlCol+10,'15:')
-    xlFlagSheet.write(1,xlCol+11,ds.globalattributes['Flag015'])
-    xlFlagSheet.write(1,xlCol+12,'16:')
-    xlFlagSheet.write(1,xlCol+13,ds.globalattributes['Flag016'])
-    xlFlagSheet.write(1,xlCol+14,'17:')
-    xlFlagSheet.write(1,xlCol+15,ds.globalattributes['Flag017'])
-    xlFlagSheet.write(1,xlCol+16,'18:')
-    xlFlagSheet.write(1,xlCol+17,ds.globalattributes['Flag018'])
-    xlFlagSheet.write(1,xlCol+18,'19:')
-    xlFlagSheet.write(1,xlCol+19,ds.globalattributes['Flag019'])
-    xlFlagSheet.write(1,xlCol+20,'21:')
-    xlFlagSheet.write(1,xlCol+21,ds.globalattributes['Flag021'])
-    xlFlagSheet.write(1,xlCol+22,'22:')
-    xlFlagSheet.write(1,xlCol+23,ds.globalattributes['Flag022'])
-    xlFlagSheet.write(2,xlCol,'30:')
-    xlFlagSheet.write(2,xlCol+1,ds.globalattributes['Flag030'])
-    xlFlagSheet.write(2,xlCol+2,'31:')
-    xlFlagSheet.write(2,xlCol+3,ds.globalattributes['Flag031'])
-    xlFlagSheet.write(2,xlCol+4,'40:')
-    xlFlagSheet.write(2,xlCol+5,ds.globalattributes['Flag040'])
-    #xlFlagSheet.write(2,xlCol+6,'50:')
-    #xlFlagSheet.write(2,xlCol+7,ds.globalattributes['Flag050'])
-    xlFlagSheet.write(2,xlCol+6,'60:')
-    xlFlagSheet.write(2,xlCol+7,ds.globalattributes['Flag060'])
-    xlFlagSheet.write(2,xlCol+8,'70:')
-    xlFlagSheet.write(2,xlCol+9,ds.globalattributes['Flag070'])
-    xlFlagSheet.write(2,xlCol+10,'80:')
-    xlFlagSheet.write(2,xlCol+11,ds.globalattributes['Flag080'])
-    xlFlagSheet.write(2,xlCol+12,'81:')
-    xlFlagSheet.write(2,xlCol+13,ds.globalattributes['Flag081'])
-    xlFlagSheet.write(2,xlCol+14,'82:')
-    xlFlagSheet.write(2,xlCol+15,ds.globalattributes['Flag082'])
-    xlFlagSheet.write(2,xlCol+16,'83:')
-    xlFlagSheet.write(2,xlCol+17,ds.globalattributes['Flag083'])
-    xlFlagSheet.write(2,xlCol+18,'84:')
-    xlFlagSheet.write(2,xlCol+19,ds.globalattributes['Flag084'])
-    xlFlagSheet.write(2,xlCol+20,'85:')
-    xlFlagSheet.write(2,xlCol+21,ds.globalattributes['Flag085'])
-    xlFlagSheet.write(2,xlCol+22,'86:')
-    xlFlagSheet.write(2,xlCol+23,ds.globalattributes['Flag086'])
-    xlFlagSheet.write(2,xlCol+24,'87:')
-    xlFlagSheet.write(2,xlCol+25,ds.globalattributes['Flag087'])
-    xlFlagSheet.write(3,xlCol,'90:')
-    xlFlagSheet.write(3,xlCol+1,ds.globalattributes['Flag090'])
-    xlFlagSheet.write(3,xlCol+2,'100:')
-    xlFlagSheet.write(3,xlCol+3,ds.globalattributes['Flag100'])
-    xlFlagSheet.write(3,xlCol+4,'110:')
-    xlFlagSheet.write(3,xlCol+5,ds.globalattributes['Flag110'])
-    xlFlagSheet.write(3,xlCol+6,'120:')
-    xlFlagSheet.write(3,xlCol+7,ds.globalattributes['Flag120'])
-    xlFlagSheet.write(4,xlCol,'121:')
-    xlFlagSheet.write(4,xlCol+1,ds.globalattributes['Flag121'])
-    xlFlagSheet.write(4,xlCol+2,'122:')
-    xlFlagSheet.write(4,xlCol+3,ds.globalattributes['Flag122'])
-    xlFlagSheet.write(5,xlCol,'131:')
-    xlFlagSheet.write(5,xlCol+1,ds.globalattributes['Flag131'])
-    xlFlagSheet.write(5,xlCol+2,'132:')
-    xlFlagSheet.write(5,xlCol+3,ds.globalattributes['Flag132'])
-    xlFlagSheet.write(5,xlCol+4,'133:')
-    xlFlagSheet.write(5,xlCol+5,ds.globalattributes['Flag133'])
-    xlFlagSheet.write(5,xlCol+6,'134:')
-    xlFlagSheet.write(5,xlCol+7,ds.globalattributes['Flag134'])
-    xlFlagSheet.write(6,xlCol,'140:')
-    xlFlagSheet.write(6,xlCol+1,ds.globalattributes['Flag140'])
-    xlFlagSheet.write(6,xlCol+2,'150:')
-    xlFlagSheet.write(6,xlCol+3,ds.globalattributes['Flag150'])
-    xlFlagSheet.write(6,xlCol+4,'151:')
-    xlFlagSheet.write(6,xlCol+5,ds.globalattributes['Flag151'])
-    xlFlagSheet.write(6,xlCol+6,'160:')
-    xlFlagSheet.write(6,xlCol+7,ds.globalattributes['Flag160'])
-    xlFlagSheet.write(6,xlCol+8,'161:')
-    xlFlagSheet.write(6,xlCol+9,ds.globalattributes['Flag161'])
-    xlFlagSheet.write(6,xlCol+10,'171:')
-    xlFlagSheet.write(6,xlCol+11,ds.globalattributes['Flag171'])
+    if ((qcutils.cfkeycheck(cf,Base='Output',ThisOne='FlagList')) and (cf['Output']['FlagList'] == 'False')):
+        xlFlagSheet.write(0,xlCol+1,'FlagList disabled')
+    else:
+        xlFlagSheet.write(0,xlCol+1,ds.globalattributes['Flag000'])
+        xlFlagSheet.write(0,xlCol+2,'1:')
+        xlFlagSheet.write(0,xlCol+3,ds.globalattributes['Flag001'])
+        xlFlagSheet.write(0,xlCol+4,'2:')
+        xlFlagSheet.write(0,xlCol+5,ds.globalattributes['Flag002'])
+        xlFlagSheet.write(0,xlCol+6,'3:')
+        xlFlagSheet.write(0,xlCol+7,ds.globalattributes['Flag003'])
+        xlFlagSheet.write(0,xlCol+8,'4:')
+        xlFlagSheet.write(0,xlCol+9,ds.globalattributes['Flag004'])
+        xlFlagSheet.write(0,xlCol+10,'5:')
+        xlFlagSheet.write(0,xlCol+11,ds.globalattributes['Flag005'])
+        xlFlagSheet.write(0,xlCol+12,'6:')
+        xlFlagSheet.write(0,xlCol+13,ds.globalattributes['Flag006'])
+        xlFlagSheet.write(0,xlCol+14,'7:')
+        xlFlagSheet.write(0,xlCol+15,ds.globalattributes['Flag007'])
+        xlFlagSheet.write(0,xlCol+16,'8:')
+        xlFlagSheet.write(0,xlCol+17,ds.globalattributes['Flag008'])
+        xlFlagSheet.write(0,xlCol+18,'9:')
+        xlFlagSheet.write(0,xlCol+19,ds.globalattributes['Flag009'])
+        xlFlagSheet.write(1,xlCol,'10:')
+        xlFlagSheet.write(1,xlCol+1,ds.globalattributes['Flag010'])
+        xlFlagSheet.write(1,xlCol+2,'11:')
+        xlFlagSheet.write(1,xlCol+3,ds.globalattributes['Flag011'])
+        xlFlagSheet.write(1,xlCol+4,'12:')
+        xlFlagSheet.write(1,xlCol+5,ds.globalattributes['Flag012'])
+        xlFlagSheet.write(1,xlCol+6,'13:')
+        xlFlagSheet.write(1,xlCol+7,ds.globalattributes['Flag013'])
+        xlFlagSheet.write(1,xlCol+8,'14:')
+        xlFlagSheet.write(1,xlCol+9,ds.globalattributes['Flag014'])
+        xlFlagSheet.write(1,xlCol+10,'15:')
+        xlFlagSheet.write(1,xlCol+11,ds.globalattributes['Flag015'])
+        xlFlagSheet.write(1,xlCol+12,'16:')
+        xlFlagSheet.write(1,xlCol+13,ds.globalattributes['Flag016'])
+        xlFlagSheet.write(1,xlCol+14,'17:')
+        xlFlagSheet.write(1,xlCol+15,ds.globalattributes['Flag017'])
+        xlFlagSheet.write(1,xlCol+16,'18:')
+        xlFlagSheet.write(1,xlCol+17,ds.globalattributes['Flag018'])
+        xlFlagSheet.write(1,xlCol+18,'19:')
+        xlFlagSheet.write(1,xlCol+19,ds.globalattributes['Flag019'])
+        xlFlagSheet.write(1,xlCol+20,'21:')
+        xlFlagSheet.write(1,xlCol+21,ds.globalattributes['Flag021'])
+        xlFlagSheet.write(1,xlCol+22,'22:')
+        xlFlagSheet.write(1,xlCol+23,ds.globalattributes['Flag022'])
+        xlFlagSheet.write(2,xlCol,'30:')
+        xlFlagSheet.write(2,xlCol+1,ds.globalattributes['Flag030'])
+        xlFlagSheet.write(2,xlCol+2,'31:')
+        xlFlagSheet.write(2,xlCol+3,ds.globalattributes['Flag031'])
+        xlFlagSheet.write(2,xlCol+4,'40:')
+        xlFlagSheet.write(2,xlCol+5,ds.globalattributes['Flag040'])
+        #xlFlagSheet.write(2,xlCol+6,'50:')
+        #xlFlagSheet.write(2,xlCol+7,ds.globalattributes['Flag050'])
+        xlFlagSheet.write(2,xlCol+6,'60:')
+        xlFlagSheet.write(2,xlCol+7,ds.globalattributes['Flag060'])
+        xlFlagSheet.write(2,xlCol+8,'70:')
+        xlFlagSheet.write(2,xlCol+9,ds.globalattributes['Flag070'])
+        xlFlagSheet.write(2,xlCol+10,'80:')
+        xlFlagSheet.write(2,xlCol+11,ds.globalattributes['Flag080'])
+        xlFlagSheet.write(2,xlCol+12,'81:')
+        xlFlagSheet.write(2,xlCol+13,ds.globalattributes['Flag081'])
+        xlFlagSheet.write(2,xlCol+14,'82:')
+        xlFlagSheet.write(2,xlCol+15,ds.globalattributes['Flag082'])
+        xlFlagSheet.write(2,xlCol+16,'83:')
+        xlFlagSheet.write(2,xlCol+17,ds.globalattributes['Flag083'])
+        xlFlagSheet.write(2,xlCol+18,'84:')
+        xlFlagSheet.write(2,xlCol+19,ds.globalattributes['Flag084'])
+        xlFlagSheet.write(2,xlCol+20,'85:')
+        xlFlagSheet.write(2,xlCol+21,ds.globalattributes['Flag085'])
+        xlFlagSheet.write(2,xlCol+22,'86:')
+        xlFlagSheet.write(2,xlCol+23,ds.globalattributes['Flag086'])
+        xlFlagSheet.write(2,xlCol+24,'87:')
+        xlFlagSheet.write(2,xlCol+25,ds.globalattributes['Flag087'])
+        xlFlagSheet.write(3,xlCol,'90:')
+        xlFlagSheet.write(3,xlCol+1,ds.globalattributes['Flag090'])
+        xlFlagSheet.write(3,xlCol+2,'100:')
+        xlFlagSheet.write(3,xlCol+3,ds.globalattributes['Flag100'])
+        xlFlagSheet.write(3,xlCol+4,'110:')
+        xlFlagSheet.write(3,xlCol+5,ds.globalattributes['Flag110'])
+        xlFlagSheet.write(3,xlCol+6,'120:')
+        xlFlagSheet.write(3,xlCol+7,ds.globalattributes['Flag120'])
+        xlFlagSheet.write(4,xlCol,'121:')
+        xlFlagSheet.write(4,xlCol+1,ds.globalattributes['Flag121'])
+        xlFlagSheet.write(4,xlCol+2,'122:')
+        xlFlagSheet.write(4,xlCol+3,ds.globalattributes['Flag122'])
+        xlFlagSheet.write(5,xlCol,'131:')
+        xlFlagSheet.write(5,xlCol+1,ds.globalattributes['Flag131'])
+        xlFlagSheet.write(5,xlCol+2,'132:')
+        xlFlagSheet.write(5,xlCol+3,ds.globalattributes['Flag132'])
+        xlFlagSheet.write(5,xlCol+4,'133:')
+        xlFlagSheet.write(5,xlCol+5,ds.globalattributes['Flag133'])
+        xlFlagSheet.write(5,xlCol+6,'134:')
+        xlFlagSheet.write(5,xlCol+7,ds.globalattributes['Flag134'])
+        xlFlagSheet.write(6,xlCol,'140:')
+        xlFlagSheet.write(6,xlCol+1,ds.globalattributes['Flag140'])
+        xlFlagSheet.write(6,xlCol+2,'150:')
+        xlFlagSheet.write(6,xlCol+3,ds.globalattributes['Flag150'])
+        xlFlagSheet.write(6,xlCol+4,'151:')
+        xlFlagSheet.write(6,xlCol+5,ds.globalattributes['Flag151'])
+        xlFlagSheet.write(6,xlCol+6,'160:')
+        xlFlagSheet.write(6,xlCol+7,ds.globalattributes['Flag160'])
+        xlFlagSheet.write(6,xlCol+8,'161:')
+        xlFlagSheet.write(6,xlCol+9,ds.globalattributes['Flag161'])
+        xlFlagSheet.write(6,xlCol+10,'171:')
+        xlFlagSheet.write(6,xlCol+11,ds.globalattributes['Flag171'])
     
     #d_xf = xlwt.easyxf('font: height 160',num_format_str='dd/mm/yyyy hh:mm')
     d_xf = xlwt.easyxf(num_format_str='dd/mm/yyyy hh:mm')
@@ -1441,3 +1584,78 @@ def xl_write_series_unsorted(ds, xlfullname, outputlist=None):
     log.info(' Saving the Excel file '+xlfullname)
     # save the xl file
     xlfile.save(xlfullname)
+
+def xlsx_write_series_unsorted(ds, xlsxfullname, outputlist=None):
+    if "nc_nrecs" in ds.globalattributes.keys():
+        nRecs = numpy.int32(ds.globalattributes["nc_nrecs"])
+    else:
+        variablelist = ds.series.keys()
+        nRecs = len(ds.series[variablelist[0]]["Data"])
+    # open the Excel file
+    log.info(' Opening and writing Excel file '+xlsxfullname)
+    if int(ds.globalattributes["xl_datemode"])==1:
+        xlfile = xlsxwriter.Workbook(xlsxfullname, {'date_1904': True})
+    else:
+        xlfile = xlsxwriter.Workbook(xlsxfullname, {'date_1904': False})
+    # set the datemode
+    xlfile.dates_1904 = numpy.int32(ds.globalattributes['xl_datemode'])
+    # add sheets to the Excel file
+    xlDataSheet = xlfile.add_worksheet('Data')
+    xlCol = 0
+    variablelist = ds.series.keys()
+    if outputlist==None:
+        outputlist = variablelist
+    else:
+        for ThisOne in outputlist:
+            if ThisOne not in variablelist:
+                log.warn(' Requested series '+ThisOne+' not found in data structure')
+                outputlist.remove(ThisOne)
+        if len(outputlist)==0:
+            outputlist = variablelist
+    # write the xl date/time value to the first column of the worksheets
+    ldt = ds.series["DateTime"]["Data"]
+    # get the datemode of the original spreadsheet
+    datemode = numpy.int32(ds.globalattributes['xl_datemode'])
+    xlDateTime = qcutils.get_xldate_from_datetime(ldt,datemode=datemode)
+    log.info(' Writing the datetime to Excel file '+xlsxfullname)
+    dt_format = xlfile.add_format({'num_format': 'dd/mm/yyyy hh:mm'})
+    for j in range(nRecs):
+        xlDataSheet.write_datetime(j+10,xlCol,ldt[j],dt_format)
+    xlDataSheet.write(9,xlCol,'TIMESTAMP')
+    
+    # remove the date and time variables from the list to output
+    for ThisOne in ['xlDateTime','Year','Month','Day','Hour','Minute','Second','Hdh','DateTime_UTC','DateTime']:
+        if ThisOne in variablelist:
+            variablelist.remove(ThisOne)
+    # now start looping over the other variables in the xl file
+    xlCol = xlCol + 1
+    # list of variables in the data structure
+    #VariablesInFile.sort(key=str.lower)
+    # list of variables to write out (specified in the control file)
+    #VariablesToOutput.sort(key=str.lower)
+    # loop over variables to be output to xl file
+    for ThisOne in outputlist:
+        if ThisOne in variablelist:
+            # put up a progress message
+            log.info(' Writing '+ThisOne+' into column '+str(xlCol)+' of the Excel file')
+            # specify the style of the output
+            #d_xf = xlwt.easyxf('font: height 160')
+            d_xf = xlwt.easyxf()
+            # write the units and the variable name to the header rows in the xl file
+            longname = ds.series[ThisOne]['Attr']['long_name']
+            units = ds.series[ThisOne]['Attr']['units']
+            #xlDataSheet.write(8,xlCol,Units,d_xf)
+            #xlDataSheet.write(9,xlCol,ThisOne,d_xf)
+            xlDataSheet.write(7,xlCol,longname)
+            xlDataSheet.write(8,xlCol,units)
+            xlDataSheet.write(9,xlCol,ThisOne)
+            # loop over the values in the variable series (array writes don't seem to work)
+            for j in range(nRecs):
+                #xlDataSheet.write(j+10,xlCol,float(ds.series[ThisOne]['Data'][j]),d_xf)
+                xlDataSheet.write(j+10,xlCol,numpy.float64(ds.series[ThisOne]['Data'][j]))
+            # increment the column pointer
+            xlCol = xlCol + 1
+    # tell the user what we are doing
+    log.info(' Saving the Excel file '+xlsxfullname)
+    # save the xl file
+    xlfile.close()

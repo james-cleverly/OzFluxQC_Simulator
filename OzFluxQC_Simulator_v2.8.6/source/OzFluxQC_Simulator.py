@@ -643,7 +643,7 @@ class qcgui(Tkinter.Frame):
             sort = False
         else:
             sort = True
-        qcio.nc_2xls(infilename,outfilename,outputlist=outputlist,sortoption=sort)
+        qcio.nc_2xls(self.cf,infilename,outfilename,outputlist=outputlist,sortoption=sort)
         self.do_progress(text='Finished L2 Data Export')              # tell the user we are done
         log.info(' Finished saving L2 data')
         print '\a'
@@ -704,7 +704,7 @@ class qcgui(Tkinter.Frame):
             sort = False
         else:
             sort = True
-        qcio.nc_2xls(infilename,outfilename,outputlist=outputlist,sortoption=sort)
+        qcio.nc_2xls(self.cf,infilename,outfilename,outputlist=outputlist,sortoption=sort)
         self.do_progress(text='Finished L3 Data Export')              # tell the user we are done
         log.info(' Finished saving L3 data')
         print '\a'
@@ -765,7 +765,7 @@ class qcgui(Tkinter.Frame):
             sort = False
         else:
             sort = True
-        qcio.nc_2xls(infilename,outfilename,outputlist=outputlist,sortoption=sort)
+        qcio.nc_2xls(self.cf,infilename,outfilename,outputlist=outputlist,sortoption=sort)
         outtext = 'Finished ' + str(OutLevel) + ' Data Export'
         self.do_progress(text=outtext)              # tell the user we are done
         log.info(' '+outtext)

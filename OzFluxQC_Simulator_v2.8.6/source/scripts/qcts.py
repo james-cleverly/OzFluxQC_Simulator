@@ -1485,9 +1485,15 @@ def ConvertFc(cf,ds,Fco2_in='Fc'):
     Fc_co2,f,a = qcutils.GetSeriesasMA(ds,Fco2_in)
     # conversion factors:  mol2umol: 1e6; mg2kg: 1e-6
     # conversions cancel:  mgCO2, kgCO2/mol, umol
-    NEE = Fc_co2 / c.Mco2
-    NEP = -NEE
-    Fc_c = NEE * c.Mc
+    if 'umol' in a['units']:
+        NEE = Fc_co2
+        Fc_co2 = NEE * c.Mco2
+        NEP = -NEE
+        Fc_c = NEE * c.Mc
+    else:
+        NEE = Fc_co2 / c.Mco2
+        NEP = -NEE
+        Fc_c = NEE * c.Mc
     
     attr_hist = 'Flux of carbon, Raw uncorrected'
     if 'rotated' in ds.series[Fco2_in]['Attr']['long_name']:
@@ -2028,6 +2034,14 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     varw,f,a = qcutils.GetSeriesasMA(ds,'ww')
     varv,f,a = qcutils.GetSeriesasMA(ds,'vv')
     ustar,f,a = qcutils.GetSeriesasMA(ds,'ustar')
+    Ta,f,a = qcutils.GetSeriesasMA(ds,'Ta')
+    Ah,f,a = qcutils.GetSeriesasMA(ds,'Ah')
+    ps,f,a = qcutils.GetSeriesasMA(ds,'ps')
+    Fh,f,a = qcutils.GetSeriesasMA(ds,'Fh')
+    if 'L' not in ds.series.keys():
+        L_calc = mf.molen(Ta, Ah, ps, ustar, Fh, fluxtype='sensible')
+        attr = qcutils.MakeAttributeDictionary(long_name='Obukhov Length: Raw uncorrected',units='m')
+        qcutils.CreateSeries(ds,'L',L_calc,FList=['Ta','Ah','ps','ustar','Fh'],Attr=attr)
     L,Lf,a = qcutils.GetSeriesasMA(ds,'L')
     Fsd,f,a = qcutils.GetSeriesasMA(ds,'Fsd')
     n = len(L)
@@ -2064,24 +2078,24 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
         ldt = ds.series['DateTime']['Data']
         IncludeList = cf['Footprint']['AnalysisDates'].keys()
         NumDates = len(IncludeList)
-        analysisflag = numpy.zeros(n,dtype=numpy.int32)
+        analysisflag = numpy.zeros(n,dtype=numpy.int32) + 1
         for i in range(NumDates):
             IncludeDateList = ast.literal_eval(cf['Footprint']['AnalysisDates'][str(i)])
             try:
                 si = ldt.index(datetime.datetime.strptime(IncludeDateList[0],'%Y-%m-%d %H:%M'))
             except ValueError:
-                si = -1
+                si = 0
             
             try:
                 ei = ldt.index(datetime.datetime.strptime(IncludeDateList[1],'%Y-%m-%d %H:%M')) + 1
             except ValueError:
                 ei = -1
             
-            analysisflag[si:ei] = numpy.int32(1)
+            analysisflag[si:ei] = numpy.int32(0)
         
-        index = numpy.where(analysisflag == 0)[0]
+        index = numpy.where(analysisflag == 1)[0]
         Lf[index] = 9999
-        includedate = len(numpy.where(analysisflag == 1)[0])
+        includedate = len(numpy.where(analysisflag == 0)[0])
     
     if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='Fluxes'):
         Fluxesin = ast.literal_eval(cf['Footprint']['Fluxes'])
@@ -2981,7 +2995,7 @@ def footprint_2d(cf,sigmaw,sigmav,ustar,zm,h,znot,r,wd,zeta,L,zc,timestamp,eta,F
         f_2d = xy[1] * 1/(sqrt2pi*xy[2]) *  numpy.exp(-xy[3]**2 / (2*xy[2]**2))
         
         if qcutils.cfkeycheck(cf,Base='Output',ThisOne='FootprintDataFileType') and (cf['Output']['FootprintDataFileType'] == 'Weighted' or cf['Output']['FootprintDataFileType'] == 'Climatology'):
-            check = numpy.zeros(5,dtype=int32)
+            check = numpy.zeros(5,dtype=numpy.int32)
             matrixfiles = []
             vectorfiles = []
             labels = []
@@ -3438,7 +3452,9 @@ def get_rav(cf,ds,Uavg,PMin,qList,layer='',method='Cemethod'):
     Fg,f,a = qcutils.GetSeriesasMA(ds,PMin[7])
     wA,f,a = qcutils.GetSeriesasMA(ds,PMin[8])
     Lv,f,a = qcutils.GetSeriesasMA(ds,'Lv')
-    if 'WPLcov' not in ds.globalattributes['L3Functions']:
+    #if 'WPLcov' not in ds.globalattributes['L3Functions']:
+    #    wA = Fe / (Lv * c.g2kg)
+    if 'wA' not in ds.series.keys():
         wA = Fe / (Lv * c.g2kg)
     Ce = mf.bulktransfercoefficient(wA,Uavg,qair,qsurface)
     rav = mf.aerodynamicresistance(Uavg,Ce)

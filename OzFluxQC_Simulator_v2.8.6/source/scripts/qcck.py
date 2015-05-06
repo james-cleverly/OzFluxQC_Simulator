@@ -166,7 +166,7 @@ def do_diurnalcheck(cf,ds,section='',series='',code=5):
 
 def do_excludedates(cf,ds,section='',series='',code=6):
     if 'ExcludeDates' not in cf[section][series].keys(): return
-    if ds.globalattributes['nc_level'] != 'L2': return
+    #if ds.globalattributes['nc_level'] != 'L2': return
     ldt = ds.series['DateTime']['Data']
     ExcludeList = cf[section][series]['ExcludeDates'].keys()
     NumExclude = len(ExcludeList)
@@ -292,5 +292,8 @@ def do_qcchecks_oneseries(cf,ds,series=''):
     do_excludedates(cf,ds,section=section,series=series,code=excludedates_code)
     # do exclude hours
     do_excludehours(cf,ds,section=section,series=series,code=excludehours_code)
-    if 'do_qcchecks' not in ds.globalattributes['Functions']:
-        ds.globalattributes['Functions'] = ds.globalattributes['Functions']+',do_qcchecks'
+    try:
+        if 'do_qcchecks' not in ds.globalattributes['Functions']:
+            ds.globalattributes['Functions'] = ds.globalattributes['Functions']+',do_qcchecks'
+    except:
+        ds.globalattributes['Functions'] = 'do_qcchecks'

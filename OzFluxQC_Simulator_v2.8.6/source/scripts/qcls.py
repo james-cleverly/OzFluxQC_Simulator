@@ -446,7 +446,10 @@ def l3qc(cf,ds2):
         
         qcts.do_sums(cf,ds3)
     
-    ds3.globalattributes['Functions'] = ds3.globalattributes['Functions'] + ', ' + ds3.globalattributes['L3Functions']
+    try:
+        ds3.globalattributes['Functions'] = ds3.globalattributes['Functions'] + ', ' + ds3.globalattributes['L3Functions']
+    except:
+        ds3.globalattributes['Functions'] = ds3.globalattributes['L3Functions']
     
     return ds3
 
@@ -623,7 +626,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
     
     ds4x = copy.deepcopy(ds3x)
     for ThisOne in ['NEE','NEP','Fc','Fc_co2','Fc_c','Fe','Fh']:
-        if ThisOne in ds4x.series.keys():
+        if ThisOne in ds4x.series.keys() and ThisOne in ds3.series.keys():
             ds4x.series[ThisOne] = ds3.series[ThisOne].copy()
     for ThisOne in ['GPP','Re']:
         if ThisOne in ds4x.series.keys():
