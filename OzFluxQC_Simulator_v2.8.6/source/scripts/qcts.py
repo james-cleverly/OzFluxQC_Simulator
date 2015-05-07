@@ -2001,31 +2001,29 @@ def do_climatology(cf,ds):
 
 def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     if 'Footprint' not in cf.keys(): log.error('   no Footprint section in cf'); return
+    if not qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='zm'): log.error('   no measurement height zm in cf'); return
+    if not qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='zc'): log.error('   no canopy height zc in cf'); return
     log.info(' Calculating 2D footprint')
-    if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='zm'):
-        zm = numpy.float64(cf['Footprint']['zm'])
+    n = len(ds.series['xlDateTime']['Data'])
+    if cf['Footprint']['zc'] == 'variable':
+        zc,f,a = qcutils.GetSeriesasMA(ds,'zc')
+    else:
+        zc = numpy.zeros(n,dtype=numpy.float64) + numpy.float64(cf['Footprint']['zc'])
     
-    if zm<1.0:
-        log.error('zm needs to be larger than 1 m')
-        return
-    
-    if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='zc'):
-        zc = numpy.float64(cf['Footprint']['zc'])
-    
+    zm = numpy.zeros(n,dtype=numpy.float64) + numpy.float64(cf['Footprint']['zm'])
+    if cf['Footprint']['zm']<1.0: log.error('   zm needs to be larger than 1 m'); return
+    # roughness length, z0 = zc / 3e (Brutseart 1982, eqn 5.7), m
+    denominator = 1 / (3 * numpy.exp(1))
+    znot = zc * denominator
     d = 2 / 3 * zc
     zmd = zm - d
-    if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='z0'):
-        znot = numpy.float64(cf['Footprint']['z0'])
-    
-    if znot<0.0:
-        log.error('z0 needs to be larger than 0 m')
-        return
-    
     if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='r'):
         r = numpy.int32(cf['Footprint']['r'])
+    else:
+        r = numpy.int32(96)
     
-    if r>96.0:
-        log.error('r needs to be smaller than 96')
+    if r>96:
+        log.error('   r needs to be smaller than 96')
         return
     
     if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='ExcludeHours') and cf['Footprint']['ExcludeHours'] == 'True':
@@ -2059,7 +2057,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
         zetaindex = numpy.where(L != 0)[0]
         zetaflagindex = numpy.where((L == 0)&(numpy.mod(Lf,10)==0))[0]
         zeta = numpy.ones(len(L),dtype=numpy.float64)*c.missing_value
-        zeta[zetaindex] = zmd / L[zetaindex]
+        zeta[zetaindex] = zmd[zetaindex] / L[zetaindex]
         zf = numpy.zeros(n,dtype=numpy.int32) + Lf
         zf[zetaflagindex] = numpy.int32(22) 
         attr = qcutils.MakeAttributeDictionary(long_name='stability coefficient, (z-d)/L',units='unitless')
@@ -2132,6 +2130,20 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     Lf[ustarindex] = 18
     index_noFlux = numpy.ma.where((numpy.mod(Lf,10)==0) & ((numpy.mod(fFc,10)!=0) | (numpy.mod(fFe,10)!=0) | (numpy.mod(fFh,10)!=0)))[0]
     Lf[index_noFlux] = 31
+    if 'zi' in ds.series.keys():
+        h,zif,a = qcutils.GetSeriesasMA(ds,'zi')
+    else:
+        h = numpy.ma.zeros(n,dtype=numpy.float64)
+        h[index_very_unstable] = numpy.float64(2000)
+        h[index_unstable] = numpy.float64(1500)
+        h[index_slight_unstable] = numpy.float64(1200)
+        h[index_neutral] = numpy.float64(1000)
+        h[index_slight_stable] = numpy.float64(800)
+        h[index_stable] = numpy.float64(250)
+        h[index_very_stable] = numpy.float64(200)
+    
+    ziindex = numpy.where((numpy.mod(zif,10)!=0) & (numpy.mod(Lf,10)==0))[0]
+    Lf[ziindex] = 99999999
     zetaxindex = numpy.where(numpy.mod(Lf,10)==0)[0]
     Lfindex = numpy.where(numpy.mod(Lf,10)!=0)[0]
     zeta[Lfindex] = 9999999
@@ -2143,18 +2155,6 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     index_slight_unstable = numpy.ma.where((zeta < -0.1) & (zeta > -1))[0]
     index_unstable = numpy.ma.where((zeta < -1) & (zeta > -2))[0]
     index_very_unstable = numpy.ma.where(zeta < -2)[0]
-    if 'zi' in ds.series.keys():
-        h,f,a = qcutils.GetSeriesasMA(ds,'zi')
-    else:
-        h = numpy.ma.zeros(n,dtype=numpy.float64)
-        h[index_very_unstable] = numpy.float64(2000)
-        h[index_unstable] = numpy.float64(1500)
-        h[index_slight_unstable] = numpy.float64(1200)
-        h[index_neutral] = numpy.float64(1000)
-        h[index_slight_stable] = numpy.float64(800)
-        h[index_stable] = numpy.float64(250)
-        h[index_very_stable] = numpy.float64(200)
-    
     h[index_zero_L] = numpy.float64(0)
     log.info('  Total measurements:  '+str(includedate))
     log.info('  Masked measurements (not included):  '+str(includedate-len(zetaxindex)))
@@ -2162,6 +2162,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     log.info('   '+str(includedate-len(zetaxindex)-len(ustarindex)-len(index_noFlux)-excludehours)+':  turbulence gaps (sigma-w, L, u*)')
     log.info('   '+str(len(index_noFlux))+':  flux gaps')
     log.info('   '+str(len(ustarindex))+':  u* < 0.2 m/s')
+    log.info('   '+str(len(ziindex))+':  zi gaps')
     log.info('  Included measurements:  '+str(len(zetaxindex)))
     log.info('   '+str(len(index_neutral))+':  neutral, -0.1 < zeta < 0.1')
     log.info('   '+str(len(index_slight_stable))+':  slightly stable, 0.1 < zeta < 1')
@@ -2179,6 +2180,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
         out.write(' '+str(includedate-len(zetaxindex)-len(ustarindex)-len(index_noFlux)-excludehours)+':  turbulence gaps (sigma-w, L, u*)\n')
         out.write(' '+str(len(index_noFlux))+':  flux gaps\n')
         out.write(' '+str(len(ustarindex))+':  u* < 0.2 m/s\n')
+        out.write(' '+str(len(ziindex))+':  zi gaps\n')
         out.write('Included measurements:  '+str(len(zetaxindex))+'\n')
         out.write(' '+str(len(index_neutral))+':  neutral, -0.1 < zeta < 0.1\n')
         out.write(' '+str(len(index_slight_stable))+':  slightly stable, 0.1 < zeta < 1\n')
@@ -2219,21 +2221,22 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
             log.error('  Footprint climatology: Spatial parameters missing from controlfile')
             return
     
-    do_index = numpy.where((sigmaw > 0) & (sigmav > 0) & (ustar > 0.2) & (h > 1) & (h > zm) & (numpy.mod(Lf,10)==0))[0]
+    hcheck = h - zm
+    do_index = numpy.where((sigmaw > 0) & (sigmav > 0) & (ustar > 0.2) & (h > 1) & (hcheck > 0) & (numpy.mod(Lf,10)==0))[0]
     for i in range(len(do_index)):
         if qcutils.cfkeycheck(cf,Base='Footprint',ThisOne='loglist') and cf['Footprint']['loglist'] == 'True':
             log.info('    Footprint: '+str(ds.series['DateTime']['Data'][do_index[i]]))
         
         if qcutils.cfkeycheck(cf,Base='Output',ThisOne='FootprintDataFileType') and cf['Output']['FootprintDataFileType'] == 'Climatology' and qcutils.cfkeycheck(cf,Base='Output',ThisOne='FootprintDataFile') and cf['Output']['FootprintDataFile'] == 'True':
             if footprintlevel == 'V3':
-                xr[do_index[i]],x_2d,y_2d,fw_c1_2d,fw_e_2d,fw_h_2d,fw_c2_2d,fw_c3_2d,filenames,labels = footprint_2d(cf,sigmaw[do_index[i]],sigmav[do_index[i]],ustar[do_index[i]],zm,h[do_index[i]],znot,r,wd[do_index[i]],zeta[do_index[i]],L[do_index[i]],zc,ds.series['DateTime']['Data'][do_index[i]],eta[do_index[i]],Fc[do_index[i]],Fe[do_index[i]],Fh[do_index[i]],footprintlevel)
+                xr[do_index[i]],x_2d,y_2d,fw_c1_2d,fw_e_2d,fw_h_2d,fw_c2_2d,fw_c3_2d,filenames,labels = footprint_2d(cf,sigmaw[do_index[i]],sigmav[do_index[i]],ustar[do_index[i]],zm[do_index[i]],h[do_index[i]],znot[do_index[i]],r,wd[do_index[i]],zeta[do_index[i]],L[do_index[i]],zc[do_index[i]],ds.series['DateTime']['Data'][do_index[i]],eta[do_index[i]],Fc[do_index[i]],Fe[do_index[i]],Fh[do_index[i]],footprintlevel)
                 fc_c1_2d,fc_e_2d,fc_h_2d,fc_c2_2d,fc_c3_2d,fc_x2d,fc_y2d = footprint_climatology(fc_c1_2d,fc_e_2d,x_2d,y_2d,fw_c1_2d,fw_e_2d,n,m,xmin,xmax,ymin,ymax,p,fc_h=fc_h_2d,fc_c2=fc_c2_2d,fc_c3=fc_c3_2d,fw_h=fw_h_2d,fw_c2=fw_c2_2d,fw_c3=fw_c3_2d)
             
             if footprintlevel == 'V2':
-                xr[do_index[i]],x_2d,y_2d,fw_c1_2d,fw_e_2d,filenames,labels = footprint_2d(cf,sigmaw[do_index[i]],sigmav[do_index[i]],ustar[do_index[i]],zm,h[do_index[i]],znot,r,wd[do_index[i]],zeta[do_index[i]],L[do_index[i]],zc,ds.series['DateTime']['Data'][do_index[i]],eta[do_index[i]],Fc[do_index[i]],Fe[do_index[i]],Fh[do_index[i]],footprintlevel)
+                xr[do_index[i]],x_2d,y_2d,fw_c1_2d,fw_e_2d,filenames,labels = footprint_2d(cf,sigmaw[do_index[i]],sigmav[do_index[i]],ustar[do_index[i]],zm[do_index[i]],h[do_index[i]],znot[do_index[i]],r,wd[do_index[i]],zeta[do_index[i]],L[do_index[i]],zc[do_index[i]],ds.series['DateTime']['Data'][do_index[i]],eta[do_index[i]],Fc[do_index[i]],Fe[do_index[i]],Fh[do_index[i]],footprintlevel)
                 fc_c1_2d,fc_e_2d,fc_x2d,fc_y2d = footprint_climatology(fc_c1_2d,fc_e_2d,x_2d,y_2d,fw_c1_2d,fw_e_2d,n,m,xmin,xmax,ymin,ymax,p)
         else:
-            xr[do_index[i]] = footprint_2d(cf,sigmaw[do_index[i]],sigmav[do_index[i]],ustar[do_index[i]],zm,h[do_index[i]],znot,r,wd[do_index[i]],zeta[do_index[i]],L[do_index[i]],zc,ds.series['DateTime']['Data'][do_index[i]],eta[do_index[i]],Fc[do_index[i]],Fe[do_index[i]],Fh[do_index[i]],footprintlevel)
+            xr[do_index[i]] = footprint_2d(cf,sigmaw[do_index[i]],sigmav[do_index[i]],ustar[do_index[i]],zm[do_index[i]],h[do_index[i]],znot[do_index[i]],r,wd[do_index[i]],zeta[do_index[i]],L[do_index[i]],zc[do_index[i]],ds.series['DateTime']['Data'][do_index[i]],eta[do_index[i]],Fc[do_index[i]],Fe[do_index[i]],Fh[do_index[i]],footprintlevel)
         
     if qcutils.cfkeycheck(cf,Base='Output',ThisOne='FootprintDataFileType') and cf['Output']['FootprintDataFileType'] == 'Climatology' and qcutils.cfkeycheck(cf,Base='Output',ThisOne='FootprintDataFile') and cf['Output']['FootprintDataFile'] == 'True':
         if ((not qcutils.cfkeycheck(cf, Base='Output', ThisOne='FootprintDataType')) or ((qcutils.cfkeycheck(cf, Base='Output', ThisOne='FootprintDataType')) and ((cf['Output']['FootprintDataType'] != 'Vector') and (cf['Output']['FootprintDataType'] != 'Matrix') and (cf['Output']['FootprintDataType'] != 'Both')))):
