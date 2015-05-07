@@ -1321,16 +1321,17 @@ def xlsx_write_series(ds, xlsxfullname, outputlist=None):
             xlAttrSheet.write(xlrow,xlcol_attrvalue,str(ds.series[ThisOne]['Attr'][Attr]))
             xlrow = xlrow + 1
     # write the Excel date/time to the data and the QC flags as the first column
-    ldt = ds.series["DateTime"]["Data"]
-    # get the datemode of the original spreadsheet
     datemode = numpy.int32(ds.globalattributes['xl_datemode'])
+    ldt = ds.series["DateTime"]["Data"]
     xlDateTime = qcutils.get_xldate_from_datetime(ldt,datemode=datemode)
     log.info(' Writing the datetime to Excel file '+xlsxfullname)
     dt_format = xlfile.add_format({'num_format': 'dd/mm/yyyy hh:mm'})
     xlDataSheet.write(2,xlcol,'xlDateTime')
+    xlFlagSheet.write(2,xlcol,'xlDateTime')
     for j in range(nRecs):
         xlDataSheet.write_datetime(j+3,xlcol,ldt[j],dt_format)
         xlFlagSheet.write_datetime(j+3,xlcol,ldt[j],dt_format)
+    # remove xlDateTime from the list of variables to be written to the Excel file
     if "xlDateTime" in outputlist: outputlist.remove("xlDateTime")
     if "xlDateTime_UTC" in outputlist: outputlist.remove("xlDateTime_UTC")
     # now start looping over the other variables in the xl file
@@ -1339,7 +1340,6 @@ def xlsx_write_series(ds, xlsxfullname, outputlist=None):
     for ThisOne in outputlist:
         # put up a progress message
         log.info(' Writing '+ThisOne+' into column '+str(xlcol)+' of the Excel file')
-        d_xf = xlwt.easyxf()
         # write the units and the variable name to the header rows in the xl file
         attrlist = ds.series[ThisOne]['Attr'].keys()
         if 'long_name' in attrlist:
@@ -1362,13 +1362,13 @@ def xlsx_write_series(ds, xlsxfullname, outputlist=None):
             xlDataSheet.write(j+3,xlcol,numpy.float64(ds.series[ThisOne]['Data'][j]))
         # check to see if this variable has a quality control flag
         if 'Flag' in ds.series[ThisOne].keys():
-            # write the QC flag name to the xk file
+            # write the QC flag name to the Excel file
             xlFlagSheet.write(2,xlcol,ThisOne)
             # specify the format of the QC flag (integer)
-            d_xf = xlwt.easyxf(num_format_str='0')
-            # loop over QV flag values and write to xl file
+            flag_format = xlfile.add_format({'num_format': '0'})
+            # loop over QC flag values and write to xl file
             for j in range(nRecs):
-                xlFlagSheet.write(j+3,xlcol,numpy.int32(ds.series[ThisOne]['Flag'][j]),d_xf)
+                xlFlagSheet.write(j+3,xlcol,numpy.int32(ds.series[ThisOne]['Flag'][j]),flag_format)
         # increment the column pointer
         xlcol = xlcol + 1
     
