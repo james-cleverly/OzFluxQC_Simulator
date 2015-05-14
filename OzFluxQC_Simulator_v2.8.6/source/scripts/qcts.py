@@ -1428,6 +1428,7 @@ def CoordRotation2D(cf,ds):
     wA = UzA*ct - UxA*st*ce - UyA*st*se       # covariance(w,A) in natural wind coordinate system
     wC = UzC*ct - UxC*st*ce - UyC*st*se       # covariance(w,C) in natural wind coordinate system
     uw = UxUz*ce*(ct**2-st**2) - 2*UxUy*ct*st*ce*se + UyUz*se*(ct**2-st**2) - UxUx*ct*st*ce**2 - UyUy*ct*st*se**2 + UzUz*ct*st    # covariance(w,x) in natural wind coordinate system
+    uv = UxUy*ct*(ce*ce-se*se) + UyUz*st*ce - UxUz*st*se - UxUx*ct*ce*se + UyUy*ct*ce*se    # covariance(x,y) in natural wind coordinate system
     vw = UyUz*ct*ce - UxUz*ct*se - UxUy*st*(ce**2-se**2) + UxUx*st*ce*se - UyUy*st*ce*se    # covariance(w,y) in natural wind coordinate system
     # store the rotated quantities in the nc object
     attr = qcutils.MakeAttributeDictionary(long_name='Horizontal rotation angle',units='deg')
@@ -1448,6 +1449,8 @@ def CoordRotation2D(cf,ds):
     qcutils.CreateSeries(ds,'wC',wC,FList=['Ux','Uy','Uz','UxC','UyC','UzC'],Attr=attr)
     attr = qcutils.MakeAttributeDictionary(long_name='Momentum flux X component, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'uw',uw,FList=['Ux','Uy','Uz','UxUz','UxUx','UxUy'],Attr=attr)
+    attr = qcutils.MakeAttributeDictionary(long_name='Horizontal streamwise-crosswind covariance, rotated to natural wind coordinates',units='m2/s2')
+    qcutils.CreateSeries(ds,'uv',uv,FList=['Ux','Uy','Uz','UxUz','UxUx','UxUy'],Attr=attr)
     attr = qcutils.MakeAttributeDictionary(long_name='Momentum flux Y component, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'vw',vw,FList=['Ux','Uy','Uz','UyUz','UxUy','UyUy'],Attr=attr)
     attr = qcutils.MakeAttributeDictionary(long_name='Variance of streamwise windspeed, rotated to natural wind coordinates',units='m2/s2')
