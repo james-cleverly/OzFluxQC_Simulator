@@ -32,11 +32,12 @@ import datetime
 from matplotlib.dates import date2num
 import meteorologicalfunctions as mf
 import numpy
+import os
 import qcck
 import qcio
 import qcts
 import qcutils
-from scipy import interpolate
+from scipy import interpolate, signal
 import time
 import xlrd
 from matplotlib.mlab import griddata
@@ -1430,6 +1431,10 @@ def CoordRotation2D(cf,ds):
     uw = UxUz*ce*(ct**2-st**2) - 2*UxUy*ct*st*ce*se + UyUz*se*(ct**2-st**2) - UxUx*ct*st*ce**2 - UyUy*ct*st*se**2 + UzUz*ct*st    # covariance(w,x) in natural wind coordinate system
     uv = UxUy*ct*(ce*ce-se*se) + UyUz*st*ce - UxUz*st*se - UxUx*ct*ce*se + UyUy*ct*ce*se    # covariance(x,y) in natural wind coordinate system
     vw = UyUz*ct*ce - UxUz*ct*se - UxUy*st*(ce**2-se**2) + UxUx*st*ce*se - UyUy*st*ce*se    # covariance(w,y) in natural wind coordinate system
+    # now update the standard deviations
+    u_Sd = numpy.ma.sqrt(uu)
+    v_Sd = numpy.ma.sqrt(vv)
+    w_Sd = numpy.ma.sqrt(ww)
     # store the rotated quantities in the nc object
     attr = qcutils.MakeAttributeDictionary(long_name='Horizontal rotation angle',units='deg')
     qcutils.CreateSeries(ds,'eta',eta,FList=['Ux','Uy','Uz'],Attr=attr)
@@ -1459,15 +1464,21 @@ def CoordRotation2D(cf,ds):
     qcutils.CreateSeries(ds,'vv',vv,FList=['Ux','Uy','Uz','UyUy','UxUy'],Attr=attr)
     attr = qcutils.MakeAttributeDictionary(long_name='Variance of vertical windspeed, rotated to natural wind coordinates',units='m2/s2')
     qcutils.CreateSeries(ds,'ww',ww,FList=['Ux','Uy','Uz','UzUz','UxUz','UyUz'],Attr=attr)
+    attr = qcutils.MakeAttributeDictionary(long_name='Longitudinal velocity component from CSAT, standard deviation, rotated to natural wind coordinates',units='m/s')
+    qcutils.CreateSeries(ds,'u_Sd',u_Sd,FList=['Ux','Uy','Uz','UxUx','UxUy','UxUz'],Attr=attr)
+    attr = qcutils.MakeAttributeDictionary(long_name='Lateral velocity component from CSAT, standard deviation, rotated to natural wind coordinates',units='m/s')
+    qcutils.CreateSeries(ds,'v_Sd',v_Sd,FList=['Ux','Uy','Uz','UyUy','UxUy'],Attr=attr)
+    attr = qcutils.MakeAttributeDictionary(long_name='Vertical velocity component from CSAT, standard deviation, rotated to natural wind coordinates',units='m/s')
+    qcutils.CreateSeries(ds,'w_Sd',w_Sd,FList=['Ux','Uy','Uz','UzUz','UxUz','UyUz'],Attr=attr)
     if qcutils.cfkeycheck(cf,Base='General',ThisOne='RotateFlag') and cf['General']['RotateFlag'] == 'True':
-        keys = ['eta','theta','u','v','w','wT','wA','wC','uw','vw','uu','vv','ww']
+        keys = ['eta','theta','u','v','w','wT','wA','wC','uw','vw','uu','vv','ww','u_Sd','v_Sd','w_Sd']
         for ThisOne in keys:
             testseries,f,a = qcutils.GetSeriesasMA(ds,ThisOne)
             mask = numpy.ma.getmask(testseries)
             index = numpy.where(mask.astype(numpy.int32)==1)
             ds.series[ThisOne]['Flag'][index] = numpy.int32(11)
     else:
-        keys = ['eta','theta','u','v','w','wT','wA','wC','uw','vw','uu','vv','ww']
+        keys = ['eta','theta','u','v','w','wT','wA','wC','uw','vw','uu','vv','ww','u_Sd','v_Sd','w_Sd']
         for ThisOne in keys:
             testseries,f,a = qcutils.GetSeriesasMA(ds,ThisOne)
             mask = numpy.ma.getmask(testseries)
@@ -1594,34 +1605,6 @@ def ConvertFcJason(cf,ds,Fco2_in='Fc'):
     else:
         attr = qcutils.MakeAttributeDictionary(long_name='Fc (Flux of carbon), '+attr_hist,units='umol/m2/s')
         qcutils.CreateSeries(ds,'Fc',NEE,FList=[Fco2_in],Attr=attr)
-
-def CorrectFcForStorage(cf,ds,Fc_out='Fc',Fc_in='Fc',Fc_storage_in='Fc_storage'):
-    """
-    Correct CO2 flux for storage in the air column beneath the CO2 instrument.
-    
-    Usage qcts.CorrectFcForStorage(cf,ds,Fc_out,Fc_in,Fc_storage_in)
-    cf: control file object    
-    ds: data structure
-    Fc_out: series label of the corrected CO2 flux
-    Fc_in: series label of the input CO2 flux
-    Fc_storage: series label of the CO2 flux storage term
-
-    """
-    if not qcutils.cfoptionskey(cf,Key='ApplyFcStorage'): return
-    if (Fc_in not in ds.series.keys()) or (Fc_storage_in not in ds.series.keys()): return
-    log.info(' ***!!! Applying Fc storage term !!!***')
-    Fc,Fc_flag,Fc_attr = qcutils.GetSeriesasMA(ds,Fc_in)
-    Fc_storage,Fc_storage_flag,Fc_storage_attr = qcutils.GetSeriesasMA(ds,Fc_storage_in)
-    if Fc_attr['units']!=Fc_storage_attr['units']:
-        log.error('CorrectFcForStorage: units of Fc do not match those of storage term, storage not applied')
-        return
-    log.info(' Applying storage correction to Fc')
-    Fc = Fc + Fc_storage
-    long_name = Fc_attr['long_name'] + ', corrected for storage using supplied storage term'
-    attr_out = qcutils.MakeAttributeDictionary(long_name=long_name, units=Fc_attr['units'])
-    qcutils.CreateSeries(ds,Fc_out,Fc,FList=[Fc_in,Fc_storage_in],Attr=attr_out)
-    if 'CorrectFcForStorage' not in ds.globalattributes['Functions']:
-        ds.globalattributes['Functions'] = ds.globalattributes['Functions']+', CorrectFcForStorage'
 
 def CorrectIndividualFgForStorage(cf,ds):
     log.info(' Correcting soil heat flux for storage')
@@ -2309,16 +2292,31 @@ def do_functions(cf,ds):
         UxUx = Ux_Sd*Ux_Sd
         attr = qcutils.MakeAttributeDictionary(long_name='Longitudinal velocity component from CSAT, variance',units='(m/s)2')
         qcutils.CreateSeries(ds,'UxUx',UxUx,Flag=flag,Attr=attr)
+    if 'UxUx' in ds.series.keys() and 'Ux_Sd' not in ds.series.keys():
+        UxUx,flag,attr = qcutils.GetSeriesasMA(ds,'UxUx')
+        Ux_Sd = numpy.ma.sqrt(UxUx)
+        attr = qcutils.MakeAttributeDictionary(long_name='Longitudinal velocity component from CSAT, standard deviation',units='m/s')
+        qcutils.CreateSeries(ds,'Ux_Sd',Ux_Sd,Flag=flag,Attr=attr)
     if 'Uy_Sd' in ds.series.keys() and 'UyUy' not in ds.series.keys():
         Uy_Sd,flag,attr = qcutils.GetSeriesasMA(ds,'Uy_Sd')
         UyUy = Uy_Sd*Uy_Sd
         attr = qcutils.MakeAttributeDictionary(long_name='Lateral velocity component from CSAT, variance',units='(m/s)2')
         qcutils.CreateSeries(ds,'UyUy',UyUy,Flag=flag,Attr=attr)
+    if 'UyUy' in ds.series.keys() and 'Uy_Sd' not in ds.series.keys():
+        UyUy,flag,attr = qcutils.GetSeriesasMA(ds,'UyUy')
+        Uy_Sd = numpy.ma.sqrt(UyUy)
+        attr = qcutils.MakeAttributeDictionary(long_name='Lateral velocity component from CSAT, standard deviation',units='m/s')
+        qcutils.CreateSeries(ds,'Uy_Sd',Uy_Sd,Flag=flag,Attr=attr)
     if 'Uz_Sd' in ds.series.keys() and 'UzUz' not in ds.series.keys():
         Uz_Sd,flag,attr = qcutils.GetSeriesasMA(ds,'Uz_Sd')
         UzUz = Uz_Sd*Uz_Sd
         attr = qcutils.MakeAttributeDictionary(long_name='Vertical velocity component from CSAT, variance',units='(m/s)2')
         qcutils.CreateSeries(ds,'UzUz',UzUz,Flag=flag,Attr=attr)
+    if 'UzUz' in ds.series.keys() and 'Uz_Sd' not in ds.series.keys():
+        UzUz,flag,attr = qcutils.GetSeriesasMA(ds,'UzUz')
+        Uz_Sd = numpy.ma.sqrt(UzUz)
+        attr = qcutils.MakeAttributeDictionary(long_name='Vertical velocity component from CSAT, standard deviation',units='m/s')
+        qcutils.CreateSeries(ds,'Uz_Sd',Uz_Sd,Flag=flag,Attr=attr)
 
 def do_PenmanMonteith(cf,ds):
     if qcutils.cfkeycheck(cf,Base='PenmanMonteith',ThisOne='Cdmethod'):
@@ -2436,7 +2434,7 @@ def Fc_WPL(cf,ds,Fc_wpl_out='Fc',Fc_raw_in='Fc',Fh_in='Fh',Fe_in='Fe',Ta_in='Ta'
     co2_wpl_Fh = (Cc/TaK)*(Fh/RhoCp)
     Fc_wpl_data = Fc_raw+co2_wpl_Fe+co2_wpl_Fh
     Fc_wpl_flag = numpy.zeros(len(Fc_wpl_data),dtype=numpy.int32)
-    index = numpy.where(Fc_wpl_data.mask==True)[0]
+    index = numpy.where(numpy.ma.getmaskarray(Fc_wpl_data)==True)[0]
     Fc_wpl_flag[index] = numpy.int32(14)
     attr = qcutils.MakeAttributeDictionary(long_name='WPL corrected Fc',units='mg/m2/s')
     qcutils.CreateSeries(ds,Fc_wpl_out,Fc_wpl_data,Flag=Fc_wpl_flag,Attr=attr)
@@ -2568,7 +2566,7 @@ def Fe_WPL(cf,ds,Fe_wpl_out='Fe',Fe_raw_in='Fe',Fh_in='Fh',Ta_in='Ta',Ah_in='Ah'
     Fe_wpl_data = Fe_raw+h2o_wpl_Fe+h2o_wpl_Fh
     Fe_wpl_flag = numpy.zeros(len(Fe_wpl_data),dtype=numpy.int32)
     mask = numpy.ma.getmask(Fe_wpl_data)
-    index = numpy.where(Fe_wpl_data.mask==True)[0]
+    index = numpy.where(numpy.ma.getmaskarray(Fe_wpl_data)==True)[0]
     Fe_wpl_flag[index] = numpy.int32(14)
     attr = qcutils.MakeAttributeDictionary(long_name='WPL corrected Fe',units='W/m2',standard_name='surface_upward_latent_heat_flux')
     qcutils.CreateSeries(ds,Fe_wpl_out,Fe_wpl_data,Flag=Fe_wpl_flag,Attr=attr)

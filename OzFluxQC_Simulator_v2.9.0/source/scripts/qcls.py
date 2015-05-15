@@ -883,7 +883,10 @@ def l6qc(cf,ds5,z):
         
         qcts.do_footprint_2d(cf,ds6,datalevel='L6')
     
-    ds6.globalattributes['Functions'] = ds6.globalattributes['Functions'] + ', ' + ds6.globalattributes['L6Functions']
+    try:
+        ds6.globalattributes['Functions'] = ds6.globalattributes['Functions'] + ', ' + ds6.globalattributes['L6Functions']
+    except:
+        ds6.globalattributes['Functions'] = ''
     
     # re-apply the quality control checks (range, diurnal and rules)
     if z > 0:

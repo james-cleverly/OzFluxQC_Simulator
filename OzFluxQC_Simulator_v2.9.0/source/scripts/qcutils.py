@@ -463,15 +463,15 @@ def GetSeries(ds,ThisOne,si=0,ei=-1,mode="truncate"):
         # make an empty series if the requested series does not exist in the data structure
         Series,Flag,Attr = MakeEmptySeries(ds,ThisOne)
     # tidy up
+    if ei==-1: ei = nRecs - 1
     if mode=="truncate":
         # truncate to the requested start and end indices
         si = max(0,si)                  # clip start index at 0
         ei = min(nRecs,ei)              # clip end index to nRecs
-        if ei==-1: ei = nRecs - 1       # trap ei = -1 values
         Series = Series[si:ei+1]        # truncate the data
         Flag = Flag[si:ei+1]            # truncate the QC flag
     elif mode=="pad":
-        # pad with maiising data at the start and/or the end of the series
+        # pad with missing data at the start and/or the end of the series
         if si<0 and ei>nRecs-1:
             # pad at the start
             Series = numpy.append(numpy.float64(c.missing_value)*numpy.ones(abs(si),dtype=numpy.float64),Series)
@@ -489,7 +489,6 @@ def GetSeries(ds,ThisOne,si=0,ei=-1,mode="truncate"):
             Flag = numpy.append(Flag[si:],numpy.ones((ei-(nRecs-1)),dtype=numpy.int32))
         elif si>=0 and ei<=nRecs-1:
             # truncate at the start and end
-            if ei==-1: ei = nRecs - 1
             Series = Series[si:ei+1]
             Flag = Flag[si:ei+1]
         else:
@@ -648,7 +647,7 @@ def get_nrecs(ds):
     if 'nc_nrecs' in ds.globalattributes.keys():
         nRecs = numpy.int32(ds.globalattributes['nc_nrecs'])
     elif 'NumRecs' in ds.globalattributes.keys():
-        nRecs = numpy.int32(ds.globalattributes['nc_nrecs'])
+        nRecs = numpy.int32(ds.globalattributes['NumRecs'])
     else:
         nRecs = len(ds.series[SeriesList[0]]['Data'])
     return nRecs

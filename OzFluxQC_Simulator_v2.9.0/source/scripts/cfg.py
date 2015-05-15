@@ -16,6 +16,7 @@
 
 """
     Version History:
+    <<2.9.0 15 May 2015, Reconciled against OzFluxQC v2.9.0; variances, standard deviations and rotations updated>>
     <<2.8.6 2 Jan 2015, Reconciled against OzFluxQC v2.8.6>>
     <<v2.8.5 2 Oct 2014, Update following Alice Springs workshop>>
     <<v2.8.4a 18 Sep 2014, Reconciled against OzFluxQCv2.8.4, L1-L4 including new levels L4-L6>>
@@ -33,8 +34,9 @@
 """
 
 version_name = "OzFluxQC Simulator"
-version_number = "v2.8.6"
+version_number = "v2.9.0"
 
+# 2.9.0    - 15 May 2015, Reconciled against OzFluxQC v2.9.0; variances, standard deviations and rotations updated
 # 2.8.6    - 2 Jan 2015, Reconciled against OzFluxQC v2.8.6
 # 2.8.5    - 2 Oct 2014, Update following Alice Springs workshop
 # 2.8.4a   - 18 Sep 2014, Reconciled against OzFluxQCv2.8.4, L1-L4 including new levels L4-L6
