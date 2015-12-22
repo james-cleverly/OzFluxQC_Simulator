@@ -1,5 +1,5 @@
-#    QCPlus.py  Starts primary GUI for QCPlus
-#    Copyright (C) 2014  Dr James Cleverly, Dr Peter Isaac
+#    OzFluxQC_Simulator.py  Starts primary GUI for OzFluxQC Simulator
+#    Copyright (C) 2015  Dr James Cleverly, Dr Peter Isaac
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by

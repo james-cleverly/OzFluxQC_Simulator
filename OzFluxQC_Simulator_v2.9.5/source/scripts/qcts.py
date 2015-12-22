@@ -1,5 +1,5 @@
 #    qcts.py  Performs most of the analysis and synthesis functions
-#    Copyright (C) 2014  Dr James Cleverly, Dr Peter Isaac
+#    Copyright (C) 2015  Dr James Cleverly, Dr Peter Isaac
 #    
 #    footprint functions do_footprint_2d and footprint_2d
 #        Applies the Kljun two-dimensional approximate analytical footprint
