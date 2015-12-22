@@ -1,0 +1,110 @@
+[Files]
+    [[L1]]
+        in_file_path = ../TiTreeEast/level6partitioning/Conditional_correlation/15Aug15/
+        in_filename = TTE_15Aug_1300-1330_fast_std.xls
+        in_headerrow  = 2
+        in_firstdatarow = 5
+
+[operations]
+    scales = "[0,300,600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,6300,6600,6900,7200,7500,7800,8100,8400,8700,9000,9300,9600,9900,10200,10500,10800,11100,11400,11700,12000,12300,12600,12900,13200,13500,13800,14100,14400,14700,15000,15300,15600,15900,16200,16500,16800,17100,17400,17700]"
+#    scales = "[0,600,1200,1800,2400,3000,3600,4200,4800,5400,6000,6600,7200,7800,8400,9000,9600,10200,10800,11400,12000,12600,13200,13800,14400,15000,15600,16200,16800,17400]"
+    NEE = 0.848013529
+    dER = 0.120557905
+    Sws = 0.01634947
+
+[Global]
+    contact  = "james.cleverly@uts.edu.au"
+    site_pi  = "James Cleverly, Derek Eamus"
+    citation = "Cleverly, J. (2013), Ti Tree East OzFlux Site, OzFlux:  Australian and New Zealand Flux Research and Monitoring Network, hdl: 102.100.100/11135."
+    license_type = "TERN-BY-SA_NC"
+    license_url = "http://www.tern.org.au/datalicence/TERN-BY-SA-NC/1.0"
+    canopy_height = "4.85m"
+    comment06 = "27 Aug 2013:  Penman-Monteith inversion variables consistent with reference1"
+    comment10 = "Carbon flux outputs:  Fc [mgC m-2 s-1], Fco2 [mgCO2 m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
+    comment13 = "Re-analysis 10 Apr 2014:  supervised QA/QC for soil moisture data"
+    comment14 = "17 July 2014:  Carbon flux outputs converted at L3 and L4:  Fc [mgCO2 m-2 s-1], Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
+    comment15 = "9 Mar-28 Mar 2015:  batteries failing, power loss at night; gaps in meteorology filled from TTE-SOLO"
+    comment16 = "9 Mar-9 Apr:  Timestamp on grass array CR1000 behind, failed to keep time through power failure.  Without time-matching, data unusable and replaced by -9999"    conventions = "CF-1.6"
+    conventions_names = "CF convention standard names table version 27, 28 Nov 2013, audited 4 Jan 2015"
+    data_url = "http://data.ozflux.org.au"
+    institution = "University of Technology Sydney"
+    latitude = -22.287
+    longitude = 133.640
+    elevation = "600m"
+    metadata_url = "http://www.ozflux.org.au/monitoringsites/titreeeast/index.html"
+    ozflux_url = "http://ozflux.org.au/"
+    reference_list = "1: Cleverly et al. 2013"
+    reference1 = "Cleverly, J., C. Chen, N. Boulain, R. Villalobos-Vega, R. Faux, N. Grant, Q. Yu, and D. Eamus (2013), Aerodynamic Resistance and Penman-Monteith Evapotranspiration over a Seasonally Two-Layered Canopy in Semiarid Central Australia, J. Hydrometeor., 14, 1562-1570, doi: 10.1175/jhm-d-13-080.1."
+    site_name = "TiTreeEast"
+    site = "Ti Tree East, Northern Territory, Australia"
+    soil = "red kandosol, loamy sand"
+    source = "10m flux tower plus array of soil sensors"
+    title = "Flux tower data set from the Ti Tree East site for the calendar year 2015"
+    time_step = 30
+    time_zone = "Australia/Darwin"
+    tower_height = "10 m"
+    vegetation  = "Open Corymbia-hummock savanna and Mulga patches"
+    vegetation1 = "Mulga trees with grassy interspaces and understorey"
+    vegetation2 = "Corymbia/Triodia savanna"
+    version = "OzFluxQC Simulator v.2.8.6, https://github.com/james-cleverly/OzFluxQC_Simulator"
+    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.6, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.14083"
+
+[Output]
+    DefaultXl = False
+
+[Variables]
+    [[xlDateTime]]
+        [[[xl]]]
+            sheet    = conditional_correlation
+            name     = TIMESTAMP
+        [[[Attr]]]
+            ancillary_variables = ""
+            long_name = "Date/time in Excel format"
+            units    = ""
+            standard_name = "not defined"
+            cf_role       = "timeseries_id"
+    [[Uz]]
+        [[[xl]]]
+            sheet    = conditional_correlation
+            name     = Uz_CSAT
+        [[[Attr]]]
+            ancillary_variables = "Uz QC flag"
+            long_name = "Uz (CSAT)"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[Cc]]
+        [[[xl]]]
+            sheet    = conditional_correlation
+            name     = "Cc_7500"
+        [[[Attr]]]
+            ancillary_variables = "Cc QC flag"
+            long_name = "not defined"
+            units    = "mg/m3"
+            standard_name = "not defined"
+    [[Ah]]
+        [[[xl]]]
+            sheet    = conditional_correlation
+            name     = "Ah_7500"
+        [[[Attr]]]
+            ancillary_variables = "Ah QC flag"
+            long_name = "not defined"
+            units    = "g/m3"
+            standard_name = "not defined"
+    [[Tv]]
+        [[[xl]]]
+            sheet    = conditional_correlation
+            name     = "Tv_CSAT"
+        [[[Attr]]]
+            ancillary_variables = "Tv QC flag"
+            long_name = "not defined"
+            units    = "C"
+            standard_name = "not defined"
+    [[ps]]
+        [[[xl]]]
+            sheet    = conditional_correlation
+            name     = "ps_7500"
+        [[[Attr]]]
+            ancillary_variables = "ps QC flag"
+            long_name = "not defined"
+            units    = "kPa"
+            standard_name = "not defined"
