@@ -1,0 +1,862 @@
+[General]
+    InLevel = L1
+    OutLevel = L1
+
+[Files]
+    [[L1]]
+        in_file_path = ../TiTreeEast/level1/
+        in_filename = TTE_EC_2015.xls
+        in_headerrow  = 2
+        in_firstdatarow = 5
+        out_file_path = ncData/TTE/
+        out_filename = TTE_EC_2015_L1.nc
+
+[Global]
+    contact  = "james.cleverly@uts.edu.au"
+    site_pi  = "James Cleverly, Derek Eamus"
+    citation = "Cleverly, J. (2013), Ti Tree East OzFlux Site, OzFlux:  Australian and New Zealand Flux Research and Monitoring Network, hdl: 102.100.100/11135."
+    license_type = "TERN-BY"
+    license_url = "http://www.tern.org.au/datalicence/TERN-BY/1.0"
+    canopy_height = "4.85m"
+    comment06 = "27 Aug 2013:  Penman-Monteith inversion variables consistent with reference1"
+    comment10 = "Carbon flux outputs:  Fc [mgC m-2 s-1], Fco2 [mgCO2 m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
+    comment13 = "Re-analysis 10 Apr 2014:  supervised QA/QC for soil moisture data"
+    comment14 = "17 July 2014:  Carbon flux outputs converted at L3 and L4:  Fc [mgCO2 m-2 s-1], Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
+    comment15 = "9 Mar-28 Mar 2015:  batteries failing, power loss at night; gaps in meteorology filled from TTE-SOLO"
+    comment16 = "9 Mar-9 Apr:  Timestamp on grass array CR1000 behind, failed to keep time through power failure.  Without time-matching, data unusable and replaced by -9999"    conventions = "CF-1.6"
+    conventions_names = "CF convention standard names table version 27, 28 Nov 2013, audited 4 Jan 2015"
+    data_url = "http://data.ozflux.org.au"
+    institution = "University of Technology Sydney"
+    latitude = -22.287
+    longitude = 133.640
+    elevation = "600m"
+    metadata_url = "http://www.ozflux.org.au/monitoringsites/titreeeast/index.html"
+    ozflux_url = "http://ozflux.org.au/"
+    reference_list = "1: Cleverly et al. 2013"
+    reference1 = "Cleverly, J., C. Chen, N. Boulain, R. Villalobos-Vega, R. Faux, N. Grant, Q. Yu, and D. Eamus (2013), Aerodynamic Resistance and Penman-Monteith Evapotranspiration over a Seasonally Two-Layered Canopy in Semiarid Central Australia, J. Hydrometeor., 14, 1562-1570, doi: 10.1175/jhm-d-13-080.1."
+    site_name = "TiTreeEast"
+    site = "Ti Tree East, Northern Territory, Australia"
+    soil = "red kandosol, loamy sand"
+    source = "10m flux tower plus array of soil sensors"
+    title = "Flux tower data set from the Ti Tree East site for the calendar year 2015"
+    time_step = 30
+    time_zone = "Australia/Darwin"
+    tower_height = "10 m"
+    vegetation  = "Open Corymbia-hummock savanna and Mulga patches"
+    vegetation1 = "Mulga trees with grassy interspaces and understorey"
+    vegetation2 = "Corymbia/Triodia savanna"
+    version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
+    version_citation = "Cleverly, J, and P Isaac (2015), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.14083."
+
+[Output]
+    DefaultXl = False
+
+[Variables]
+    [[xlDateTime]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = TIMESTAMP
+        [[[Attr]]]
+            ancillary_variables = ""
+            long_name = "Date/time in Excel format"
+            units    = ""
+            standard_name = "not defined"
+            cf_role       = "timeseries_id"
+    [[Fn]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fn_CNR4_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fn QC flag"
+            long_name = "Net radiation"
+            units    = "W/m2"
+            instrument = "Kipp and Zonen CNR4"
+            standard_name = "surface_net_downwawrd_radiative_flux"
+    [[Flu]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Flu_CNR4_Avg
+        [[[Attr]]]
+            ancillary_variables = "Flu QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Up-welling long wave"
+            standard_name = "surface_upwelling_longwave_flux_in_air"
+            units = "W/m2"
+    [[Fld]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fld_CNR4_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fld QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Down-welling long wave"
+            standard_name = "surface_downwelling_longwave_flux_in_air"
+            units = "W/m2"
+    [[Fsd]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fsd_CNR4_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fsd QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Down-welling short wave"
+            standard_name = "surface_downwelling_shortwave_flux_in_air"
+            units = "W/m2"
+    [[Fsu]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fsu_CNR4_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fsu QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Up-welling short wave"
+            standard_name = "surface_upwelling_shortwave_flux_in_air"
+            units = "W/m2"
+    [[Fc]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fc_raw_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fc QC flag"
+            long_name = "Flux of carbon, Raw uncorrected"
+            units    = "mg/(m2 s)"
+            standard_name = "not defined"
+    [[Fe]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fe_raw_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fe QC flag"
+            long_name = "Latent heat flux, Raw uncorrected"
+            units    = "W/m2"
+            standard_name = "surface_upward_latent_heat_flux"
+    [[Fh]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fh_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fh QC flag"
+            long_name = "Sensible heat flux, Raw uncorrected"
+            units    = "W/m2"
+            standard_name = "surface_upward_sensible_heat_flux"
+    [[UzT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUzTv
+        [[[Attr]]]
+            ancillary_variables = "UzT QC flag"
+            instrument = "CSAT"
+            long_name = "Covariance of Uz and T"
+            units = "mC/s"
+            standard_name = "not defined"
+    [[UxT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUxTv
+        [[[Attr]]]
+            ancillary_variables = "UxT QC flag"
+            units    = "mC/s"
+            long_name = "Covariance of Ux and T"
+            standard_name = "not defined"
+    [[UyT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUyTv
+        [[[Attr]]]
+            ancillary_variables = "UyT QC flag"
+            long_name = "Covariance of Uy and T (CSAT)"
+            units    = "mC/s"
+            standard_name = "not defined"
+    [[UzA]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUzAh
+        [[[Attr]]]
+            ancillary_variables = "UzA QC flag"
+            long_name = "Covariance of w and H2O (7500)"
+            units    = "g/m2/s"
+            standard_name = "not defined"
+    [[UxA]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUxAh
+        [[[Attr]]]
+            ancillary_variables = "UxA QC flag"
+            long_name = "Covariance of Ux and H2O (7500)"
+            units    = "g/m2/s"
+            standard_name = "not defined"
+    [[UyA]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUyAh
+        [[[Attr]]]
+            ancillary_variables = "UyA QC flag"
+            long_name = "Covariance of Uy and H2O (7500)"
+            units    = "g/m2/s"
+            standard_name = "not defined"
+    [[UzC]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUzCc
+        [[[Attr]]]
+            ancillary_variables = "UzC QC flag"
+            long_name = "Covariance of Uz and CO2 (7500)"
+            units    = "mg/m2/s"
+            standard_name = "not defined"
+    [[UxC]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUxCc
+        [[[Attr]]]
+            ancillary_variables = "UxC QC flag"
+            long_name = "Covariance of Ux and CO2 (7500)"
+            units    = "mg/m2/s"
+            standard_name = "not defined"
+    [[UyC]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUyCc
+        [[[Attr]]]
+            ancillary_variables = "UyC QC flag"
+            long_name = "Covariance of Uy and CO2 (7500)"
+            units    = "mg/m2/s"
+            standard_name = "not defined"
+    [[UxUz]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUzUx
+        [[[Attr]]]
+            ancillary_variables = "UxUz QC flag"
+            long_name = "Covariance of Ux and Uz"
+            units    = "m2/s2"
+            standard_name = "not defined"
+    [[UyUz]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUzUy
+        [[[Attr]]]
+            ancillary_variables = "UyUz QC flag"
+            long_name = "Covariance of Uy and Uz"
+            units    = "m2/s2"
+            standard_name = "not defined"
+    [[UxUy]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUxUy
+        [[[Attr]]]
+            ancillary_variables = "UxUy QC flag"
+            long_name = "Covariance of Ux and Uy"
+            units    = "m2/s2"
+            standard_name = "not defined"
+    [[UxUx]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUxUx
+        [[[Attr]]]
+            ancillary_variables = "UxUx QC flag"
+            long_name = "Variance of Ux"
+            units    = "m2/s2"
+            standard_name = "not defined"
+    [[UyUy]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUyUy
+        [[[Attr]]]
+            ancillary_variables = "UyUy QC flag"
+            long_name = "Variance of Uy"
+            units    = "m2/s2"
+            standard_name = "not defined"
+    [[UzUz]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covUzUz
+        [[[Attr]]]
+            ancillary_variables = "UzUz QC flag"
+            long_name = "Variance of Uz"
+            units    = "m2/s2"
+            standard_name = "not defined"
+    [[Cc_7500_Av]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Cc_7500_filtered
+        [[[Attr]]]
+            ancillary_variables = "Cc_7500_Av QC flag"
+            long_name = "CO2 concentration"
+            units    = "mg/m3"
+            standard_name = "mass_concentration_of_carbon_dioxide_in_air"
+    [[Ah_7500_Av]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ah_7500_filtered
+        [[[Attr]]]
+            ancillary_variables = "Ah_7500_Av QC flag"
+            long_name = "Absolute humidity (7500)"
+            units    = "g/m3"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
+    [[Ah_HMP]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ah_HMP_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "Ah_HMP QC flag"
+            long_name = "Absolute humidity (HMP) at 9.81 m height"
+            units    = "g/m3"
+            standard_name = "mass_concentration_of_water_vapor_in_air"
+    [[Tv_CSAT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Tv_CSAT_filtered
+        [[[Attr]]]
+            ancillary_variables = "Tv_CSAT QC flag"
+            long_name = "Virtual air temperature (CSAT)"
+            units    = "C"
+            standard_name = "virtual_temperature"
+    [[Ta_HMP]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ta_HMP_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "Ta_HMP QC flag"
+            long_name = "Air temperature (HMP) at 9.81 m height"
+            units    = "C"
+            standard_name = "air_temperature"
+    [[AhAh]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covAhAh
+        [[[Attr]]]
+            ancillary_variables = "AhAh QC flag"
+            long_name = "Variance of Absolute humidity (7500)"
+            units    = "g2/m6"
+            standard_name = "not defined"
+    [[CcCc]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = covCcCc
+        [[[Attr]]]
+            ancillary_variables = "CcCc QC flag"
+            long_name = "Variance of CO2 concentration"
+            units    = "mg2/m6"
+            standard_name = "not defined"
+    [[Fg_spinifex]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fg_03_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fg_spinifex QC flag"
+            long_name = "Soil heat flux under spinifex, 8 cm depth"
+            units    = "W/m2"
+            standard_name = "downward_heat_flux_in_soil"
+    [[Fg_mulga]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fg_02_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fg_mulga QC flag"
+            long_name = "Soil heat flux under mulga, 8 cm depth"
+            units    = "W/m2"
+            standard_name = "downward_heat_flux_in_soil"
+    [[Fg_grass]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fg_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fg_grass QC flag"
+            long_name = "Soil heat flux under grass, 8 cm depth"
+            units    = "W/m2"
+            standard_name = "downward_heat_flux_in_soil"
+    [[Fg_x]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fg_x
+        [[[Attr]]]
+            ancillary_variables = "Fg_x QC flag"
+            long_name = "Soil heat flux under grass pre-merged, 8 cm depth"
+            units    = "W/m2"
+            standard_name = "downward_heat_flux_in_soil"
+    [[Sws_spinifex_100cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_01_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_spinifex_100cm QC flag"
+            long_name = "Soil water content beneath spinifex grass, 95-105 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_spinifex_60cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_02_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_spinifex_60cm QC flag"
+            long_name = "Soil water content beneath spinifex grass, 55-65 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_spinifex_10cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_03
+        [[[Attr]]]
+            ancillary_variables = "Sws_spinifex_10cm QC flag"
+            long_name = "Soil water content beneath spinifex grass, 10-20 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_spinifex_0cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_04
+        [[[Attr]]]
+            ancillary_variables = "Sws_spinifex_0cm QC flag"
+            long_name = "Soil water content beneath spinifex grass, 0-10 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_mulga_100cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_05_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_mulga_100cm QC flag"
+            long_name = "Soil water content beneath mulga, 95-105 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_mulga_60cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_06_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_mulga_60cm QC flag"
+            long_name = "Soil water content beneath mulga, 55-65 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_mulga_10cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_07
+        [[[Attr]]]
+            ancillary_variables = "Sws_mulga_10cm QC flag"
+            long_name = "Soil water content beneath mulga, 10-20 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_mulga_0cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Sws_616_08
+        [[[Attr]]]
+            ancillary_variables = "Sws_mulga_0cm QC flag"
+            long_name = "Soil water content beneath mulga, 0-10 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_grass_100cm]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Sws_616_12_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_grass_100cm QC flag"
+            long_name = "Soil water content beneath inter-mulga grass, 95-105 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_grass_60cm]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Sws_616_11_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_grass_60cm QC flag"
+            long_name = "Soil water content beneath inter-mulga grass, 55-65 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_grass_10cm]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Sws_616_10_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_grass_10cm QC flag"
+            long_name = "Soil water content beneath inter-mulga grass, 10-20 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_grass_0cm]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Sws_616_09_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_grass_0cm QC flag"
+            long_name = "Soil water content beneath inter-mulga grass, 0-10 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_grass_100cm_b]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Sws_616_13_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_grass_100cm_b QC flag"
+            long_name = "Soil water content beneath inter-mulga grass, 100-115 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Sws_grass_50cm_b]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Sws_616_14_raw
+        [[[Attr]]]
+            ancillary_variables = "Sws_grass_50cm_b QC flag"
+            long_name = "Soil water content beneath inter-mulga grass, 50-65 cm depth"
+            units    = "m3/m3"
+            standard_name = "soil_moisture_content"
+    [[Ts_spinifex_100cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_Avg(1)
+        [[[Attr]]]
+            ancillary_variables = "Ts_spinifex_100cm QC flag"
+            long_name = "Soil temperature under spinifex, 100 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_spinifex_60cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_Avg(2)
+        [[[Attr]]]
+            ancillary_variables = "Ts_spinifex_60cm QC flag"
+            long_name = "Soil temperature under spinifex, 60 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_spinifex_10cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_Avg(3)
+        [[[Attr]]]
+            ancillary_variables = "Ts_spinifex_10cm QC flag"
+            long_name = "Soil temperature under spinifex, 10 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_spinifex_0cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_TCAV_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "Ts_spinifex_0cm QC flag"
+            long_name = "Soil temperature under spinifex, 0-10 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[dTs_spinifex]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = del_Tsoil(1)
+        [[[Attr]]]
+            ancillary_variables = "dTs_spinifex QC flag"
+            long_name = "30-min change in surface soil temperature under spinifex"
+            units    = "C"
+            standard_name = "not defined"
+    [[Ts_mulga_100cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_Avg(4)
+        [[[Attr]]]
+            ancillary_variables = "Ts_mulga_100cm QC flag"
+            long_name = "Soil temperature under mulga, 100 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_mulga_60cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_Avg(5)
+        [[[Attr]]]
+            ancillary_variables = "Ts_mulga_60cm QC flag"
+            long_name = "Soil temperature under mulga, 60 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_mulga_10cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_Avg(6)
+        [[[Attr]]]
+            ancillary_variables = "Ts_mulga_10cm QC flag"
+            long_name = "Soil temperature under mulga, 10 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_mulga_0cm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ts_TCAV_02_Avg
+        [[[Attr]]]
+            ancillary_variables = "Ts_mulga_0cm QC flag"
+            long_name = "Soil averaging thermocouple under mulga, 0-10 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[dTs_mulga]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = del_Tsoil(2)
+        [[[Attr]]]
+            ancillary_variables = "delTs_mulga QC flag"
+            long_name = "30-min change in surface soil temperature under mulga"
+            units    = "C"
+            standard_name = "not defined"
+    [[Ts_grass_100cm_b]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Ts_TC_Avg(1)
+        [[[Attr]]]
+            ancillary_variables = "Ts_grass_100cm_b QC flag"
+            long_name = "Soil temperature under inter-mulga grass, 100 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Ts_grass_50cm_b]]
+        [[[xl]]]
+            sheet    = slow_grass
+            name     = Ts_TC_Avg(2)
+        [[[Attr]]]
+            ancillary_variables = "Ts_grass_50cm_b QC flag"
+            long_name = "Soil temperature under inter-mulga grass, 50 cm depth"
+            units    = "C"
+            standard_name = "soil_temperature"
+    [[Precip]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Rain_Tot
+        [[[Attr]]]
+            ancillary_variables = "Precip QC flag"
+            long_name = "Rainfall, 30 minute total"
+            units    = "mm"
+            standard_name = "rainfall_amount"
+    [[Wd_CSAT_Compass]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WD_CSAT_Compass_Avg
+        [[[Attr]]]
+            ancillary_variables = "Wd_CSAT_Compass QC flag"
+            long_name = "Wind direction (CSAT)"
+            units    = "deg"
+            standard_name = "wind_from_direction"
+    [[Wd]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WD_CSAT_Compass_Avg
+        [[[Attr]]]
+            ancillary_variables = "Wd QC flag"
+            long_name = "Wind direction (CSAT)"
+            units    = "deg"
+            standard_name = "wind_from_direction"
+    [[Wd_CSAT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WD_CSAT_Compass_Avg
+        [[[Attr]]]
+            ancillary_variables = "Wd_CSAT QC flag"
+            long_name = "Wind direction (CSAT)"
+            units    = "deg"
+            standard_name = "wind_from_direction"
+    [[Ws_CSAT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WS_CSAT_Avg
+        [[[Attr]]]
+            ancillary_variables = "Ws_CSAT QC flag"
+            long_name = "Wind speed (CSAT)"
+            units    = "m/s"
+            standard_name = "wind_speed"
+    [[Ux]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Ux_filtered
+        [[[Attr]]]
+            ancillary_variables = "Ux QC flag"
+            long_name = "Ux (CSAT)"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[Uy]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Uy_filtered
+        [[[Attr]]]
+            ancillary_variables = "Uy QC flag"
+            long_name = "Uy (CSAT)"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[Uz]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Uz_filtered
+        [[[Attr]]]
+            ancillary_variables = "Uz QC flag"
+            long_name = "Uz (CSAT)"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[ps]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = ps_CS106_Avg
+        [[[Attr]]]
+            ancillary_variables = "ps QC flag"
+            long_name = "Atmospheric pressure"
+            units    = "kPa"
+            standard_name = "surface_air_pressure"
+    [[ps_7500]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = ps_7500_filtered
+        [[[Attr]]]
+            ancillary_variables = "ps_7500 QC flag"
+            long_name = "Atmospheric pressure"
+            units    = "kPa"
+            standard_name = "surface_air_pressure"
+    [[Diag_CSAT]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = CSAT_Warn
+        [[[Attr]]]
+            ancillary_variables = "Diag_CSAT QC flag"
+            long_name = "CSAT diagnostic value"
+            units    = "none"
+            standard_name = "not defined"
+    [[Diag_7500]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = 7500_Warn
+        [[[Attr]]]
+            ancillary_variables = "Diag_7500 QC flag"
+            long_name = "7500 diagnostic value"
+            units    = "none"
+            standard_name = "not defined"
+    [[AGC_7500]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = AGC_7500_Avg
+        [[[Attr]]]
+            ancillary_variables = "AGC_7500 QC flag"
+            long_name = "7500 AGC"
+            units    = "none"
+            standard_name = "not defined"
+    [[albedo]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = albedo_Avg
+        [[[Attr]]]
+            ancillary_variables = "albedo QC flag"
+            long_name = "solar albedo"
+            units    = "unitless"
+            standard_name = "surface_albedo"
+    [[Fm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Fm_Avg
+        [[[Attr]]]
+            ancillary_variables = "Fm QC flag"
+            long_name = "Momentum flux, raw uncorrected"
+            units    = "kg/(m s2)"
+            standard_name = "not defined"
+    [[RH]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = RH_HMP_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "RH QC flag"
+            long_name = "Relative humidity (HMP) at 9.81 m height"
+            units    = "fraction"
+            standard_name = "relative_humidity"
+    [[Ws_WS]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WS_WS_Avg
+        [[[Attr]]]
+            ancillary_variables = "Ws_WS QC flag"
+            long_name = "Wind speed (Wind Sentry) at 8.28m"
+            units    = "m/s"
+            standard_name = "wind_speed"
+    [[Wd_WS]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WD_WS_Avg
+        [[[Attr]]]
+            ancillary_variables = "Wd_WS QC flag"
+            long_name = "Wind direction (Wind Sentry) at 8.28m"
+            units    = "deg"
+            standard_name = "wind_from_direction"
+    [[Ws_CSAT_Sd]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WS_CSAT_Sd
+        [[[Attr]]]
+            ancillary_variables = "Ws_CSAT_Sd QC flag"
+            long_name = "Standard deviation of wind speed (CSAT)"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[Wd_CSAT_Sd]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WD_CSAT_Sd
+        [[[Attr]]]
+            ancillary_variables = "Wd_CSAT_Sd QC flag"
+            long_name = "Standard deviation of wind direction (CSAT)"
+            units    = "deg"
+            standard_name = "not defined"
+    [[Ws_WS_Sd]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WS_WS_Sd
+        [[[Attr]]]
+            ancillary_variables = "Ws_WS_Sd QC flag"
+            long_name = "Standard deviation of wind speed (Wind Sentry) at 8.28m"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[Wd_WS_Sd]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = WD_WS_Sd
+        [[[Attr]]]
+            ancillary_variables = "Wd_WS_Sd QC flag"
+            long_name = "Standard deviation of wind direction (Wind Sentry) at 8.28m"
+            units    = "deg"
+            standard_name = "not defined"
+    [[Tpanel]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Tpanel_Avg
+        [[[Attr]]]
+            ancillary_variables = "Tpanel QC flag"
+            long_name = "CR3000 datalogger panel temperature"
+            units    = "C"
+            standard_name = "not defined"
+    [[Vbat]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Vbat_Avg
+        [[[Attr]]]
+            ancillary_variables = "Vbat QC flag"
+            long_name = "Battery voltage"
+            units    = "V"
+            standard_name = "not defined"
+    [[C_ppm]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = co2_um_m_Avg
+        [[[Attr]]]
+            ancillary_variables = "Cc_ppm QC flag"
+            long_name = "CO2 molar concentration (ppm)"
+            units    = "umol/mol"
+            standard_name = "mole_concentration_of_carbon_dioxide_in_air"
+    [[H_ppt]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = h2o_mm_m_Avg
+        [[[Attr]]]
+            ancillary_variables = "H_ppt QC flag"
+            long_name = "H2O molar concentration (ppt)"
+            units    = "mmol/mol"
+            standard_name = "mole_concentration_of_water_vapor_in_air"
+    [[esat]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = es_HMP_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "esat QC flag"
+            long_name = "saturation vapour pressure (HMP)"
+            units    = "kPa"
+            standard_name = "not defined"
+    [[e]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = e_HMP_01_Avg
+        [[[Attr]]]
+            ancillary_variables = "e QC flag"
+            long_name = "atmospheric vapour pressure (HMP) at 9.81 m height"
+            units    = "kPa"
+            standard_name = "water_vapor_partial_pressure_in_air"

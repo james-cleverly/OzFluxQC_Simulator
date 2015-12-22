@@ -1,0 +1,13 @@
+[General]
+    InputLevel = L3_Corrected
+    OutputLevel = L3_Corrected
+
+[Files]
+    [[L3_Corrected]]
+        in_file_path = ../TiTreeEast/level3/
+        in_filename = TTE_EC_2015_L3_Corrected.nc
+        out_file_path = ../TiTreeEast/level3/
+        out_filename = TTE_EC_2015_L3_Corrected.xls
+
+[Output]
+    DefaultXl = False

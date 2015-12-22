@@ -1,0 +1,205 @@
+[General]
+    AttributesLevel = L3
+    InputLevel = L6
+    OutputLevel = L6
+
+[Functions]
+    # Gapfilling
+    L4_offline = False
+    L4_keys = "['GapFillFrom1Min','InterpolateOverMissing','GapFillFromAlternate','GapFillUsingSOLO']"
+    L5_offline = True
+    L5_keys = GapFillUsingSOLO
+    L6_offline = True
+    L6_keys = "['Nocturnal Q10','Light response function','Conditional correlation']"
+    
+    Sums = L6    # L4 L5 L6 False
+    convertFc = True
+    climatology = False    # L4 L5 L6 False
+    UpdateCF = False
+    FlagStats = True
+    
+    # L4 services
+    CalculateMetVars = True
+    MergeSeriesWS = True
+    InterpolateOverMissing = True
+    
+    # L5 services
+    UstarFromFh = True
+    CalculateET = True
+    PenmanMonteith = True
+    
+    # L6 services
+    footprint = False
+
+[Files]
+    [[L3]]
+        in_file_path = ncData/TTE/
+        in_filename = TTE_EC_2015_L3.nc
+    [[L4]]
+        out_file_path = ncData/TTE/
+        out_filename = TTE_EC_2015_L4.nc
+        flag_file_path = ../TiTreeEast/level4/flagstats/
+    [[L5]]
+        out_file_path = ncData/TTE/
+        out_filename = TTE_EC_2015_L5.nc
+        flag_file_path = ../TiTreeEast/level5/flagstats/
+    [[L6]]
+        xlSumFilePath = ../TiTreeEast/level6_summaries/
+        xlSumFileName = TTE_EC_2015_DailyL6.xls
+        in_file_path = ncData/TTE/
+        in_filename = TTE_EC_2015_L6int.nc
+        out_file_path = ncData/TTE/
+        out_filename = TTE_EC_2015_L6.nc
+        flag_file_path = ../TiTreeEast/level6/flagstats/
+    [[L4_MetFilled]]
+        out_file_path = ../TiTreeEast/level4/
+        out_filename = TTE_EC_2015_L4_MetFilled.nc
+    [[L5_FluxFilled]]
+        out_file_path = ../TiTreeEast/level5/
+        out_filename = TTE_EC_2015_L5_FluxFilled.nc
+    [[L6_CPartitioned]]
+        out_file_path = ../TiTreeEast/level6/
+        out_filename = TTE_EC_2015_L6_CPartitioned.nc
+    [[PNG]]
+        PNGFilePath = ../TiTreeEast/level6/PNG/
+
+
+
+
+[Output]
+    nc6 = "['xlDateTime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Second', 'Hdh', 'Fm', 'Fc_co2', 'Fe', 'Fh', 'Fg', 'Fn', 'Fa', 'Fsd', 'Fsd_syn', 'Fsu', 'Flu', 'Fld', 'albedo', 'uscalc', 'ustar', 'L', 'Diag_CSAT', 'Diag_7500', 'AGC_7500', 'Vbat', 'Tpanel', 'theta', 'eta', 'u', 'v', 'w', 'uu', 'uv', 'uw', 'uA', 'uC', 'uT', 'vA', 'vC', 'vT', 'vv', 'vw', 'ww', 'u_Sd', 'v_Sd', 'w_Sd', 'AhAh', 'CcCc', 'wT', 'wA', 'wC', 'Ts', 'dTs', 'Sws', 'Fg_spinifex', 'Fg_mulga', 'Fg_grass', 'dTs_spinifex', 'dTs_mulga', 'Ts_spinifex_0cm', 'Ts_spinifex_10cm', 'Ts_spinifex_60cm', 'Ts_spinifex_100cm', 'Ts_mulga_0cm', 'Ts_mulga_10cm', 'Ts_mulga_60cm', 'Ts_mulga_100cm', 'Ts_grass_50cm_b', 'Ts_grass_100cm_b', 'Sws_spinifex_100cm', 'Sws_spinifex_60cm', 'Sws_spinifex_10cm', 'Sws_spinifex_0cm', 'Sws_mulga_100cm', 'Sws_mulga_60cm', 'Sws_mulga_10cm', 'Sws_mulga_0cm', 'Sws_grass_0cm', 'Sws_grass_10cm', 'Sws_grass_60cm', 'Sws_grass_100cm', 'rhom', 'rhod', 'Ta', 'Ah', 'e', 'RH', 'esat', 'q', 'qsat', 'SHD', 'VPD', 'Tv', 'Tvp', 'ps', 'Tv_CSAT', 'Ah_7500_Av', 'H_ppt', 'Cc', 'Cc_7500_Av', 'C_ppm', 'Ws', 'Wd', 'Ws_CSAT', 'Wd_CSAT_Compass', 'Ws_WS', 'Wd_WS', 'Ws_CSAT_Sd', 'Wd_CSAT_Sd', 'Ws_WS_Sd', 'Wd_WS_Sd', 'Precip', 'ram', 'rSm', 'GSm', 'zeta', 'Fc', 'Fc_c', 'NEP', 'NEE', 'GPP', 'GPP_gC', 'GPP_gCO2', 'ER', 'ER_gC', 'ER_gCO2', 'ER_night', 'ER_dark', 'ER_bio', 'ER_day', 'PD', 'ET']"
+    nc5 = "['xlDateTime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Second', 'Hdh', 'Fm', 'Fc_co2', 'Fe', 'Fh', 'Fg', 'Fn', 'Fa', 'Fsd', 'Fsd_syn', 'Fsu', 'Flu', 'Fld', 'albedo', 'uscalc', 'ustar', 'L', 'Diag_CSAT', 'Diag_7500', 'AGC_7500', 'Vbat', 'Tpanel', 'theta', 'eta', 'u', 'v', 'w', 'uu', 'uv', 'uw', 'uA', 'uC', 'uT', 'vA', 'vC', 'vT', 'vv', 'vw', 'ww', 'u_Sd', 'v_Sd', 'w_Sd', 'AhAh', 'CcCc', 'wT', 'wA', 'wC', 'Ts', 'dTs', 'Sws', 'Fg_spinifex', 'Fg_mulga', 'Fg_grass', 'dTs_spinifex', 'dTs_mulga', 'Ts_spinifex_0cm', 'Ts_spinifex_10cm', 'Ts_spinifex_60cm', 'Ts_spinifex_100cm', 'Ts_mulga_0cm', 'Ts_mulga_10cm', 'Ts_mulga_60cm', 'Ts_mulga_100cm', 'Ts_grass_50cm_b', 'Ts_grass_100cm_b', 'Sws_spinifex_100cm', 'Sws_spinifex_60cm', 'Sws_spinifex_10cm', 'Sws_spinifex_0cm', 'Sws_mulga_100cm', 'Sws_mulga_60cm', 'Sws_mulga_10cm', 'Sws_mulga_0cm', 'Sws_grass_0cm', 'Sws_grass_10cm', 'Sws_grass_60cm', 'Sws_grass_100cm', 'rhom', 'rhod', 'Ta', 'Ah', 'e', 'RH', 'esat', 'q', 'qsat', 'SHD', 'VPD', 'Tv', 'Tvp', 'ps', 'Tv_CSAT', 'Ah_7500_Av', 'H_ppt', 'Cc', 'Cc_7500_Av', 'C_ppm', 'Ws', 'Wd', 'Ws_CSAT', 'Wd_CSAT_Compass', 'Ws_WS', 'Wd_WS', 'Ws_CSAT_Sd', 'Wd_CSAT_Sd', 'Ws_WS_Sd', 'Wd_WS_Sd', 'Precip', 'ram', 'rSm', 'GSm', 'zeta', 'Fc', 'Fc_c', 'NEP', 'NEE', 'ET']"
+    nc4 = "['xlDateTime', 'Year', 'Month', 'Day', 'Hour', 'Minute', 'Second', 'Hdh', 'Fm', 'Fc_co2', 'Fe', 'Fh', 'Fg', 'Fn', 'Fa', 'Fsd', 'Fsd_syn', 'Fsu', 'Flu', 'Fld', 'albedo', 'ustar', 'L', 'Diag_CSAT', 'Diag_7500', 'AGC_7500', 'Vbat', 'Tpanel', 'theta', 'eta', 'u', 'v', 'w', 'uu', 'uv', 'uw', 'uA', 'uC', 'uT', 'vA', 'vC', 'vT', 'vv', 'vw', 'ww', 'u_Sd', 'v_Sd', 'w_Sd', 'AhAh', 'CcCc', 'wT', 'wA', 'wC', 'Ts', 'dTs', 'Sws', 'Fg_spinifex', 'Fg_mulga', 'Fg_grass', 'dTs_spinifex', 'dTs_mulga', 'Ts_spinifex_0cm', 'Ts_spinifex_10cm', 'Ts_spinifex_60cm', 'Ts_spinifex_100cm', 'Ts_mulga_0cm', 'Ts_mulga_10cm', 'Ts_mulga_60cm', 'Ts_mulga_100cm', 'Ts_grass_50cm_b', 'Ts_grass_100cm_b', 'Sws_spinifex_100cm', 'Sws_spinifex_60cm', 'Sws_spinifex_10cm', 'Sws_spinifex_0cm', 'Sws_mulga_100cm', 'Sws_mulga_60cm', 'Sws_mulga_10cm', 'Sws_mulga_0cm', 'Sws_grass_0cm', 'Sws_grass_10cm', 'Sws_grass_60cm', 'Sws_grass_100cm', 'rhom', 'rhod', 'Ta', 'Ah', 'e', 'RH', 'esat', 'q', 'qsat', 'SHD', 'VPD', 'Tv', 'Tvp', 'ps', 'Tv_CSAT', 'Ah_7500_Av', 'H_ppt', 'Cc', 'Cc_7500_Av', 'C_ppm', 'Ws', 'Wd', 'Ws_CSAT', 'Wd_CSAT_Compass', 'Ws_WS', 'Wd_WS', 'Ws_CSAT_Sd', 'Wd_CSAT_Sd', 'Ws_WS_Sd', 'Wd_WS_Sd', 'Precip', 'ram', 'rSm', 'GSm', 'zeta', 'Fc', 'Fc_c', 'NEP', 'NEE', 'ET']"
+    DefaultXl = False
+    PNGFile = True
+
+[Params]
+    # default firstMonth = 1
+    # default secondMonth = 12
+    zmd = 6.58  # instrument height above displacement plane, d = 2 / 3 * h = 3.2, h = 4.85, z = 9.81 m
+    z0 = 0.6  # roughness length from Brutseart 1982, eqn 5.7: h / z = 3 * e
+
+[CalculateET]
+    # Default Fe_in = Fe
+
+[Sums]
+    #
+    # Default SumList = "['Precip','ET','Energy','Radiation','Carbon']"
+    # Default SubSumList = "[]"
+    # Default MinMaxList = "['Ta_EC','Vbat','Tpanel','Carbon']"
+    # Default MeanList = "['Ta_EC','Tpanel']"
+    #
+    # Default ETin = Fe
+    # Default Energyin = "['Fe', 'Fh', 'Fg']"
+    # Default Radin = "['Fld','Flu','Fn','Fsd','Fsu']"
+    # Default Cin = Fc
+    #
+    SumList = "['Precip','ET','Energy','Radiation','Carbon','PM']"
+    SubSumList = "['ET','Energy']"
+    MinMaxList = "['PM','VPD','Ta','Vbat','Tpanel','Carbon']"
+    #MeanList = "['PM','VPD','Ta','Ts','Sws','ps','Tpanel']"
+    MeanList = "['PM','VPD','Ta','Tpanel','GPP','ER','Ts','Sws','ps']"
+    #
+    GPPin = "['GPP','ER', 'ER_night', 'ER_dark', 'ER_bio', 'ER_day', 'PD']"
+    #
+    SoilList = "['SWCsurface','SWC10cm','SWC60cm','SWC100cm']"
+    SWCsurface = "['Sws_spinifex_0cm','Sws_mulga_0cm','Sws_grass_0cm']"
+    SWC10cm = "['Sws_spinifex_10cm','Sws_mulga_10cm','Sws_grass_10cm']"
+    SWC60cm = "['Sws_spinifex_60cm','Sws_mulga_60cm','Sws_grass_60cm','Sws_grass_50cm_b']"
+    SWC100cm = "['Sws_spinifex_100cm','Sws_mulga_100cm','Sws_grass_100cm','Sws_grass_100cm_b']"
+
+[PenmanMonteith]
+    # Default PMin = "['Fe', 'Ta', 'Ah', 'ps', 'Ws', 'Fn', 'Fsd', 'Fg', 'VPD']"
+    # Default PMcritFe = 0  # Fe flux greater than or equal to this value to keep rst
+    # Default PMcritFsd = 10  # Fsd flux greater than or equal to this value to keep rst
+    PMcritFe = 0         # Fe flux greater than or equal to this value to keep rst
+    PMcritFsd = 10       # Fsd flux greater than or equal to this value to keep rst
+    
+    Cdmethod = True      # Jensen/Leuning, returns canopy conductance (Gc)
+    zm = 9.81            # Height of measurement
+    z0 = 0.6             # Aerodynamic roughness length
+    zc = 4.85            # Canopy height
+    rlm = False           # requires daily LAI input file
+
+[InterpolateVars]
+    [[Fg]]
+    [[Fn]]
+    [[Fsd]]
+    [[Fsu]]
+    [[Flu]]
+    [[Fld]]
+    [[Ts]]
+    [[Sws]]
+    [[Fg_spinifex]]
+    [[Fg_mulga]]
+    [[Fg_grass]]
+    [[Ts_spinifex_0cm]]
+    [[Ts_spinifex_10cm]]
+    [[Ts_spinifex_60cm]]
+    [[Ts_spinifex_100cm]]
+    [[Sws_spinifex_0cm]]
+    [[Sws_spinifex_10cm]]
+    [[Sws_spinifex_60cm]]
+    [[Sws_spinifex_100cm]]
+    [[Ts_mulga_0cm]]
+    [[Ts_mulga_10cm]]
+    [[Ts_mulga_60cm]]
+    [[Ts_mulga_100cm]]
+    [[Sws_mulga_0cm]]
+    [[Sws_mulga_10cm]]
+    [[Sws_mulga_60cm]]
+    [[Sws_mulga_100cm]]
+    [[Ts_grass_50cm_b]]
+    [[Ts_grass_100cm_b]]
+    [[Sws_grass_0cm]]
+    [[Sws_grass_10cm]]
+    [[Sws_grass_60cm]]
+    [[Sws_grass_100cm]]
+    [[Sws_grass_50cm_b]]
+    [[Sws_grass_100cm_b]]
+    [[Ah]]
+    [[q]]
+    [[qsat]]
+    [[e]]
+    [[RH]]
+    [[rhom]]
+    [[rhod]]
+    [[esat]]
+    [[Ta]]
+    [[VPD]]
+    [[ps]]
+    [[Ws]]
+
+
+[Variables]
+    [[Fh]]
+    [[Fe]]
+    [[Fc]]
+    [[Ws]]
+        [[[MergeSeries]]]
+            Source = "['Ws_CSAT']"
+    [[ustar]]
+        [[[MergeSeries]]]
+            Source = "['ustar','uscalc']"
+    [[Fm]]
+        [[[RangeCheck]]]
+            Level      = "L5"
+            Lower      = "[1e-15]*12"
+            Upper      = "[5]*12"
+
+[PlotSpec]
+    #Width = 23.5    # office
+    #Height = 11.5   # office
+    #Width = 19.5    # home
+    #Height = 11.4   # home
+    Width = 17      # field
+    Height = 9.5    # field
+
+[Plots]
+    [[31]]
+        Title = "Fluxes"
+        Variables = "['Fm','Fh','Fe','Fc','zeta']"
+        #YLMin = "['-100','-100','-.5']"
+        #YLMax = "['700','350','.4']"
+        #YRMin = "['-100','-100','-.5']"
+        #YRMax = "['700','350','.4']"

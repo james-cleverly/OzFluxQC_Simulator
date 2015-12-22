@@ -1,0 +1,13 @@
+[General]
+    InputLevel = L5_FluxFilled
+    OutputLevel = L5_FluxFilled
+
+[Files]
+    [[L5_FluxFilled]]
+        in_file_path = ../TiTreeEast/level5/
+        in_filename = TTE_EC_2015_L5_FluxFilled.nc
+        out_file_path = ../TiTreeEast/level5/
+        out_filename = TTE_EC_2015_L5_FluxFilled.xls
+
+[Output]
+    DefaultXl = False

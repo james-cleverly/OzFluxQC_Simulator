@@ -1,0 +1,98 @@
+[General]
+InLevel = 'L4'
+OutLevel = 'L4'
+Platform = Mac    # comment out if PC excel
+netCDFv3 = False
+
+[Files]
+    [[L4]]
+        xlFilePath = ../TiTreeEast/level3_intermediates/
+        xlFileName = TTE_EC_2015_FullPreFilled.xls
+        xlHeaderRow  = 10
+        xl1stDataRow = 11
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L4pin.nc
+
+[Global]
+    study = "Carbon Partitioning"
+    contact  = "james.cleverly@uts.edu.au"
+    license_type = "CC-BY-NC-ND"
+    license_url = "http://creativecommons.org/licenses/by-nc-nd/3.0/au/"
+    canopy_height = "4.85m"
+    comment = "CF convention version"
+    comment1 = "Soil moisture and temperature from Alice Springs Mulga substituted in 2012 while sensors are sorted"
+    comment2 = "Re-analysis 19 Apr 2013:  correction of error in WPL routine, which caused invalid Fc in previous analysis"
+    comment3 = "Re-analysis 14 May 2013:  CO2 density corrected against ambient measured at Alice Springs Mulga with a more reliable LI7500"
+    data_url = "http://ozflux.its.monash.edu.au/"
+    end_datetime = "2012-12-31 23:30"
+    history = ""
+    institution = "University of Technology, Sydney"
+    latitude = -22.287
+    longitude = 133.640
+    elevation = "600m"
+    metadata_url = "http://www.ozflux.org.au/monitoringsites/titreeeast/index.html"
+    ozflux_url = "http://ozflux.org.au/"
+    references = "None"
+    site_name = "TiTreeEast"
+    site = "Ti Tree East, Northern Territory, Australia"
+    soil_type = "red kandosol, sand"
+    source = "10m flux tower plus array of soil sensors"
+    start_datetime = "2012-07-01 00:00"
+    title = "Flux tower data set from the Ti Tree East site for the calendar year 2012"
+    time_step = 30
+    vegetation1 = "Mulga trees with grassy interspaces and understory"    vegetation2 = "Corymbia/Triodia savanna"
+[Variables]
+    [[xlDateTime]]
+        [[[xl]]]
+            sheet    = Data
+            name     = TIMESTAMP
+        [[[Attr]]]
+            ancillary_variables = ""
+            long_name = "Date/time in Excel format"
+            units    = ""
+            standard_name = "not defined"
+    [[Gap]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Gap
+        [[[Attr]]]
+            long_name = "0 for observed, 30 for gapfilled, 31 for not filled"
+            units    = "unitless"
+            standard_name = "not defined"
+    [[Fc]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fc_co2
+        [[[Attr]]]
+            ancillary_variables = "Fc QC flag"
+            long_name = "Flux of carbon, Raw uncorrected, CO2 flux, rotated to natural wind coordinates and frequency response corrected, WPL corrected Fc, ANN gapfilled"
+            units    = "mg/(m2 s)"
+            standard_name = "surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources"
+    [[Fsd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fsd
+        [[[Attr]]]
+            ancillary_variables = "Fsd QC flag"
+            instrument = "Kipp and Zonen CNR1"
+            long_name = "Down-welling short wave"
+            standard_name = "surface_downwelling_shortwave_flux_in_air"
+            units = "W/m2"
+    [[Ts]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Ts
+        [[[Attr]]]
+            long_name = "Element-wise average of series Ts_bs, Ts_ms, Ts_mu"
+            units    = "C"
+            ancillary_variables = "Ts QC flag"
+            standard_name = "soil_temperature"
+    [[Sws]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Sws
+        [[[Attr]]]
+            ancillary_variables = "Sws QC flag"
+            long_name = "Element-wise average of series Sws_spinifex_0cm, Sws_mulga_0cm"
+            units    = "frac"
+            standard_name = "soil_moisture_content"

@@ -1,0 +1,24 @@
+[General]
+Platform = Mac    # Mac or PC
+InputLevel = L3
+OutputLevel = Partitioning
+netCDFv3 = False
+
+[Files]
+    [[L3]]
+        ncFilePath = ncData/ASM/
+        ncFileName = ASM_EC_2013_L3pin.nc
+        xlFilePath = ../AliceSpringsMulga/level5partitioning/
+        xlFileName = ASM_EC_2013_NightRe.xls
+    [[Partitioning]]
+        ncFilePath = ncData/ASM/
+        ncFileName = ASM_EC_2013_L3part.nc
+        xlFilePath = ../AliceSpringsMulga/level5partitioning/
+        xlFileName = ASM_EC_2013_DayFc.xls
+
+[Params]
+firstMonth = 12
+secondMonth = 12
+
+[Output]
+Partitioning = "['Fsd', 'Ts', 'Fc_wpl', 'Fc_5to11', 'Fc_11to16', 'Fc_16to21', 'Fc_21to26', 'Fc_26to31', 'Fc_31to36', 'Fc_36to42', 'Fc_swc0to5', 'Fc_swc5to10', 'Fc_swc10to20', 'Fc_swc20to40']"

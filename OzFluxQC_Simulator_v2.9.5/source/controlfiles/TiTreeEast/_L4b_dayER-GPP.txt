@@ -1,0 +1,102 @@
+[General]
+    Platform = Mac    # Mac or PC
+    InputLevel = L4
+    OutputLevel = Partitioning
+    netCDFv3 = False
+
+[Files]
+    [[L4]]
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L4pin.nc
+    [[L4ER]]
+        xlFilePath = ../TiTreeEast/level3_intermediates/Partitioning/
+        xlFileName = TTE_EC_2015_NightER_Filled.xls
+        xlHeaderRow  = 2
+        xl1stDataRow = 3
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L4ER_night.nc
+    [[Partitioning]]
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L4part.nc
+        xlFilePath = ../TiTreeEast/level3_intermediates/
+        xlFileName = TTE_EC_2015_ERGPP.xls
+
+[Params]
+    firstMonth = 1
+    secondMonth = 12
+    #Fc_in = "['Fc']"
+
+[LRF]
+    [[SinkPeriods]]
+        0          = "['2015-1-1 0:00','2015-7-31 23:30']"
+    [[SourcePeriods]]
+        0          = "['2015-8-1 0:00','2015-12-31 23:30']"
+
+[Output]
+    DefaultXl = False
+
+[Global]
+    study = "Carbon Partitioning"
+    contact  = "james.cleverly@uts.edu.au"
+    license_type = "CC-BY-NC-ND"
+    license_url = "http://creativecommons.org/licenses/by-nc-nd/3.0/au/"
+    canopy_height = "4.85m"
+    comment = "CF convention version"
+    comment1 = "Soil moisture and temperature from Alice Springs Mulga substituted in 2012 while sensors are sorted"
+    comment2 = "Re-analysis 19 Apr 2013:  correction of error in WPL routine, which caused invalid Fc in previous analysis"
+    comment3 = "Re-analysis 14 May 2013:  CO2 density corrected against ambient measured at Alice Springs Mulga with a more reliable LI7500"
+    data_url = "http://ozflux.its.monash.edu.au/"
+    end_datetime = "2012-12-31 23:30"
+    history = ""
+    institution = "University of Technology, Sydney"
+    latitude = -22.287
+    longitude = 133.640
+    elevation = "600m"
+    metadata_url = "http://www.ozflux.org.au/monitoringsites/titreeeast/index.html"
+    ozflux_url = "http://ozflux.org.au/"
+    references = "None"
+    site_name = "TiTreeEast"
+    site = "Ti Tree East, Northern Territory, Australia"
+    soil_type = "red kandosol, sand"
+    source = "10m flux tower plus array of soil sensors"
+    start_datetime = "2012-07-01 00:00"
+    title = "Flux tower data set from the Ti Tree East site for the calendar year 2012"
+    time_step = 30
+    vegetation1 = "Mulga trees with grassy interspaces and understory"    vegetation2 = "Corymbia/Triodia savanna"
+[Variables]
+    [[xlDateTime]]
+        [[[xl]]]
+            sheet    = Data
+            name     = TIMESTAMP
+        [[[Attr]]]
+            ancillary_variables = ""
+            long_name = "Date/time in Excel format"
+            units    = ""
+            standard_name = "not defined"
+    [[ER_night_gap]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_night_gap
+        [[[Attr]]]
+            long_name = "Observed nocturnal carbon flux"
+            units    = "umol/(m2 s)"
+            short_name = "not defined"
+            ancillary_variables = "ER_night_gap QC flag"
+    [[ER_night_model]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_night_model
+        [[[Attr]]]
+            long_name = "Nocturnal carbon flux modelled from Q10 response curve binned by soil volumetric moisture content"
+            units    = "umol/(m2 s)"
+            short_name = "not defined"
+            ancillary_variables = "ER_night_model QC flag"
+    [[ER_night_gapfilled]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_night_gapfilled
+        [[[Attr]]]
+            long_name = "Nocturnal carbon flux gapfilled using modelled from Q10 response curve binned by soil volumetric moisture content"
+            units    = "umol/(m2 s)"
+            short_name = "not defined"
+            ancillary_variables = "ER_night_gapfilled QC flag"

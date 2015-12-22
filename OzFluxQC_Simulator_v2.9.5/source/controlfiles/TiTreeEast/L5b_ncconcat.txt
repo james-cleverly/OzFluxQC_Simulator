@@ -1,0 +1,12 @@
+[General]
+    netCDFv3 = False
+
+[Files]
+    [[Out]]
+        ncFileName = ../TiTreeEast/level5/TTE_EC_Aug2012-Oct2015_L5.nc
+    [[In]]
+        0 = ../TiTreeEast/level5/TTE_EC_2012_L5_FluxFilled.nc
+        1 = ../TiTreeEast/level5/TTE_EC_2013_L5_FluxFilled.nc
+        2 = ../TiTreeEast/level5/TTE_EC_2014Jan-Jul_L5_FluxFilled.nc
+        3 = ../TiTreeEast/level5/TTE_EC_2014Aug-Dec_L5_FluxFilled.nc
+        4 = ../TiTreeEast/level5/TTE_EC_2015_L5_FluxFilled.nc

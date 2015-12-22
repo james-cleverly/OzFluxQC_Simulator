@@ -1,0 +1,25 @@
+[General]
+    Platform = Mac    # Mac or PC
+    InputLevel = L3
+    OutputLevel = Partitioning
+    netCDFv3 = False
+
+[Files]
+    [[L3]]
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L4pin.nc
+        xlFilePath = ../TiTreeEast/level6partitioning/
+        xlFileName = TTE_EC_2015_NightER.xls
+    [[Partitioning]]
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L4part.nc
+        xlFilePath = ../TiTreeEast/level6partitioning/
+        xlFileName = TTE_EC_2015_DayFc.xls
+
+[Params]
+    firstMonth = 1
+    secondMonth = 12
+
+[Output]
+    Format = Full   # Full (default) or Subset
+    DefaultXl = False

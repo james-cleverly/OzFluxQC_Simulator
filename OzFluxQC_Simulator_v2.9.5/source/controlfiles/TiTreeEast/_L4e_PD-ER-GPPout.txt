@@ -1,0 +1,19 @@
+[General]
+    Platform = Mac    # Mac or PC
+    InputLevel = L6
+    OutputLevel = Partitioning
+    netCDFv3 = False
+
+[Files]
+    [[L6]]
+        ncFilePath = ncData/TTE/
+        ncFileName = TTE_EC_2015_L6_PD_ER_GPP.nc
+    [[Partitioning]]
+        xlFilePath = ../TiTreeEast/level3_intermediates/Partitioning/
+        xlFileName = TTE_EC_2015_L6_PD_ER_GPP.xls
+
+[Output]
+    Partitioning = "['NEE', 'ER_night', 'ER_dark', 'ER_bio', 'ER_day', 'ER', 'PD', 'GPP']"
+    Format = Subset   # Full (default) or Subset
+    DefaultXl = False
+
