@@ -614,21 +614,20 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         qcutils.prepOzFluxVars(cf,ds3x)
         # convert Fc [mgCO2 m-2 s-1] to Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1] and NEP = - NEE
         if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='convertFc') and cf['Functions']['convertFc'] == 'True':
-            if AttrLevel == 'L3':
-                try:
-                    ds3x.globalattributes['L4Functions'] = ds3x.globalattributes['L4Functions']+', convertFc'
-                except:
-                    ds3x.globalattributes['L4Functions'] = 'convertFc'
-                if 'Fc_co2' in ds3x.series.keys():
-                    qcts.ConvertFc(cf,ds3x,Fco2_in='Fc_co2')
-                else:
-                    qcts.ConvertFc(cf,ds3x)
+            try:
+                ds3x.globalattributes['L4Functions'] = ds3x.globalattributes['L4Functions']+', convertFc'
+            except:
+                ds3x.globalattributes['L4Functions'] = 'convertFc'
+            if 'Fc_co2' in ds3x.series.keys():
+                qcts.ConvertFc(cf,ds3x,Fco2_in='Fc_co2')
+            else:
+                qcts.ConvertFc(cf,ds3x)
     
     ds4x = copy.deepcopy(ds3x)
     for ThisOne in ['NEE','NEP','Fc','Fc_co2','Fc_c','Fe','Fh']:
         if ThisOne in ds4x.series.keys() and ThisOne in ds3.series.keys():
             ds4x.series[ThisOne] = ds3.series[ThisOne].copy()
-    for ThisOne in ['GPP','Re']:
+    for ThisOne in ['GPP','ER']:
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
@@ -654,7 +653,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
             qcio.get_seriesstats(cf,ds5)
     if OutLevel == 'L6':
         ds5z = copy.deepcopy(ds5)
-        for ThisOne in ['GPP','Re']:
+        for ThisOne in ['GPP','ER']:
             if ThisOne in ds3x.series.keys():
                 ds5z.series[ThisOne] = ds3x.series[ThisOne].copy()
         ds6,z = l6qc(cf,ds5z,z)
@@ -754,10 +753,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
                 ds5.globalattributes['L5Functions'] = 'No further L5 gapfilling'
             
             log.warn('  L5:  no record of gapfilling functions')
-        if InLevel == 'L3' or InLevel == 'L4':
-            return ds4,ds5
-        else:
-            return ds5,ds5
+        return ds4,ds5
     elif OutLevel == 'L6':
         if x == 0:
             if InLevel == 'L3' or InLevel == 'L4':
@@ -800,12 +796,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
             except:
                 ds6.globalattributes['L6Functions'] = 'No further L6 partitioning'
             log.warn('  L6:  no record of gapfilling functions')
-        if InLevel == 'L3' or InLevel == 'L4':
-            return ds4,ds5,ds6
-        elif InLevel == 'L5':
-            return ds5,ds5,ds6
-        else:
-            return ds6,ds6,ds6
+        return ds4,ds5,ds6
     
 
 def l5qc(cf,ds4,y):

@@ -31,6 +31,7 @@ import qcls
 import qcplot
 import qcts
 import qcutils
+import pdb
 
 class qcgui(Tkinter.Frame):
     """
@@ -669,6 +670,7 @@ class qcgui(Tkinter.Frame):
             """
         self.do_progress(text='Exporting L3 NetCDF -> Xcel ...')                     # put up the progress message
         log.info('Saving L3 to Excel')
+        # pdb.set_trace()
         check = 'True'
         try:
             self.cf

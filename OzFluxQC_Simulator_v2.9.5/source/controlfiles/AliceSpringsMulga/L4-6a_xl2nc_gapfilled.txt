@@ -14,8 +14,8 @@
     contact  = "james.cleverly@uts.edu.au"
     site_pi  = "James Cleverly, Derek Eamus"
     citation = "Cleverly, J. (2011), Alice Springs Mulga OzFlux site, OzFlux: Australian and New Zealand Flux Research and Monitoring Network, hdl: 102.100.100/8697."
-    license_type = "TERN-BY-SA_NC"
-    license_url = "http://www.tern.org.au/datalicence/TERN-BY-SA-NC/1.0"
+    license_type = "TERN-BY"
+    license_url = "http://www.tern.org.au/datalicence/TERN-BY/1.0"
     canopy_height = "6.5m"
     comment01 = "GPP & Re corrected 2 March 2013, consistent with reference2"
     comment02 = "Re-analysis 31 July 2013:  Cross-sensor sigma-v re-defined to crosswind sigma-v.  Correction to crosswind footprint distribution and rotation of covariances contributing to momentum transfer."
@@ -27,6 +27,7 @@
     comment08 = "Re-analysis 15 Nov 2013:  L4 gap fill using corrected fluxes"
     comment10 = "1 Jan 2014:  Units for Fc and Fco2 corrected"
     comment11 = "17 July 2014:  Carbon flux outputs converted at L3 and L4:  Fc [mgCO2 m-2 s-1], Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
+    comment13 = "16 Dec 2015: L6 semantics updated to follow Chapin et al. 2006: NEE = ER - GPP; ER: ecosystem respiration (equivalent to ecosystem decomposition)"
     conventions = "CF-1.6"
     conventions_names = "CF convention standard names table version 27, 28 Nov 2013, audited 4 Jan 2015"
     data_url = "http://data.ozflux.org.au"
@@ -36,15 +37,18 @@
     elevation = "600m"
     metadata_url = "http://www.ozflux.org.au/monitoringsites/alicesprings/index.html"
     ozflux_url = "http://ozflux.org.au/"
-    reference_list = "1: Eamus et al. 2013; 2,3: Cleverly et al. 2013; 4: Ma et al. 2013; 5: Chen et al. 2014; 6: Ma et al. 2014; 7: Shi et al. 2014; 8: Donohue et al. 2014"
+    reference_list = "1: Eamus et al. 2013; 2,3: Cleverly et al. 2013; 4: Ma et al. 2013; 5: Chen et al. 2014; 6: Ma et al. 2014; 7: Shi et al. 2014; 8: Donohue et al. 2014; 9: Chen et al. 2015; 10: Haverd et al. 2015; 11: Restrepo Coupe et al. 2015"
     reference1 = "Eamus, D., J. Cleverly, N. Boulain, N. Grant, R. Faux, and R. Villalobos-Vega (2013), Carbon and water fluxes in an arid-zone Acacia savanna woodland: An analyses of seasonal patterns and responses to rainfall events, Agric. For. Meteor., 182-183, 225-238, doi: 10.1016/j.agrformet.2013.04.020."
     reference2 = "Cleverly, J., N. Boulain, R. Villalobos-Vega, N. Grant, R. Faux, C. Wood, P. G. Cook, Q. Yu, A. Leigh, and D. Eamus (2013), Dynamics of component carbon fluxes in a semi-arid Acacia woodland, central Australia, J. Geophys. Res. Biogeosci., 118, 1168-1185, doi: 10.1002/jgrg.20101."
     reference3 = "Cleverly, J., C. Chen, N. Boulain, R. Villalobos-Vega, R. Faux, N. Grant, Q. Yu, and D. Eamus (2013), Aerodynamic Resistance and Penman-Monteith Evapotranspiration over a Seasonally Two-Layered Canopy in Semiarid Central Australia, J. Hydrometeor., 14, 1562-1570, doi: 10.1175/jhm-d-13-080.1."
     reference4 = "Ma, X., A. Huete, Q. Yu, N. Restrepo Coupe, K. Davies, M. Broich, P. Ratana, J. Beringer, L. Hutley, J. Cleverly, N. Boulain, and D. Eamus (2013), Spatial patterns and temporal dynamics in savanna vegetation phenology across the North Australian Tropical Transect, Remote Sens. Environ., 139, 97-115, doi: 10.1016/j.rse.2013.07.030."
-    reference5 = "Chen, C, D Eamus, J Cleverly, N Boulain, P Cook, L Zhang, L Cheng, and Q Yu (2014), Modelling vegetation water-use and groundwater recharge as affected by climate variability in an arid-zone Acacia savanna woodland, J. Hydrol., Accepted August 2014."
+    reference5 = "Chen, C, D Eamus, J Cleverly, N Boulain, P Cook, L Zhang, L Cheng, and Q Yu (2014), Modelling vegetation water-use and groundwater recharge as affected by climate variability in an arid-zone Acacia savanna woodland, J. Hydrol., 519, 1084-1096, doi: 10.1016/j.jhydrol.2014.08.032."
     reference6 = "Ma, X, A Huete, Q Yu, N Restrepo-Coupe, J Beringer, LB Hutley, KD Kanniah, J Cleverly, and D Eamus (2014), Parameterization of an ecosystem light-use-efficiency model for predicting savanna GPP using MODIS EVI, Remote Sens. Environ., 154, 253-271, doi: 10.1016/j.rse.2014.08.025."
-    reference7 = "Shi, H, L Li, D Eamus, J Cleverly, A Huete, Q Yu, J Beringer, E van gorsel, and LB Hutley (2014), Intrinsic climate dependency of ecosystem light and water-use-efficiencies across Australian biomes, Environ. Res. Lett., Accepted 27 August 2014."
-    reference8 = "Donohue, RJ, IH Hume, ML Roderick, TR McVicar, J Beringer, LB Hutley, JC Gallant, JM Austin, E van Gorsel, JR Cleverly, WS Meyer, and SK Arndt (2014), Evaluation of the remote-sensing-based DIFFUSE model for estimating photosynthesis of vegetation, Remote Sens. Environ., Accepted 3 September 2014."
+    reference7 = "Shi, H, L Li, D Eamus, J Cleverly, A Huete, J Beringer, Q Yu, E van Gorsel, and L Hutley (2014), Intrinsic climate dependency of ecosystem light and water-use-efficiencies across Australian biomes, Environ. Res. Lett., 9, 104002, doi: 10.1088/1748-9326/9/10/104002."
+    reference8 = "Donohue, RJ, IH Hume, ML Roderick, TR McVicar, J Beringer, LB Hutley, JC Gallant, JM Austin, E van Gorsel, JR Cleverly, WS Meyer, and SK Arndt (2014), Evaluation of the remote-sensing-based DIFFUSE model for estimating photosynthesis of vegetation, Remote Sens. Environ., 155, 349-365, doi: 10.1016/j.rse.2014.09.007."
+    reference9 = "Chen, C, J Cleverly, L Zhang, Q Yu, and D Eamus (2015), Modelling seasonal and inter-annual variations in carbon and water fluxes in an arid-zone Acacia savanna woodland, 1981-2012, Ecosystems, Accepted 15 November 2015."
+    reference10 = "Haverd, V, B Smith, M Raupach, P Briggs, L Nieradzik, J Beringer, L Hutley, CM Trudinger, and J Cleverly (2015), Coupling carbon allocation with leaf and root phenology predicts tree-grass partitioning along a savanna rainfall gradient, Biogeosciences Discuss., 12, 16313-16357, doi: 10.5194/bgd-12-16313-2015."
+    reference11 = "Restrepo Coupe, N, A Huete, K Davies, J Cleverly, J Beringer, D Eamus, E van Gorsel, LB Hutley, and WS Meyer (2015), MODIS vegetation products as proxies of photosynthetic potential: a look across meteorological and biologic driven ecosystem productivity, Biogeosciences Discuss., 12, 19213-19267, doi: 10.5194/bgd-12-19213-2015."
     site_name = "AliceSpringsMulga"
     site = "Alice Springs Mulga, Northern Territory, Australia"
     soil = "red kandosol, sandy loam"
@@ -1168,6 +1172,15 @@
             long_name = "Wind direction (CSAT)"
             units    = "deg"
             standard_name = "wind_from_direction"
+    [[Wd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Wd_CSAT_Compass
+        [[[Attr]]]
+            ancillary_variables = "Wd QC flag"
+            long_name = "Wind direction (CSAT)"
+            units    = "deg"
+            standard_name = "wind_from_direction"
     [[Ws_WS]]
         [[[xl]]]
             sheet    = Data
@@ -1285,12 +1298,12 @@
             long_name = "Rainfall, 30 minute total"
             units    = "mm"
             standard_name = "rainfall_amount"
-    [[Re]]
+    [[ER]]
         [[[xl]]]
             sheet    = Data
-            name     = Re
+            name     = ER
         [[[Attr]]]
-            ancillary_variables = "Re QC flag"
+            ancillary_variables = "ER QC flag"
             long_name = "Ecosystem respiration gapfilled using modelled from Q10 response curve binned by soil volumetric moisture content class (night) and intercept of light response curve binned by temperature class (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
@@ -1300,7 +1313,7 @@
             name     = GPP
         [[[Attr]]]
             ancillary_variables = "GPP QC flag"
-            long_name = "Gross primary production, determined as Re - Fc (day)"
+            long_name = "Gross primary production, determined as ER - Fc (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
     [[Ta_1147cm]]
@@ -1672,4 +1685,32 @@
             long_name = "integrated footprint in the direction of the wind"
             units    = "m"
             ancillary_variables = "xr QC flag"
+            standard_name = "not defined"
+    [[w_Sd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = w_Sd
+        [[[Attr]]]
+            ancillary_variables = "w_Sd QC flag"
+            long_name = "Vertical velocity component from CSAT, standard deviation, rotated to natural wind coordinates"
+            units    = "mm/30min"
+            standard_name = "not defined"
+            Level = "L3"
+    [[u_Sd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = u_Sd
+        [[[Attr]]]
+            long_name = "Longitudinal velocity component from CSAT, standard deviation, rotated to natural wind coordinates"
+            units    = "m"
+            ancillary_variables = "u_Sd QC flag"
+            standard_name = "not defined"
+    [[v_Sd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = v_Sd
+        [[[Attr]]]
+            long_name = "Lateral velocity component from CSAT, standard deviation, rotated to natural wind coordinates"
+            units    = "m"
+            ancillary_variables = "v_Sd QC flag"
             standard_name = "not defined"

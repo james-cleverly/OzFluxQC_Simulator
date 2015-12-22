@@ -46,7 +46,7 @@ import logging
 import math
 import csv
 import pysolar
-
+import pdb
 
 log = logging.getLogger('qc.ts')
 
@@ -329,6 +329,7 @@ def CalculateAvailableEnergy(ds,Fa_out='Fa',Fn_in='Fn',Fg_in='Fg'):
     Fn,f,a = qcutils.GetSeriesasMA(ds,Fn_in)
     Fg,f,a = qcutils.GetSeriesasMA(ds,Fg_in)
     Fa = Fn - Fg
+#    pdb.set_trace()
     attr = qcutils.MakeAttributeDictionary(long_name='Available energy using '+Fn_in+','+Fg_in,units='W/m2')
     qcutils.CreateSeries(ds,Fa_out,Fa,FList=[Fn_in,Fg_in],Attr=attr)
 
@@ -1098,49 +1099,6 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 if ThisOne in SubSumList:
                     log.error('  Subsum: Negative radiation flux not defined')
         elif ThisOne == 'Carbon':
-            if qcutils.cfkeycheck(cf,Base='Sums',ThisOne='GPPin'):
-                GPPIn = ast.literal_eval(cf['Sums']['GPPin'])
-                GPP,f,a = qcutils.GetSeriesasMA(ds,GPPIn[0])
-                Re,f,a = qcutils.GetSeriesasMA(ds,GPPIn[1])
-                Fsd,f,a = qcutils.GetSeriesasMA(ds,'Fsd')
-                GPP_mmol = GPP * 1800 / 1000
-                GPP_gC = GPP_mmol  * c.Mc
-                GPP_gCO2 = GPP_mmol * c.Mco2
-                Re_mmol = Re * 1800 / 1000
-                Re_gC = Re_mmol * c.Mc
-                Re_gCO2 = Re_mmol * c.Mco2
-                Re_LRF_mmol = numpy.zeros(len(Re_mmol), dtype=numpy.float64) + Re_mmol
-                Re_n_mmol = numpy.zeros(len(Re_mmol), dtype=numpy.float64)
-                Re_NEEmax_mmol = numpy.zeros(len(Re_mmol), dtype=numpy.float64)
-                nightindex = numpy.where(Fsd < 10)[0]
-                NEEmaxindex = numpy.where(Fsd > 500)[0]
-                Re_LRF_mmol[nightindex] = 0.
-                Re_LRF_mmol[NEEmaxindex] = 0.
-                Re_n_mmol[nightindex] = Re_mmol[nightindex]
-                Re_NEEmax_mmol[NEEmaxindex] = Re_mmol[NEEmaxindex]
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2')
-                qcutils.CreateSeries(ds,'GPP_mmol',GPP_mmol,FList=[GPPIn[0]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gC/m2',standard_name='gross_primary_productivity_of_carbon')
-                qcutils.CreateSeries(ds,'GPP_gC',GPP_gC,FList=[GPPIn[0]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gCO2/m2')
-                qcutils.CreateSeries(ds,'GPP_gCO2',GPP_gCO2,FList=[GPPIn[0]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='mmol/m2')
-                qcutils.CreateSeries(ds,'Re_mmol',Re_mmol,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
-                qcutils.CreateSeries(ds,'Re_gC',Re_gC,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re',units='gCO2/m2')
-                qcutils.CreateSeries(ds,'Re_gCO2',Re_gCO2,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2')
-                qcutils.CreateSeries(ds,'Re_LRF_mmol',Re_LRF_mmol,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, nocturnal accumulation',units='mmol/m2')
-                qcutils.CreateSeries(ds,'Re_n_mmol',Re_n_mmol,FList=[GPPIn[1]],Attr=attr)
-                attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min Re, estimated by LRF',units='mmol/m2')
-                qcutils.CreateSeries(ds,'Re_NEEmax_mmol',Re_NEEmax_mmol,FList=[GPPIn[1]],Attr=attr)
-                GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','Re_mmol','Re_gC','Re_gCO2','Re_LRF_mmol','Re_n_mmol','Re_NEEmax_mmol']
-                for listindex in range(0,9):
-                    OutList.append(GPPOut[listindex])
-                    SumOutList.append(GPPOut[listindex])
-            
             Fc,f,a = qcutils.GetSeriesasMA(ds,'Fc_c')
             Fco2,f,a = qcutils.GetSeriesasMA(ds,'Fc_co2')
             Fc_umol,f,a = qcutils.GetSeriesasMA(ds,'NEE')
@@ -1163,6 +1121,128 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                 SumOutList.append(COut[listindex])
                 if ThisOne in SubSumList:
                     SubOutList.append(COut[listindex])
+            
+            if 'AliceSpringsMulga' in ds.globalattributes['site_name']:
+                if qcutils.cfkeycheck(cf,Base='Sums',ThisOne='GPPin'):
+                    GPPIn = ast.literal_eval(cf['Sums']['GPPin'])
+                    GPP,f,a = qcutils.GetSeriesasMA(ds,GPPIn[0])
+                    ER,f,a = qcutils.GetSeriesasMA(ds,GPPIn[1])
+                    Fsd,f,a = qcutils.GetSeriesasMA(ds,'Fsd')
+                    GPP_mmol = GPP * 1800 / 1000
+                    GPP_gC = GPP_mmol  * c.Mc
+                    GPP_gCO2 = GPP_mmol * c.Mco2
+                    ER_mmol = ER * 1800 / 1000
+                    ER_gC = ER_mmol * c.Mc
+                    ER_gCO2 = ER_mmol * c.Mco2
+                    ER_LRF_mmol = numpy.zeros(len(ER_mmol), dtype=numpy.float64) + ER_mmol
+                    ER_n_mmol = numpy.zeros(len(ER_mmol), dtype=numpy.float64)
+                    ER_NEEmax_mmol = numpy.zeros(len(ER_mmol), dtype=numpy.float64)
+                    nightindex = numpy.where(Fsd < 10)[0]
+                    NEEmaxindex = numpy.where(Fsd > 500)[0]
+                    ER_LRF_mmol[nightindex] = 0.
+                    ER_LRF_mmol[NEEmaxindex] = 0.
+                    ER_n_mmol[nightindex] = ER_mmol[nightindex]
+                    ER_NEEmax_mmol[NEEmaxindex] = ER_mmol[NEEmaxindex]
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'GPP_mmol',GPP_mmol,FList=[GPPIn[0]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gC/m2',standard_name='gross_primary_productivity_of_carbon')
+                    qcutils.CreateSeries(ds,'GPP_gC',GPP_gC,FList=[GPPIn[0]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'GPP_gCO2',GPP_gCO2,FList=[GPPIn[0]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_mmol',ER_mmol,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'ER_gC',ER_gC,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'ER_gCO2',ER_gCO2,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, estimated by LRF',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_LRF_mmol',ER_LRF_mmol,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, nocturnal accumulation',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_n_mmol',ER_n_mmol,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, estimated by LRF',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_NEEmax_mmol',ER_NEEmax_mmol,FList=[GPPIn[1]],Attr=attr)
+                    GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','ER_mmol','ER_gC','ER_gCO2','ER_LRF_mmol','ER_n_mmol','ER_NEEmax_mmol']
+                    for listindex in range(0,9):
+                        OutList.append(GPPOut[listindex])
+                        SumOutList.append(GPPOut[listindex])
+            elif 'TiTreeEast' in ds.globalattributes['site_name']:
+                if qcutils.cfkeycheck(cf,Base='Sums',ThisOne='GPPin'):
+                    GPPIn = ast.literal_eval(cf['Sums']['GPPin'])
+                    GPP,f,a = qcutils.GetSeriesasMA(ds,GPPIn[0])
+                    ER,f,a = qcutils.GetSeriesasMA(ds,GPPIn[1])
+                    ER_night,f,a = qcutils.GetSeriesasMA(ds,GPPIn[2])
+                    ER_dark,f,a = qcutils.GetSeriesasMA(ds,GPPIn[3])
+                    ER_bio,f,a = qcutils.GetSeriesasMA(ds,GPPIn[4])
+                    ER_day,f,a = qcutils.GetSeriesasMA(ds,GPPIn[5])
+                    PD,f,a = qcutils.GetSeriesasMA(ds,GPPIn[6])
+                    Fsd,f,a = qcutils.GetSeriesasMA(ds,'Fsd')
+                    GPP_mmol = GPP * 1800 / 1000
+                    GPP_gC = GPP_mmol  * c.Mc
+                    GPP_gCO2 = GPP_mmol * c.Mco2
+                    ER_mmol = ER * 1800 / 1000
+                    ER_gC = ER_mmol * c.Mc
+                    ER_gCO2 = ER_mmol * c.Mco2
+                    ER_night_mmol = ER_night * 1800 / 1000
+                    ER_night_gC = ER_night_mmol  * c.Mc
+                    ER_night_gCO2 = ER_night_mmol * c.Mco2
+                    ER_dark_mmol = ER_dark * 1800 / 1000
+                    ER_dark_gC = ER_dark_mmol * c.Mc
+                    ER_dark_gCO2 = ER_dark_mmol * c.Mco2
+                    ER_bio_mmol = ER_bio * 1800 / 1000
+                    ER_bio_gC = ER_bio_mmol * c.Mc
+                    ER_bio_gCO2 = ER_bio_mmol * c.Mco2
+                    ER_day_mmol = ER_day * 1800 / 1000
+                    ER_day_gC = ER_day_mmol * c.Mc
+                    ER_day_gCO2 = ER_day_mmol * c.Mco2
+                    PD_mmol = PD * 1800 / 1000
+                    PD_gC = PD_mmol * c.Mc
+                    PD_gCO2 = PD_mmol * c.Mco2
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'GPP_mmol',GPP_mmol,FList=[GPPIn[0]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gC/m2',standard_name='gross_primary_productivity_of_carbon')
+                    qcutils.CreateSeries(ds,'GPP_gC',GPP_gC,FList=[GPPIn[0]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'GPP_gCO2',GPP_gCO2,FList=[GPPIn[0]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_mmol',ER_mmol,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'ER_gC',ER_gC,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'ER_gCO2',ER_gCO2,FList=[GPPIn[1]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, nocturnal accumulation',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_night_mmol',ER_night_mmol,FList=[GPPIn[2]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, nocturnal accumulation',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'ER_night_gC',ER_night_gC,FList=[GPPIn[2]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, nocturnal accumulation',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'ER_night_gCO2',ER_night_gCO2,FList=[GPPIn[2]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min dark ER, intercept of light response function',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_dark_mmol',ER_dark_mmol,FList=[GPPIn[3]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min dark ER, intercept of light response function',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'ER_dark_gC',ER_dark_gC,FList=[GPPIn[3]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min dark ER, intercept of light response function',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'ER_dark_gCO2',ER_dark_gCO2,FList=[GPPIn[3]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, biological sources (AR+HR)',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_bio_mmol',ER_bio_mmol,FList=[GPPIn[4]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, biological sources (AR+HR)',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'ER_bio_gC',ER_bio_gC,FList=[GPPIn[4]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, biological sources (AR+HR)',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'ER_bio_gCO2',ER_bio_gCO2,FList=[GPPIn[4]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, daytime accumulation',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'ER_day_mmol',ER_day_mmol,FList=[GPPIn[5]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, daytime accumulation',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'ER_day_gC',ER_day_gC,FList=[GPPIn[5]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, daytime accumulation',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'ER_day_gCO2',ER_day_gCO2,FList=[GPPIn[5]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min photo-degradation',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'PD_mmol',PD_mmol,FList=[GPPIn[6]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min photo-degradation',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'PD_gC',PD_gC,FList=[GPPIn[6]],Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min photo-degradation',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'PD_gCO2',PD_gCO2,FList=[GPPIn[6]],Attr=attr)
+                    GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','ER_mmol','ER_gC','ER_gCO2','ER_night_mmol','ER_night_gC','ER_night_gCO2','ER_dark_mmol','ER_dark_gC','ER_dark_gCO2','ER_bio_mmol','ER_bio_gC','ER_bio_gCO2','ER_day_mmol','ER_day_gC','ER_day_gCO2','PD_mmol','PD_gC','PD_gCO2']
+                    for listindex in range(0,21):
+                        OutList.append(GPPOut[listindex])
+                        SumOutList.append(GPPOut[listindex])
         elif ThisOne == 'PM':
             if 'GSv_2layer' not in ds.series.keys() and 'GSv_1layer' not in ds.series.keys() and 'GSm' not in ds.series.keys():
                 SumList.remove('PM')
@@ -1496,10 +1576,10 @@ def ConvertFc(cf,ds,Fco2_in='Fc'):
     if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='convertFc'):
         Fc_list = ast.literal_eval(cf['FunctionArgs']['convertFc'])
         Fco2_in = Fc_list[0]
-    Fc_co2,f,a = qcutils.GetSeriesasMA(ds,Fco2_in)
+    Fc_co2,f,attr = qcutils.GetSeriesasMA(ds,Fco2_in)
     # conversion factors:  mol2umol: 1e6; mg2kg: 1e-6
     # conversions cancel:  mgCO2, kgCO2/mol, umol
-    if 'umol' in a['units']:
+    if 'umol' in attr['units']:
         NEE = Fc_co2
         Fc_co2 = NEE * c.Mco2
         NEP = -NEE
@@ -1894,22 +1974,26 @@ def do_attributes(cf,ds):
         ds.globalattributes['Flag085'] = 'GapFilling: L5 Diurnal SD Check'
         ds.globalattributes['Flag086'] = 'GapFilling: L6 Range Check'
         ds.globalattributes['Flag087'] = 'GapFilling: L6 Diurnal SD Check'
-        ds.globalattributes['Flag090'] = 'Partitioning Night: Re computed from exponential temperature response curves'
-        ds.globalattributes['Flag100'] = 'Partitioning Day: GPP/Re computed from light-response curves, GPP = Re - Fc'
+        ds.globalattributes['Flag090'] = 'Partitioning Night: ER computed from exponential temperature response curves'
+        ds.globalattributes['Flag100'] = 'Partitioning Day: GPP/ER computed from light-response curves, GPP = ER - Fc'
         ds.globalattributes['Flag110'] = 'Partitioning Day: GPP night mask'
-        ds.globalattributes['Flag120'] = 'Partitioning Day: Fc > Re, GPP = 0, Re = Fc'
-        ds.globalattributes['Flag121'] = 'Footprint: Date filter'
-        ds.globalattributes['Flag122'] = 'Footprint: no solution'
-        ds.globalattributes['Flag131'] = 'Penman-Monteith: bad rav or rSm only if bad Uavg, bad Fe and bad Fsd flags not set'
-        ds.globalattributes['Flag132'] = 'Penman-Monteith: bad Fe < threshold (0 W/m2 default) only if bad Fsd flag not set'
-        ds.globalattributes['Flag133'] = 'Penman-Monteith: bad Fsd < threshold (10 W/m2 default)'
-        ds.globalattributes['Flag134'] = 'Penman-Monteith: Uavg == 0 (undefined aerodynamic resistance under calm conditions) only if bad Fe and bad Fsd flags not set'
-        ds.globalattributes['Flag140'] = 'Penman-Monteith 2-layer: rav_base short-circuit'
-        ds.globalattributes['Flag150'] = 'Penman-Monteith 2-layer: rav_top short-circuit'
-        ds.globalattributes['Flag151'] = 'Penman-Monteith 2-layer: rav_top not short-circuit (rav_base undefined)'
-        ds.globalattributes['Flag160'] = 'Penman-Monteith 2-layer: parallel circuit'
-        ds.globalattributes['Flag161'] = 'Penman-Monteith 2-layer: not parallel circuit (rav_full short-circuit)'
-        ds.globalattributes['Flag171'] = 'Bulk Richardson number flags: delta_U=0 (RiB infinite)'
+        ds.globalattributes['Flag120'] = 'Partitioning Day: Fc > ER, GPP = 0, ER = Fc'
+        ds.globalattributes['Flag130'] = 'Partitioning Day: ER_dark from sink period (+NEP) light response curves'
+        ds.globalattributes['Flag140'] = 'Partitioning Day: ER_dark from source  period (+NEE) light response curves'
+        ds.globalattributes['Flag150'] = 'Partitioning Day: PD, ER_day & GPP from conditional correlation'
+        ds.globalattributes['Flag151'] = 'Partitioning Day: no solution from conditional correlation'
+        ds.globalattributes['Flag161'] = 'Footprint: Date filter'
+        ds.globalattributes['Flag162'] = 'Footprint: no solution'
+        ds.globalattributes['Flag171'] = 'Penman-Monteith: bad rav or rSm only if bad Uavg, bad Fe and bad Fsd flags not set'
+        ds.globalattributes['Flag172'] = 'Penman-Monteith: bad Fe < threshold (0 W/m2 default) only if bad Fsd flag not set'
+        ds.globalattributes['Flag173'] = 'Penman-Monteith: bad Fsd < threshold (10 W/m2 default)'
+        ds.globalattributes['Flag174'] = 'Penman-Monteith: Uavg == 0 (undefined aerodynamic resistance under calm conditions) only if bad Fe and bad Fsd flags not set'
+        ds.globalattributes['Flag180'] = 'Penman-Monteith 2-layer: rav_base short-circuit'
+        ds.globalattributes['Flag190'] = 'Penman-Monteith 2-layer: rav_top short-circuit'
+        ds.globalattributes['Flag191'] = 'Penman-Monteith 2-layer: rav_top not short-circuit (rav_base undefined)'
+        ds.globalattributes['Flag200'] = 'Penman-Monteith 2-layer: parallel circuit'
+        ds.globalattributes['Flag201'] = 'Penman-Monteith 2-layer: not parallel circuit (rav_full short-circuit)'
+        ds.globalattributes['Flag211'] = 'Bulk Richardson number flags: delta_U=0 (RiB infinite)'
     for ThisOne in ds.series.keys():
         if ThisOne in cf['Variables']:
             if 'Attr' in cf['Variables'][ThisOne].keys():
@@ -1955,7 +2039,7 @@ def do_bulkRichardson(cf,ds):
         qcutils.CreateSeries(ds,IncludeHeightList[5],delta_Tvp,FList=[IncludeHeightList[1],IncludeHeightList[2],IncludeHeightList[3],'Fc'],Attr=attr)
         attr = qcutils.MakeAttributeDictionary(long_name='Bulk Richardson number',units='none')
         qcutils.CreateSeries(ds,IncludeHeightList[6],RiB,FList=[IncludeHeightList[1],IncludeHeightList[2],IncludeHeightList[3],'Fc'],Attr=attr)
-        ds.series[IncludeHeightList[6]]['Flag'][Uindex] = numpy.int32(171)
+        ds.series[IncludeHeightList[6]]['Flag'][Uindex] = numpy.int32(211)
         flaglist = [IncludeHeightList[4],IncludeHeightList[5],IncludeHeightList[6]]
         for ThisOne in flaglist:
             flag = numpy.where(numpy.mod(ds.series[ThisOne]['Flag'],10)!=0)[0]
@@ -2232,7 +2316,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
             for i in range(len(labels)):
                 if labels[i] == 'fc_GPP' or labels[i] == 'fc_Fc':
                     footprint_vector_out(filenames[0][i],fc_x2d,fc_y2d,fc_c1_2d,labels[i])
-                if labels[i] == 'fc_Re' or labels[i] == 'fc_Fe':
+                if labels[i] == 'fc_ER' or labels[i] == 'fc_Fe':
                     footprint_vector_out(filenames[0][i],fc_x2d,fc_y2d,fc_e_2d,labels[i])
                 if labels[i] == 'fc_Fh':
                     footprint_vector_out(filenames[0][i],fc_x2d,fc_y2d,fc_h_2d,labels[i])
@@ -2245,7 +2329,7 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
             for i in range(len(labels)):
                 if labels[i] == 'fc_GPP' or labels[i] == 'fc_Fc':
                     footprint_matrix_out(filenames[1][i],fc_x2d,fc_y2d,fc_c1_2d)
-                if labels[i] == 'fc_Re' or labels[i] == 'fc_Fe':
+                if labels[i] == 'fc_ER' or labels[i] == 'fc_Fe':
                     footprint_matrix_out(filenames[1][i],fc_x2d,fc_y2d,fc_e_2d)
                 if labels[i] == 'fc_Fh':
                     footprint_matrix_out(filenames[1][i],fc_x2d,fc_y2d,fc_h_2d)
@@ -2259,9 +2343,9 @@ def do_footprint_2d(cf,ds,datalevel='L3',footprintlevel='V3'):
     flag_index = numpy.ma.where((xr == 0) & (numpy.mod(ds.series['xr']['Flag'],10)==0))[0]
     ustar_index = numpy.ma.where(ustar < 0.2)[0]
     date_index = numpy.ma.where(Lf == 9999)[0]
-    ds.series['xr']['Flag'][flag_index] = numpy.int32(122)
+    ds.series['xr']['Flag'][flag_index] = numpy.int32(162)
     ds.series['xr']['Flag'][ustar_index] = numpy.int32(18)
-    ds.series['xr']['Flag'][date_index] = numpy.int32(121)
+    ds.series['xr']['Flag'][date_index] = numpy.int32(201)
     index = numpy.where((numpy.mod(ds.series['xr']['Flag'],10)!=0))[0]    # find the elements with flag != 0, 10, 20 etc
     ds.series['xr']['Data'][index] = numpy.float64(c.missing_value)
 
@@ -2936,7 +3020,7 @@ def footprint_2d(cf,sigmaw,sigmav,ustar,zm,h,znot,r,wd,zeta,L,zc,timestamp,eta,F
             xlSheet.write(xlRow,xlCol,Fc)
             xlRow = xlRow + 1
             xlCol = 1
-            xlSheet.write(xlRow,xlCol,'Re')
+            xlSheet.write(xlRow,xlCol,'ER')
             xlCol = xlCol - 1
             xlSheet.write(xlRow,xlCol,Fe)
         
@@ -3062,19 +3146,19 @@ def footprint_2d(cf,sigmaw,sigmav,ustar,zm,h,znot,r,wd,zeta,L,zc,timestamp,eta,F
                 fw_e_2d = f_2d * Fe
                 if cf['Output']['FootprintDataFileType'] == 'Weighted':
                     labels.append('fw_GPP')
-                    labels.append('fw_Re')
+                    labels.append('fw_ER')
                     vectorfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'GPP_w_footprint_2d_vectors'+''.join(STList)+'.xls')
                     matrixfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'GPP_w_footprint_2d_matrix'+''.join(STList)+'.xls')
-                    vectorfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'Re_w_footprint_2d_vectors'+''.join(STList)+'.xls')
-                    matrixfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'Re_w_footprint_2d_matrix'+''.join(STList)+'.xls')
+                    vectorfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'ER_w_footprint_2d_vectors'+''.join(STList)+'.xls')
+                    matrixfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'ER_w_footprint_2d_matrix'+''.join(STList)+'.xls')
                 
                 if cf['Output']['FootprintDataFileType'] == 'Climatology':
                     labels.append('fc_GPP')
-                    labels.append('fc_Re')
+                    labels.append('fc_ER')
                     vectorfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'GPP_c_footprint_2d_vectors'+''.join(STList)+'.xls')
                     matrixfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'GPP_c_footprint_2d_matrix'+''.join(STList)+'.xls')
-                    vectorfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'Re_c_footprint_2d_vectors'+''.join(STList)+'.xls')
-                    matrixfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'Re_c_footprint_2d_matrix'+''.join(STList)+'.xls')
+                    vectorfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'ER_c_footprint_2d_vectors'+''.join(STList)+'.xls')
+                    matrixfiles.append(cf['Files']['Footprint']['FootprintFilePath']+'ER_c_footprint_2d_matrix'+''.join(STList)+'.xls')
             
             filenames = [vectorfiles, matrixfiles]
         
@@ -3253,10 +3337,10 @@ def get_canopyresistance(cf,ds,Uavg,uindex,PMin,Level,critFsd,critFe):
         ds.series[Label[listindex]]['Attr']['InputSeries'] = PMin
         ds.series[Label[listindex]]['Attr']['FsdCutoff'] = critFsd
         ds.series[Label[listindex]]['Attr']['FeCutoff'] = critFe
-        ds.series[Label[listindex]]['Flag'][rcindex] = numpy.int32(131)
-        ds.series[Label[listindex]]['Flag'][uindex] = numpy.int32(134)
-        ds.series[Label[listindex]]['Flag'][Feindex] = numpy.int32(132)
-        ds.series[Label[listindex]]['Flag'][Fsdindex] = numpy.int32(133)
+        ds.series[Label[listindex]]['Flag'][rcindex] = numpy.int32(171)
+        ds.series[Label[listindex]]['Flag'][uindex] = numpy.int32(174)
+        ds.series[Label[listindex]]['Flag'][Feindex] = numpy.int32(172)
+        ds.series[Label[listindex]]['Flag'][Fsdindex] = numpy.int32(173)
         ds.series[Label[listindex]]['Data'][rcindex] = numpy.float64(c.missing_value)
         ds.series[Label[listindex]]['Data'][uindex] = numpy.float64(c.missing_value)
         ds.series[Label[listindex]]['Data'][Feindex] = numpy.float64(c.missing_value)
@@ -3320,7 +3404,7 @@ def get_leafresistance(cf,ds,rinverted):
     rSm_index = numpy.where(numpy.mod(rc_flag,10)!=0)[0]
     LAI_index = numpy.where(numpy.mod(LAI_flag,10)!=0)[0]
     rl[Fsd_index] = numpy.float64(c.missing_value)
-    rl_flag[Fsd_index] = numpy.int32(133)
+    rl_flag[Fsd_index] = numpy.int32(173)
     rl[Fsd2_index] = numpy.float64(c.missing_value)
     rl_flag[Fsd2_index] = Fsd_flag[Fsd2_index]
     rl[rSm_index] = numpy.float64(c.missing_value)
@@ -3990,11 +4074,11 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
             ds.series[outList[listindex]]['Attr']['InputSeries'] = PMin
             ds.series[outList[listindex]]['Attr']['FsdCutoff'] = critFsd
             ds.series[outList[listindex]]['Attr']['FeCutoff'] = critFe
-            ds.series[outList[listindex]]['Flag'][rstindex] = numpy.int32(131)
-            ds.series[outList[listindex]]['Flag'][ravindex] = numpy.int32(131)
-            ds.series[outList[listindex]]['Flag'][uindex] = numpy.int32(134)
-            ds.series[outList[listindex]]['Flag'][Feindex] = numpy.int32(132)
-            ds.series[outList[listindex]]['Flag'][Fsdindex] = numpy.int32(133)
+            ds.series[outList[listindex]]['Flag'][rstindex] = numpy.int32(171)
+            ds.series[outList[listindex]]['Flag'][ravindex] = numpy.int32(171)
+            ds.series[outList[listindex]]['Flag'][uindex] = numpy.int32(174)
+            ds.series[outList[listindex]]['Flag'][Feindex] = numpy.int32(172)
+            ds.series[outList[listindex]]['Flag'][Fsdindex] = numpy.int32(173)
             ds.series[outList[listindex]]['Data'][rstindex] = numpy.float64(c.missing_value)
             ds.series[outList[listindex]]['Data'][ravindex] = numpy.float64(c.missing_value)
             ds.series[outList[listindex]]['Data'][uindex] = numpy.float64(c.missing_value)
@@ -4147,14 +4231,14 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
                 goodravonlyindex = numpy.setdiff1d(goodflagindex,ravindex_top)
                 goodnotbothindex = numpy.concatenate((goodflagonlyindex,goodravonlyindex), axis=0)
                 goodbothindex = numpy.setdiff1d(ravindex_top,goodnotbothindex)
-                ds.series[outList[listindex]]['Flag'][goodbothindex] = numpy.int32(150)
-                ds.series[outList[listindex]]['Flag'][rstindex_base] = numpy.int32(131)
-                ds.series[outList[listindex]]['Flag'][ravindex_base] = numpy.int32(131)
+                ds.series[outList[listindex]]['Flag'][goodbothindex] = numpy.int32(190)
+                ds.series[outList[listindex]]['Flag'][rstindex_base] = numpy.int32(171)
+                ds.series[outList[listindex]]['Flag'][ravindex_base] = numpy.int32(171)
                 goodflagonlyindex = numpy.setdiff1d(ravgoodindex_top,goodflagindex)
                 badravonlyindex = numpy.setdiff1d(goodflagindex,ravgoodindex_top)
                 badnotbothindex = numpy.concatenate((goodflagonlyindex,badravonlyindex), axis=0)
                 badbothindex = numpy.setdiff1d(ravgoodindex_top,badnotbothindex)
-                ds.series[outList[listindex]]['Flag'][badbothindex] = numpy.int32(151)
+                ds.series[outList[listindex]]['Flag'][badbothindex] = numpy.int32(191)
                 ds.series[outList[listindex]]['Data'][rstindex_base] = numpy.float64(c.missing_value)
                 ds.series[outList[listindex]]['Data'][ravindex_base] = numpy.float64(c.missing_value)
                 ds.series[outList[listindex]]['Data'][ravgoodindex_top] = numpy.float64(c.missing_value)
@@ -4167,10 +4251,10 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
                 goodnotbothindex160 = numpy.concatenate((goodflagonlyindex160,goodravonlyindex160), axis=0)
                 goodbothindex140 = numpy.setdiff1d(ravindex_base,goodnotbothindex140)
                 goodbothindex160 = numpy.setdiff1d(ravgoodindex_base,goodnotbothindex160)
-                ds.series[outList[listindex]]['Flag'][goodbothindex140] = numpy.int32(140)
-                ds.series[outList[listindex]]['Flag'][goodbothindex160] = numpy.int32(160)
-                ds.series[outList[listindex]]['Flag'][rstindex_top] = numpy.int32(131)
-                ds.series[outList[listindex]]['Flag'][ravindex_top] = numpy.int32(131)
+                ds.series[outList[listindex]]['Flag'][goodbothindex140] = numpy.int32(180)
+                ds.series[outList[listindex]]['Flag'][goodbothindex160] = numpy.int32(200)
+                ds.series[outList[listindex]]['Flag'][rstindex_top] = numpy.int32(171)
+                ds.series[outList[listindex]]['Flag'][ravindex_top] = numpy.int32(171)
                 ds.series[outList[listindex]]['Data'][rstindex_top] = numpy.float64(c.missing_value)
                 ds.series[outList[listindex]]['Data'][ravindex_top] = numpy.float64(c.missing_value)
             if '_full' in outList[listindex]:
@@ -4178,9 +4262,9 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
                 goodravonlyindex = numpy.setdiff1d(goodflagindex,ravgoodindex_full)
                 goodnotbothindex = numpy.concatenate((goodflagonlyindex,goodravonlyindex), axis=0)
                 goodbothindex = numpy.setdiff1d(ravgoodindex_full,goodnotbothindex)
-                ds.series[outList[listindex]]['Flag'][goodbothindex] = numpy.int32(160)
-                ds.series[outList[listindex]]['Flag'][rstindex_full] = numpy.int32(131)
-                ds.series[outList[listindex]]['Flag'][ravindex_full] = numpy.int32(131)
+                ds.series[outList[listindex]]['Flag'][goodbothindex] = numpy.int32(200)
+                ds.series[outList[listindex]]['Flag'][rstindex_full] = numpy.int32(171)
+                ds.series[outList[listindex]]['Flag'][ravindex_full] = numpy.int32(171)
                 goodflagonlyindex_top = numpy.setdiff1d(ravindex_top,goodflagindex)
                 goodflagonlyindex_base = numpy.setdiff1d(ravindex_base,goodflagindex)
                 badravonlyindex_top = numpy.setdiff1d(goodflagindex,ravindex_top)
@@ -4189,8 +4273,8 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
                 badnotbothindex_base = numpy.concatenate((goodflagonlyindex_base,badravonlyindex_base), axis=0)
                 badbothindex_top = numpy.setdiff1d(ravindex_top,badnotbothindex_top)
                 badbothindex_base = numpy.setdiff1d(ravindex_base,badnotbothindex_base)
-                ds.series[outList[listindex]]['Flag'][badbothindex_top] = numpy.int32(161)
-                ds.series[outList[listindex]]['Flag'][badbothindex_base] = numpy.int32(161)
+                ds.series[outList[listindex]]['Flag'][badbothindex_top] = numpy.int32(201)
+                ds.series[outList[listindex]]['Flag'][badbothindex_base] = numpy.int32(201)
                 ds.series[outList[listindex]]['Data'][rstindex_full] = numpy.float64(c.missing_value)
                 ds.series[outList[listindex]]['Data'][ravindex_full] = numpy.float64(c.missing_value)
                 ds.series[outList[listindex]]['Data'][ravindex_top] = numpy.float64(c.missing_value)
@@ -4208,22 +4292,23 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
                 goodbothindex140 = numpy.setdiff1d(ravindex_base,goodnotbothindex140)
                 goodbothindex150 = numpy.setdiff1d(ravindex_top,goodnotbothindex150)
                 goodbothindex160 = numpy.setdiff1d(ravgoodindex_full,goodnotbothindex160)
-                ds.series[outList[listindex]]['Flag'][goodbothindex160] = numpy.int32(160)
-                ds.series[outList[listindex]]['Flag'][goodbothindex140] = numpy.int32(140)
-                ds.series[outList[listindex]]['Flag'][goodbothindex150] = numpy.int32(150)
-                ds.series[outList[listindex]]['Flag'][rstindex] = numpy.int32(131)
-                ds.series[outList[listindex]]['Flag'][ravindex] = numpy.int32(131)
+                ds.series[outList[listindex]]['Flag'][goodbothindex160] = numpy.int32(200)
+                ds.series[outList[listindex]]['Flag'][goodbothindex140] = numpy.int32(180)
+                ds.series[outList[listindex]]['Flag'][goodbothindex150] = numpy.int32(190)
+                ds.series[outList[listindex]]['Flag'][rstindex] = numpy.int32(171)
+                ds.series[outList[listindex]]['Flag'][ravindex] = numpy.int32(171)
                 ds.series[outList[listindex]]['Data'][rstindex] = numpy.float64(c.missing_value)
                 ds.series[outList[listindex]]['Data'][ravindex] = numpy.float64(c.missing_value)
             
-            ds.series[outList[listindex]]['Flag'][uindex] = numpy.int32(134)
-            ds.series[outList[listindex]]['Flag'][Feindex] = numpy.int32(132)
-            ds.series[outList[listindex]]['Flag'][Fsdindex] = numpy.int32(133)
+            ds.series[outList[listindex]]['Flag'][uindex] = numpy.int32(174)
+            ds.series[outList[listindex]]['Flag'][Feindex] = numpy.int32(172)
+            ds.series[outList[listindex]]['Flag'][Fsdindex] = numpy.int32(173)
             ds.series[outList[listindex]]['Data'][badflagindex] = numpy.float64(c.missing_value)
             ds.series[outList[listindex]]['Data'][uindex] = numpy.float64(c.missing_value)
             ds.series[outList[listindex]]['Data'][Feindex] = numpy.float64(c.missing_value)
             ds.series[outList[listindex]]['Data'][Fsdindex] = numpy.float64(c.missing_value)
         
+        # calculate FAO56 using LAI input file
         if qcutils.cfkeycheck(cf,Base='PenmanMonteith',ThisOne='rlv2layer') and cf['PenmanMonteith']['rlv2layer'] == 'True':
             rlv, flag = get_leafresistance(cf,ds,outList[12])
             if 'rLv_2layer' in ds.series.keys():
@@ -4232,6 +4317,37 @@ def prep_aerodynamicresistance(cf,ds,Cdmethod,Cemethod,Ce_2layer):
                 attr = qcutils.MakeAttributeDictionary(long_name='leaf resistance from Penman-Monteith inversion, 2layer Ce-method, under well-illuminated (> 600 W m-2 Fsd) conditions',units='s/m')
             qcutils.CreateSeries(ds,'rLv_2layer',rlv,Flag=0,Attr=attr)
             ds.series['rLv_2layer']['Flag'] = flag
+        
+        # calculate 2-layer Penman potential ET
+        if qcutils.cfkeycheck(cf,Base='PenmanMonteith',ThisOne='potential') and cf['PenmanMonteith']['potential'] == 'True':
+            Fe,f,a = qcutils.GetSeriesasMA(ds,PMin[0])
+            Ta,f,a = qcutils.GetSeriesasMA(ds,PMin[1])
+            Ah,f,a = qcutils.GetSeriesasMA(ds,PMin[2])
+            ps,f,a = qcutils.GetSeriesasMA(ds,PMin[3])
+            Fn,f,a = qcutils.GetSeriesasMA(ds,PMin[5])
+            Fsd,f,a = qcutils.GetSeriesasMA(ds,PMin[6])
+            Fg,f,a = qcutils.GetSeriesasMA(ds,PMin[7])
+            VPD,f,a = qcutils.GetSeriesasMA(ds,'VPD')
+            Lv,f,a = qcutils.GetSeriesasMA(ds,'Lv')
+            Cpm,f,a = qcutils.GetSeriesasMA(ds,'Cpm')
+            rhom,f,a = qcutils.GetSeriesasMA(ds,'rhom')
+            rav,f,a = qcutils.GetSeriesasMA(ds,'rav_2layer')
+            flagList = [PMin[0],PMin[1],PMin[2],PMin[3],PMin[4],PMin[5],PMin[6],PMin[7],'rav_2layer']
+            gamma = mf.gamma(ps,Cpm,Lv)
+            delta = mf.delta(Ta)
+            if 'gamma' not in ds.series.keys():
+                attr = qcutils.MakeAttributeDictionary(long_name='Psychrometric coefficient',units='kPa/C')
+                qcutils.CreateSeries(ds,'gamma',gamma,FList=[PMin[3],'Cpm','Lv'],Attr=attr)
+            
+            if 'delta' not in ds.series.keys():
+                attr = qcutils.MakeAttributeDictionary(long_name='Slope of the saturation vapour pressure v temperature curve',units='kPa/C')
+                qcutils.CreateSeries(ds,'delta',delta,FList=[PMin[1]],Attr=attr)
+            
+            Fa = Fn - Fg
+            Fe_p = ((delta * Fa) + ((rhom * Cpm * VPD) / rav)) / (delta + gamma)
+            ETp = Fe_p * 60 * 30 * 1000 / (Lv * c.rho_water)  # mm/30min for summing
+            attr = qcutils.MakeAttributeDictionary(long_name='Penman potential ET',units='mm')
+            qcutils.CreateSeries(ds,'ETp',ETp,FList=flagList,Attr=attr)
     
     # use drag coefficient method
     if Cdmethod == 'True':
@@ -4571,7 +4687,7 @@ def write_sums(cf,ds,ThisOne,xlCol,xlSheet,DoSum='False',DoMinMax='False',DoMean
         for day in range(1,dRan+1):
             xlRow = xlRow + 1
             PMList = ['GSv_1layer_mol', 'GSv_2layer_mol', 'GSv_top_mol', 'GSv_base_mol', 'GSv_full_mol', 'GSm_mol', 'rav_1layer', 'rSv_1layer', 'rLv_1layer', 'GSv_1layer', 'rav_2layer', 'rSv_2layer', 'rLv_2layer', 'GSv_2layer', 'rav_base', 'rSv_base', 'GSv_base', 'rav_top', 'rSv_top', 'GSv_top', 'rav_full', 'rSv_full', 'GSv_full', 'ram', 'rSm', 'rLm', 'GSm']
-            CList = ['Re_mmol','Re_LRF_mmol','Re_n_mmol','Re_NEEmax_mmol','GPP','GPP_mmol','C_ppm']
+            CList = ['ER_mmol','ER_LRF_mmol','ER_n_mmol','ER_NEEmax_mmol','GPP','GPP_mmol','C_ppm']
             VarList = PMList + CList
             if ThisOne in VarList:
                 di = numpy.where((ds.series['Month']['Data']==month) & (ds.series['Day']['Data']==day) & (numpy.mod(ds.series[ThisOne]['Flag'],10) == 0))[0]

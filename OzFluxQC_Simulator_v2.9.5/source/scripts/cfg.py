@@ -16,6 +16,7 @@
 
 """
     Version History:
+    <<2.9.5 20 December 2015, implementation of Chapin semantics for carbon fluxes (ammended)>>
     <<2.9.0 15 May 2015, Reconciled against OzFluxQC v2.9.0; variances, standard deviations and rotations updated>>
     <<2.8.6 2 Jan 2015, Reconciled against OzFluxQC v2.8.6>>
     <<v2.8.5 2 Oct 2014, Update following Alice Springs workshop>>
@@ -34,8 +35,9 @@
 """
 
 version_name = "OzFluxQC Simulator"
-version_number = "v2.9.0"
+version_number = "v2.9.5"
 
+# 2.9.5    - 20 December 2015, implementation of Chapin semantics for carbon fluxes (ammended)
 # 2.9.0    - 15 May 2015, Reconciled against OzFluxQC v2.9.0; variances, standard deviations and rotations updated
 # 2.8.6    - 2 Jan 2015, Reconciled against OzFluxQC v2.8.6
 # 2.8.5    - 2 Oct 2014, Update following Alice Springs workshop

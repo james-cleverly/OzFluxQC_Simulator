@@ -1,0 +1,11 @@
+[General]
+    netCDFv3 = False
+
+[Files]
+    [[Out]]
+        ncFilePath = ../ncData/ASM/
+        ncFileName = ASM_EC_2013_Jan-Sep_L4in.nc
+    [[In]]
+        0 = ../../AliceSpringsMulga/level4/ASM_EC_2013_1Jan-Mar_L4_GapFilled.nc
+        1 = ../../AliceSpringsMulga/level4/ASM_EC_2013_2Apr-Jun_L4_GapFilled.nc
+        2 = ../../AliceSpringsMulga/level4/ASM_EC_2013_3Jul-Sep_L4_GapFilled.nc

@@ -1568,6 +1568,10 @@
         [[[RangeCheck]]]
             Lower      = [0]*12
             Upper      = [360]*12
+    [[Wd]]
+        [[[RangeCheck]]]
+            Lower      = [0]*12
+            Upper      = [360]*12
     [[Wd_WS]]
         [[[RangeCheck]]]
             Lower      = [0]*12
