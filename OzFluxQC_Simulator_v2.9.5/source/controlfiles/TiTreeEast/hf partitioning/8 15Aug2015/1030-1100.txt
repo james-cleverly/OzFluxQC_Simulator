@@ -1,6 +1,6 @@
 [Files]
     [[L1]]
-        in_file_path = ../TiTreeEast/level6partitioning/Conditional_correlation/15Aug15/
+        in_file_path = ../TiTreeEast/level6partitioning/Conditional_correlation/2015/8-15Aug15/
         in_filename = TTE_15Aug_1030-1100_fast_std.xls
         in_headerrow  = 2
         in_firstdatarow = 5

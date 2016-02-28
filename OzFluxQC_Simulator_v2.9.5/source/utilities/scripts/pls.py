@@ -60,7 +60,7 @@ def l3partition(cf,ds2):
     return ds3
     
 
-def l4partition(cf,ds3):
+def l6partition(cf,ds3):
     '''Processing OzFlux_Level4 data to partition daytime ER and GPP'''
     # make a copy of the OzFlux_Level4 data
     ds4 = copy.deepcopy(ds3)

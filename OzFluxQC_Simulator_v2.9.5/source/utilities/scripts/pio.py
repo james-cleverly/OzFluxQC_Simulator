@@ -111,6 +111,32 @@ def get_datetime(ds):
     ds.series['DateTime']['Attr']['long_name'] = 'Date-time object'
     ds.series['DateTime']['Attr']['units'] = 'None'
 
+def get_infilename_from_cf(cf,InLevel,fail=False):
+    filename = ""
+    if fail == True:
+        filename = cf['Files'][InLevel]['in_file_path']+cf['Files'][InLevel]['in_filename']
+        return str(filename)
+    else:
+        if "Files" in cf.keys():
+            if "in_file_path" in cf['Files'][InLevel].keys():
+                if "in_filename" in cf['Files'][InLevel].keys():
+                    filename = cf['Files'][InLevel]['in_file_path']+cf['Files'][InLevel]['in_filename']
+                else:
+                    log.error("get_infilename_from_cf: 'in_filename' key not found in 'Files' section of control file")
+            else:
+                log.error("get_infilename_from_cf: 'file_path' key not found in 'Files' section of control file")
+        else:
+            log.error("get_infilename_from_cf: 'Files' section not found in control file")
+        return str(filename)
+
+def get_keyvalue_from_cf(section,key):
+    try:
+        value = section[key]
+    except:
+        log.error('get_keyvalue_from_cf: '+str(key)+' not found in '+str(section.name)+' section of control file')
+        value = ''
+    return value
+
 def get_ncdtype(Series):
     sd = Series.dtype.name
     dt = 'f'
@@ -378,6 +404,70 @@ def xl_read_series(cf,level):
                         ds.series[ThisOne]['Data'][i] = numpy.float64(Values[i])
             else:
                 log.error('  xl_read_series: series '+ThisOne+' not found in xl file')
+    return ds
+
+def xl_read_series_hf(cf,InLevel):
+    # Instance the data structure object.
+    ds = DataStructure()
+    # get the filename
+    FileName = get_infilename_from_cf(cf,InLevel)
+    if len(FileName)==0:
+        log.error(' in_filename not found in control file')
+        return ds
+    if not os.path.exists(FileName):
+        log.error(' Input file '+FileName+' specified in control file not found')
+        return ds
+    # convert from Excel row number to xlrd row number
+    FirstDataRow = numpy.int32(get_keyvalue_from_cf(cf['Files'][InLevel],'in_firstdatarow')) - 1
+    HeaderRow = numpy.int32(get_keyvalue_from_cf(cf['Files'][InLevel],'in_headerrow')) - 1
+    # get the Excel workbook object.
+    log.info(' Opening and reading Excel file '+FileName)
+    xlBook = xlrd.open_workbook(FileName)
+    log.info(' Opened and read Excel file '+FileName)
+    ds.globalattributes['featureType'] = 'timeseries'
+    ds.globalattributes['xl_filename'] = FileName
+    ds.globalattributes['xl_datemode'] = str(xlBook.datemode)
+    xlsheet_names = [x.lower() for x in xlBook.sheet_names()]
+    # Get the Excel file modification date and time, these will be
+    # written to the netCDF file to uniquely identify the version
+    # of the Excel file used to create this netCDF file.
+    s = os.stat(FileName)
+    t = time.localtime(s.st_mtime)
+    ds.globalattributes['xl_moddatetime'] = str(datetime.datetime(t[0],t[1],t[2],t[3],t[4],t[5]))
+    # Loop over the variables defined in the 'Variables' section of the
+    # configuration file.
+    for ThisOne in cf['Variables'].keys():
+        if 'xl' in cf['Variables'][ThisOne].keys():
+            if 'sheet' in cf['Variables'][ThisOne]['xl'].keys():
+                xlsheet_name = cf['Variables'][ThisOne]['xl']['sheet']
+                if xlsheet_name.lower() in xlsheet_names:
+                    log.info(' Getting data for '+ThisOne+' from spreadsheet')
+                    xlsheet_index = xlsheet_names.index(xlsheet_name.lower())
+                    ActiveSheet = xlBook.sheet_by_index(xlsheet_index)
+                    HeaderList = [x.lower() for x in ActiveSheet.row_values(HeaderRow)]
+                    if cf['Variables'][ThisOne]['xl']['name'].lower() in HeaderList:
+                        LastDataRow = numpy.int32(ActiveSheet.nrows)
+                        ds.series[unicode(ThisOne)] = {}
+                        xlCol = HeaderList.index(cf['Variables'][ThisOne]['xl']['name'].lower())
+                        Values = ActiveSheet.col_values(xlCol)[FirstDataRow:LastDataRow]
+                        Types = ActiveSheet.col_types(xlCol)[FirstDataRow:LastDataRow]
+                        ds.series[ThisOne]['Data'] = numpy.ones(len(Values),dtype=numpy.float64)*numpy.float64(c.missing_value)
+                        ds.series[ThisOne]['Flag'] = numpy.ones(len(Values),dtype=numpy.int32)
+                        # we could use "where" and get rid of this for loop
+                        for i in range(len(Values)):
+                            if (Types[i]==3) or (Types[i]==2): #xlType=3 means a date/time value, xlType=2 means a number
+                                ds.series[ThisOne]['Data'][i] = numpy.float64(Values[i])
+                                if ds.series[ThisOne]['Data'][i] != numpy.float64(c.missing_value):
+                                    ds.series[ThisOne]['Flag'][i] = numpy.int32(0)
+                    else:
+                        log.error('  xl_read_series: series '+ThisOne+' not found in xl file')
+                else:
+                    log.error('  xl_read_series: sheet '+xlsheet_name+' not found in xl file')
+            else:
+                log.error('  xl_read_series: key "sheet" not found in control file entry for '+ThisOne)
+        else:
+            log.error('  xl_read_series: key "xl" not found in control file entry for '+ThisOne)
+    ds.globalattributes['nc_nrecs'] = str(len(ds.series['xlDateTime']['Data']))
     return ds
 
 def xl_write_library(cf,ds,level):

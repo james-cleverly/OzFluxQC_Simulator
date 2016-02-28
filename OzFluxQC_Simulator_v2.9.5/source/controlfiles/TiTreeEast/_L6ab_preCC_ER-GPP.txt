@@ -10,7 +10,7 @@
         ncFileName = TTE_EC_2015_L4pin.nc
     [[L4ER]]
         xlFilePath = ../TiTreeEast/level3_intermediates/Partitioning/
-        xlFileName = TTE_EC_2015_NightER_Filled.xls
+        xlFileName = TTE_2015_NightER_Filled.xls
         xlHeaderRow  = 2
         xl1stDataRow = 3
         ncFilePath = ncData/TTE/

@@ -57,7 +57,7 @@ class qcgui(Tkinter.Frame):
 
     def createWidgets(self):
         self.process1Label = Tkinter.Label(self,text='L1: raw data')
-        self.process1Label.grid(row=0,column=2,columnspan=1)
+        self.process1Label.grid(row=0,column=1,columnspan=2)
         self.process1Label = Tkinter.Label(self,text='L2: QA/QC')
         self.process1Label.grid(row=0,column=3,columnspan=2)
         self.process2Label = Tkinter.Label(self,text='L3: Corrections')
@@ -66,76 +66,74 @@ class qcgui(Tkinter.Frame):
         self.process3Label.grid(row=0,column=7,columnspan=2)
         
         self.fileloadLabel = Tkinter.Label(self,text='Xcel ->')
-        self.fileloadLabel.grid(row=1,column=1,columnspan=1)
-        self.doxl2nc1Button = Tkinter.Button (self, text="Load Datalogger Data", command=self.do_xl2ncL1 )
-        self.doxl2nc1Button.grid(row=1,column=2,columnspan=1)
-        self.doxl2nc2Button = Tkinter.Button (self, text="Load Corrected Data", command=self.do_xl2ncL3 )
+        self.fileloadLabel.grid(row=1,column=0,columnspan=1)
+        self.doxl2nc1Button = Tkinter.Button (self, text="Load L1 Data", command=self.do_xl2ncL1 )
+        self.doxl2nc1Button.grid(row=1,column=1,columnspan=2)
+        self.doxl2nc2Button = Tkinter.Button (self, text="Load L3 Data", command=self.do_xl2ncL3 )
         self.doxl2nc2Button.grid(row=1,column=5,columnspan=2)
-        self.doxl2nc2Button = Tkinter.Button (self, text="Load Gapfilled/Partitioned Data", command=self.do_xl2ncL4 )
+        self.doxl2nc2Button = Tkinter.Button (self, text="Load L4-L6 Data", command=self.do_xl2ncL4 )
         self.doxl2nc2Button.grid(row=1,column=7,columnspan=2)
         
         self.initiateLabel = Tkinter.Label(self,text='Process Data')
-        self.initiateLabel.grid(row=2,column=1,columnspan=1)
-        self.doL1Button = Tkinter.Button (self, text="QC & Visualisation", command=self.do_l2qc )
+        self.initiateLabel.grid(row=2,column=0,columnspan=1)
+        self.doL1Button = Tkinter.Button (self, text="L2 Processing", command=self.do_l2qc )
         self.doL1Button.grid(row=2,column=3,columnspan=2)
-        self.doL2Button = Tkinter.Button (self, text="Corrections, QC & Visualisation", command=self.do_l3qc )
+        self.doL2Button = Tkinter.Button (self, text="L3 Processing", command=self.do_l3qc )
         self.doL2Button.grid(row=2,column=5,columnspan=2)
-        self.doL3Button = Tkinter.Button (self, text="Gap Fill & Partition", command=self.do_l4to6qc )
+        self.doL3Button = Tkinter.Button (self, text="L4-L6 Processing", command=self.do_l4to6qc )
         self.doL3Button.grid(row=2,column=7,columnspan=2)
         
         self.initiateLabel = Tkinter.Label(self,text='Re/Load NetCDF Data')
-        self.initiateLabel.grid(row=3,column=1,columnspan=1)
-        self.doL1Button = Tkinter.Button (self, text="Re/Load L2 NetCDF Data", command=self.load_l2nc )
+        self.initiateLabel.grid(row=3,column=0,columnspan=1)
+        self.doL1Button = Tkinter.Button (self, text="Re/Load L2 Data", command=self.load_l2nc )
         self.doL1Button.grid(row=3,column=3,columnspan=2)
-        self.doL2Button = Tkinter.Button (self, text="Re/Load L3 NetCDF Data", command=self.load_l3nc )
+        self.doL2Button = Tkinter.Button (self, text="Re/Load L3 Data", command=self.load_l3nc )
         self.doL2Button.grid(row=3,column=5,columnspan=2)
-        self.doL3Button = Tkinter.Button (self, text="Re/Load L4-L6 NetCDF Data", command=self.load_l4nc )
+        self.doL3Button = Tkinter.Button (self, text="Re/Load L4-L6 Data", command=self.load_l4nc )
         self.doL3Button.grid(row=3,column=7,columnspan=2)
         
         self.filestartLabel = Tkinter.Label(self,text='File start date')
-        self.filestartLabel.grid(row=4,column=4,columnspan=2)
+        self.filestartLabel.grid(row=4,column=3,columnspan=2)
         self.fileendLabel = Tkinter.Label(self,text='File end date')
-        self.fileendLabel.grid(row=4,column=6,columnspan=2)
+        self.fileendLabel.grid(row=4,column=5,columnspan=2)
         
         self.clearcfButton = Tkinter.Button (self, text="Join NetCDF files", command=self.do_ncconcat )
         self.clearcfButton.grid(row=5,column=0,columnspan=1)
         self.filestartValue = Tkinter.Label(self,text='No file loaded ...')
-        self.filestartValue.grid(row=5,column=4,columnspan=2)
+        self.filestartValue.grid(row=5,column=3,columnspan=2)
         self.fileendValue = Tkinter.Label(self,text='No file loaded ...')
-        self.fileendValue.grid(row=5,column=6,columnspan=2)
+        self.fileendValue.grid(row=5,column=5,columnspan=2)
         
+        self.closeplotwindowsButton = Tkinter.Button (self, text="Close plot windows", command=self.do_closeplotwindows )
+        self.closeplotwindowsButton.grid(row=6,column=0,columnspan=1)
         self.plotstartLabel = Tkinter.Label(self, text='Start date (YYYY-MM-DD)')
-        self.plotstartLabel.grid(row=6,column=4,columnspan=2)
+        self.plotstartLabel.grid(row=6,column=3,columnspan=2)
         self.plotstartEntry = Tkinter.Entry(self)
-        self.plotstartEntry.grid(row=6,column=6,columnspan=2)
+        self.plotstartEntry.grid(row=6,column=5,columnspan=2)
         
-        self.plotendLabel = Tkinter.Label(self, text='End date   (YYYY-MM-DD)')
-        self.plotendLabel.grid(row=7,column=4,columnspan=2)
+        self.plotendLabel = Tkinter.Label(self, text='  End date (YYYY-MM-DD)')
+        self.plotendLabel.grid(row=7,column=3,columnspan=2)
         self.plotendEntry = Tkinter.Entry(self)
-        self.plotendEntry.grid(row=7,column=6,columnspan=2)
+        self.plotendEntry.grid(row=7,column=5,columnspan=2)
         
         self.plotL1L2Button = Tkinter.Button (self, text="Plot L1 & L2 Data", command=self.do_plotL1L2 )
         self.plotL1L2Button.grid(row=8,column=3,columnspan=2)
         self.plotL3L3Button = Tkinter.Button (self, text="Plot L3 Data", command=self.do_plotL3L3 )
         self.plotL3L3Button.grid(row=8,column=5,columnspan=2)
-        self.plotL3L3Button = Tkinter.Button (self, text="Plot L3 & L4-6 Data", command=self.do_plotL3L4 )
-        self.plotL3L3Button.grid(row=8,column=7,columnspan=2)
         
-        self.closeplotwindowsButton = Tkinter.Button (self, text="Close plot windows", command=self.do_closeplotwindows )
-        self.closeplotwindowsButton.grid(row=8,column=0,columnspan=1)
         self.filesave2Label = Tkinter.Label(self,text='-> Xcel')
-        self.filesave2Label.grid(row=9,column=1,columnspan=1)
-        self.savexL2Button = Tkinter.Button (self, text="Save L2 Met data", command=self.do_savexL2 )
+        self.filesave2Label.grid(row=9,column=0,columnspan=1)
+        self.savexL2Button = Tkinter.Button (self, text="Save L2 Data", command=self.do_savexL2 )
         self.savexL2Button.grid(row=9,column=3,columnspan=2)
-        self.savexL3Button = Tkinter.Button (self, text="Save L3 Corrected data", command=self.do_savexL3 )
+        self.savexL3Button = Tkinter.Button (self, text="Save L3 Data", command=self.do_savexL3 )
         self.savexL3Button.grid(row=9,column=5,columnspan=2)
-        self.savexL4Button = Tkinter.Button (self, text="Save L4-L6 Gap Filled/partitioned data", command=self.do_savexL4 )
+        self.savexL4Button = Tkinter.Button (self, text="Save L4-L6 Data", command=self.do_savexL4 )
         self.savexL4Button.grid(row=9,column=7,columnspan=2)
         
         self.quitButton = Tkinter.Button (self, text="Quit", command=self.do_quit )
         self.quitButton.grid(row=10,column=0,columnspan=1)
         self.progress = Tkinter.Label(self, text='Waiting for input ...')
-        self.progress.grid(row=10,column=3,columnspan=6)
+        self.progress.grid(row=10,column=1,columnspan=7)
     
     def do_closeplotwindows(self):
         """
@@ -526,46 +524,13 @@ class qcgui(Tkinter.Frame):
         log.info(' Finished plotting L3, check the GUI')
         print '\a'
 
-    def do_plotL3L4(self):
-        """
-            Plot L3 (QA/QC and Corrected) and L4 (Gap Filled) data in blue and
-                red, respectively
-            
-            Control File for do_l4qc function used.
-            If L4 Control File not loaded, requires control file selection.
-            """
-        if 'ds3' not in dir(self) or 'ds4' not in dir(self):
-            self.cf = qcio.load_controlfile(path='controlfiles')
-            if len(self.cf)==0: self.do_progress(text='Waiting for input ...'); return
-            l3filename = qcio.get_infilename_from_cf(self.cf,'L3')
-            if len(l3filename)==0: self.do_progress(text='An error occurred, check the console ...'); return
-            self.ds3 = qcio.nc_read_series(l3filename)
-            if len(self.ds3.series.keys())==0: self.do_progress(text='An error occurred, check the console ...'); del self.ds3; return
-            l4filename = qcio.get_outfilename_from_cf(self.cf,'L4')
-            self.ds4 = qcio.nc_read_series(l4filename)
-            if len(self.ds4.series.keys())==0: self.do_progress(text='An error occurred, check the console ...'); del self.ds4; return
-            self.update_startenddate(str(self.ds3.series['DateTime']['Data'][0]),
-                                     str(self.ds3.series['DateTime']['Data'][-1]))
-        self.do_progress(text='Plotting L3 and L4 QC ...')
-        cfname = self.ds4.globalattributes['controlfile_name']
-        self.cf = qcio.get_controlfilecontents(cfname)
-        for nFig in self.cf['Plots'].keys():
-            si = qcutils.GetDateIndex(self.ds3.series['DateTime']['Data'],self.plotstartEntry.get(),
-                                      ts=self.ds3.globalattributes['time_step'],default=0,match='exact')
-            ei = qcutils.GetDateIndex(self.ds3.series['DateTime']['Data'],self.plotendEntry.get(),
-                                      ts=self.ds3.globalattributes['time_step'],default=-1,match='exact')
-            qcplot.plottimeseries(self.cf,nFig,self.ds3,self.ds4,si,ei)
-        self.do_progress(text='Finished plotting L4')
-        log.info(' Finished plotting L4, check the GUI')
-        print '\a'
-
     def do_progress(self,text):
         """
             Update progress message in QC Data GUI
             """
         self.progress.destroy()
         self.progress = Tkinter.Label(self, text=text)
-        self.progress.grid(row=10,column=1,columnspan=6)
+        self.progress.grid(row=10,column=1,columnspan=7)
         self.update()
 
     def do_quit(self):
@@ -923,9 +888,9 @@ class qcgui(Tkinter.Frame):
         self.filestartValue.destroy()
         self.fileendValue.destroy()
         self.filestartValue = Tkinter.Label(self,text=startstr)
-        self.filestartValue.grid(row=5,column=4,columnspan=2)
+        self.filestartValue.grid(row=5,column=3,columnspan=2)
         self.fileendValue = Tkinter.Label(self,text=endstr)
-        self.fileendValue.grid(row=5,column=6,columnspan=2)
+        self.fileendValue.grid(row=5,column=5,columnspan=2)
         self.update()
 
 
