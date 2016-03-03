@@ -1686,9 +1686,27 @@ def ConvertFcJason(cf,ds,Fco2_in='Fc'):
         attr = qcutils.MakeAttributeDictionary(long_name='Fc (Flux of carbon), '+attr_hist,units='umol/m2/s')
         qcutils.CreateSeries(ds,'Fc',NEE,FList=[Fco2_in],Attr=attr)
 
-def CorrectIndividualFgForStorage(cf,ds):
+def CorrectIndividualFgForStorage(cf,ds,level='standard'):
     log.info(' Correcting soil heat flux for storage')
     zzz = 0
+    if level == '_tmp':
+        if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs_tmp'):
+            List = cf['FunctionArgs']['CFgArgs_tmp'].keys()
+            for i in range(len(List)):
+                CFgArgs = ast.literal_eval(cf['FunctionArgs']['CFgArgs_tmp'][str(i)])
+                if len(CFgArgs) == 4:
+                    CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3])
+                elif len(CFgArgs) == 5:
+                    for ThisOne in ['dTs_spinifex_tmp','dTs_mulga_tmp']:
+                        qcts.MergeSeries(cf,ds,ThisOne,[0,10])
+                        qcts.InterpolateOverMissing(cf,ds,series=ThisOne,maxlen=6)
+                    CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3],dTs_in=CFgArgs[4])
+                    zzz = 1
+                else:
+                    log.error('  CorrectFg: bad parameters, check controlfile'); return
+            if zzz == 1: qcts.AverageSeriesByElements(cf,ds,'dTs_tmp')
+            return
+    
     if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs'):
         List = cf['FunctionArgs']['CFgArgs'].keys()
         for i in range(len(List)):
@@ -1707,7 +1725,29 @@ def CorrectIndividualFgForStorage(cf,ds):
     qcts.AverageSeriesByElements(cf,ds3,'Fg')
     CorrectFgForStorage(cf,ds)
 
-def CorrectGroupFgForStorage(cf,ds):
+def CorrectGroupFgForStorage(cf,ds,level='standard'):
+    if level == '_tmp':
+        if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs_tmp'):
+            CFgArgs = ast.literal_eval(cf['FunctionArgs']['CFgArgs_tmp'])
+            if len(CFgArgs) == 1:
+                for ThisOne in ['dTs_spinifex_tmp','dTs_mulga_tmp']:
+                    qcts.MergeSeries(cf,ds,ThisOne,[0,10])
+                    qcts.InterpolateOverMissing(cf,ds,series=ThisOne,maxlen=6)
+                qcts.AverageSeriesByElements(cf,ds,'dTs_tmp')
+                log.info(' Correcting soil heat flux for storage')
+                qcts.CorrectFgForStorage(cf,ds,dTs_in=CFgArgs[0])
+            elif len(CFgArgs) == 4:
+                log.info(' Correcting soil heat flux for storage')
+                CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3])
+            elif len(CFgArgs) == 5:
+                for ThisOne in ['dTs_spinifex_tmp','dTs_mulga_tmp']:
+                    qcts.MergeSeries(cf,ds,ThisOne,[0,10])
+                    qcts.InterpolateOverMissing(cf,ds,series=ThisOne,maxlen=6)
+                qcts.AverageSeriesByElements(cf,ds,'dTs_tmp')
+                log.info(' Correcting soil heat flux for storage')
+                CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3],dTs_in=CFgArgs[4])
+            return
+    
     if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs'):
         CFgArgs = ast.literal_eval(cf['FunctionArgs']['CFgArgs'])
         if len(CFgArgs) == 1:

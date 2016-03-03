@@ -294,8 +294,15 @@ def l3qc(cf,ds2):
             except:
                 ds3.globalattributes['L3Functions'] = 'SoilAverage'
             
+        # interpolate over any ramaining gaps up to 3 hours in length
         qcts.AverageSeriesByElements(cf,ds3,'Ts')
         qcts.AverageSeriesByElements(cf,ds3,'Sws')
+        for ThisOne in ['Fg_grass_tmp','Fg_spinifex_tmp','Fg_mulga_tmp','Ts_spinifex_0cm_tmp','Ts_mulga_0cm_tmp','Sws_spinifex_0cm_tmp','Sws_mulga_0cm_tmp','Sws_grass_0cm_tmp']:
+            qcts.MergeSeries(cf,ds3,ThisOne,[0,10])
+            qcts.InterpolateOverMissing(cf,ds3,series=ThisOne,maxlen=6)
+        
+        qcts.AverageSeriesByElements(cf,ds3,'Ts_tmp')
+        qcts.AverageSeriesByElements(cf,ds3,'Sws_tmp')
         
     # correct the measured soil heat flux for storage in the soil layer above the sensor
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='Corrections') and cf['Functions']['Corrections'] == 'True':
@@ -307,9 +314,13 @@ def l3qc(cf,ds2):
         if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='PostCorrectSoilAverage') and cf['Functions']['PostCorrectSoilAverage'] == 'True':
             qcts.CorrectIndividualFgForStorage(cf,ds3)
             qcts.AverageSeriesByElements(cf,ds3,'Fg')
+            qcts.CorrectIndividualFgForStorage(cf,ds3,level='_tmp')
+            qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
         else:
             qcts.AverageSeriesByElements(cf,ds3,'Fg')
+            qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
             qcts.CorrectGroupFgForStorage(cf,ds3)
+            qcts.CorrectGroupFgForStorage(cf,ds3,level='_tmp')
     
     # calculate the available energy
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='CalculateAvailableEnergy') and cf['Functions']['CalculateAvailableEnergy'] == 'True':
@@ -632,6 +643,9 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
+    for ThisOne in ['Fg_tmp','Ts_tmp','Sws_tmp']:
+        if ThisOne in ds3.series.keys():
+            ds4x.series[ThisOne] = ds3.series[ThisOne].copy()
     if InLevel == 'L4' or AttrLevel == 'L3':
         ds4,x = l4qc(cf,ds4x,InLevel,x)
         qcutils.get_coverage_individual(ds4)
