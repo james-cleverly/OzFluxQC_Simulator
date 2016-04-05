@@ -265,18 +265,18 @@ def conditional_correlation(cf,ds):
         ERstar_up0 = 0
         GPPstarstar_up0 = 0
     
-    ## determine ER*down and GPP**down
-    #ERindex2 = numpy.ma.where(cov_down_wc>0)[0]
-    #if len(ERindex2) > 0:
-    #    ERstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-    #    GPPstarstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-    #    ERstar_down[ERindex2] = scale_down_cq[ERindex2]*cov_down_wc[ERindex2]
-    #    GPPstarstar_down[ERindex2] = (1-scale_down_cq[ERindex2])*cov_down_wc[ERindex2]
-    #    ERstar_down0 = numpy.sum(ERstar_down[ERindex2])
-    #    GPPstarstar_down0 = numpy.sum(GPPstarstar_down[ERindex2])
-    #else:
-    #    ERstar_down0 = 0
-    #    GPPstarstar_down0 = 0
+    # determine ER*down and GPP**down
+    ERindex2 = numpy.ma.where(cov_down_wc>0)[0]
+    if len(ERindex2) > 0:
+        ERstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
+        GPPstarstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
+        ERstar_down[ERindex2] = scale_down_cq[ERindex2]*cov_down_wc[ERindex2]
+        GPPstarstar_down[ERindex2] = (1-scale_down_cq[ERindex2])*cov_down_wc[ERindex2]
+        ERstar_down0 = numpy.sum(ERstar_down[ERindex2])
+        GPPstarstar_down0 = numpy.sum(GPPstarstar_down[ERindex2])
+    else:
+        ERstar_down0 = 0
+        GPPstarstar_down0 = 0
     
     # determine GPP*up and ER**up
     GPPindex = numpy.ma.where(cov_up_wc<0)[0]
@@ -291,33 +291,33 @@ def conditional_correlation(cf,ds):
         GPPstar_up0 = 0
         ERstarstar_up0 = 0
     
-    ## determine GPP*down and ER**down
-    #GPPindex2 = numpy.ma.where(cov_down_wc<0)[0]
-    #if len(GPPindex2) > 0:
-    #    GPPstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-    #    ERstarstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-    #    GPPstar_down[GPPindex2] = (1-scale_down_cq[GPPindex2])*-cov_down_wc[GPPindex2]
-    #    ERstarstar_down[GPPindex2] = scale_down_cq[GPPindex2]*-cov_down_wc[GPPindex2]
-    #    GPPstar_down0 = numpy.sum(GPPstar_down[GPPindex2])
-    #    ERstarstar_down0 = numpy.sum(ERstarstar_down[GPPindex2])
-    #else:
-    #    GPPstar_down0 = 0
-    #    ERstarstar_down0 = 0
+    # determine GPP*down and ER**down
+    GPPindex2 = numpy.ma.where(cov_down_wc<0)[0]
+    if len(GPPindex2) > 0:
+        GPPstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
+        ERstarstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
+        GPPstar_down[GPPindex2] = (1-scale_down_cq[GPPindex2])*-cov_down_wc[GPPindex2]
+        ERstarstar_down[GPPindex2] = scale_down_cq[GPPindex2]*-cov_down_wc[GPPindex2]
+        GPPstar_down0 = numpy.sum(GPPstar_down[GPPindex2])
+        ERstarstar_down0 = numpy.sum(ERstarstar_down[GPPindex2])
+    else:
+        GPPstar_down0 = 0
+        ERstarstar_down0 = 0
     
-    ERstar = ERstar_up0 + ERstarstar_up0
-    GPPstar = GPPstar_up0 + GPPstarstar_up0
+    ERstar = ERstar_up0 + ERstar_down0 + ERstarstar_up0 + ERstarstar_down0
+    GPPstar = GPPstar_up0 + GPPstar_down0 + GPPstarstar_up0 + GPPstarstar_down0
     
     # determine the scaling parameter between C uptake and emissions:
     # (GPP*up + GPP*down + GPP**up + GPP**down) = alpha(ER*up + ER*down + ER**up + ER**down)
     alpha = ERstar / GPPstar
     log.info(' GPP*up: '+str(GPPstar_up0))
-    #log.info(' GPP*down:  '+str(GPPstar_down0))
+    log.info(' GPP*down:  '+str(GPPstar_down0))
     log.info(' GPP**up:  '+str(GPPstarstar_up0))
-    #log.info(' GPP**down:  '+str(GPPstarstar_down0))
+    log.info(' GPP**down:  '+str(GPPstarstar_down0))
     log.info(' ER*up: '+str(ERstar_up0))
-    #log.info(' ER*down:  '+str(ERstar_down0))
+    log.info(' ER*down:  '+str(ERstar_down0))
     log.info(' ER**up:  '+str(ERstarstar_up0))
-    #log.info(' ER**down:  '+str(ERstarstar_down0))
+    log.info(' ER**down:  '+str(ERstarstar_down0))
     
     net = ERstar - GPPstar
     gross = ERstar + GPPstar
