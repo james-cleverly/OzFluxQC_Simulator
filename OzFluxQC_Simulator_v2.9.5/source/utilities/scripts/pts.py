@@ -39,23 +39,23 @@ def conditional_correlation(cf,ds):
     NEE = ast.literal_eval(cf['operations']['NEE'])
     dER = ast.literal_eval(cf['operations']['dER'])
     Sws = ast.literal_eval(cf['operations']['Sws'])
-    SR = 0.02
     
     w,f = putils.GetSeriesasMA(ds,'Uz')
-    c,f = putils.GetSeriesasMA(ds,'Cc')
+    c_in,f = putils.GetSeriesasMA(ds,'Cc')
     Ah,f = putils.GetSeriesasMA(ds,'Ah')
     Tv,f = putils.GetSeriesasMA(ds,'Tv')
     ps,f = putils.GetSeriesasMA(ds,'ps')
     
+    cc = c_in / c.Mco2
     e = mf.vapourpressure(Ah,Tv)
     mr = mf.mixingratio(ps,e)
     q = mf.specifichumidity(mr) * 1000
     
     wprime = w - numpy.mean(w)
-    cprime = c - numpy.mean(c)
+    cprime = cc - numpy.mean(cc)
     qprime = q - numpy.mean(q)
     wprime_sd = wprime / numpy.std(w)
-    cprime_sd = cprime / numpy.std(c)
+    cprime_sd = cprime / numpy.std(cc)
     qprime_sd = qprime / numpy.std(q)
     nRecs = len(wprime)
     
@@ -322,13 +322,8 @@ def conditional_correlation(cf,ds):
     net = ERstar - GPPstar
     gross = ERstar + GPPstar
     delta = NEE - net
-    if delta > 0:
-        ERstarhat = ERstar + delta
-        GPPstarhat = GPPstar
-    else:
-        ERstarhat = ERstar
-        GPPstarhat = GPPstar - delta
-        
+    ERstarhat = ERstar + (delta / 2)
+    GPPstarhat = GPPstar - (delta / 2)
     grosshat = ERstarhat + GPPstarhat
     alphahat = ERstarhat / GPPstarhat
     
