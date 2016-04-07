@@ -248,9 +248,7 @@ def conditional_correlation(cf,ds):
             scale_up_cq[j] = (1 + corr_up_cq[j]) / 2
     
     log.info(' Cov(wc)up: '+str(cov_up_wc))
-    log.info(' Cov(wc)down:  '+str(cov_down_wc))
     log.info(' Cor(cq)up:  '+str(corr_up_cq))
-    log.info(' Cor(cq)down:  '+str(corr_down_cq))
     
     # determine ER*up and GPP**up
     ERindex = numpy.ma.where(cov_up_wc>0)[0]
@@ -259,24 +257,11 @@ def conditional_correlation(cf,ds):
         GPPstarstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
         ERstar_up[ERindex] = scale_up_cq[ERindex]*cov_up_wc[ERindex]
         GPPstarstar_up[ERindex] = (1-scale_up_cq[ERindex])*cov_up_wc[ERindex]
-        ERstar_up0 = numpy.sum(ERstar_up[ERindex])
-        GPPstarstar_up0 = numpy.sum(GPPstarstar_up[ERindex])
+        ERstar_up0 = numpy.mean(ERstar_up[ERindex])
+        GPPstarstar_up0 = numpy.mean(GPPstarstar_up[ERindex])
     else:
         ERstar_up0 = 0
         GPPstarstar_up0 = 0
-    
-    # determine ER*down and GPP**down
-    ERindex2 = numpy.ma.where(cov_down_wc>0)[0]
-    if len(ERindex2) > 0:
-        ERstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-        GPPstarstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-        ERstar_down[ERindex2] = scale_down_cq[ERindex2]*cov_down_wc[ERindex2]
-        GPPstarstar_down[ERindex2] = (1-scale_down_cq[ERindex2])*cov_down_wc[ERindex2]
-        ERstar_down0 = numpy.sum(ERstar_down[ERindex2])
-        GPPstarstar_down0 = numpy.sum(GPPstarstar_down[ERindex2])
-    else:
-        ERstar_down0 = 0
-        GPPstarstar_down0 = 0
     
     # determine GPP*up and ER**up
     GPPindex = numpy.ma.where(cov_up_wc<0)[0]
@@ -285,45 +270,32 @@ def conditional_correlation(cf,ds):
         ERstarstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
         GPPstar_up[GPPindex] = (1-scale_up_cq[GPPindex])*-cov_up_wc[GPPindex]
         ERstarstar_up[GPPindex] = scale_up_cq[GPPindex]*-cov_up_wc[GPPindex]
-        GPPstar_up0 = numpy.sum(GPPstar_up[GPPindex])
-        ERstarstar_up0 = numpy.sum(ERstarstar_up[GPPindex])
+        GPPstar_up0 = numpy.mean(GPPstar_up[GPPindex])
+        ERstarstar_up0 = numpy.mean(ERstarstar_up[GPPindex])
     else:
         GPPstar_up0 = 0
         ERstarstar_up0 = 0
     
-    # determine GPP*down and ER**down
-    GPPindex2 = numpy.ma.where(cov_down_wc<0)[0]
-    if len(GPPindex2) > 0:
-        GPPstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-        ERstarstar_down = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-        GPPstar_down[GPPindex2] = (1-scale_down_cq[GPPindex2])*-cov_down_wc[GPPindex2]
-        ERstarstar_down[GPPindex2] = scale_down_cq[GPPindex2]*-cov_down_wc[GPPindex2]
-        GPPstar_down0 = numpy.sum(GPPstar_down[GPPindex2])
-        ERstarstar_down0 = numpy.sum(ERstarstar_down[GPPindex2])
-    else:
-        GPPstar_down0 = 0
-        ERstarstar_down0 = 0
-    
-    ERstar = ERstar_up0 + ERstar_down0 + ERstarstar_up0 + ERstarstar_down0
-    GPPstar = GPPstar_up0 + GPPstar_down0 + GPPstarstar_up0 + GPPstarstar_down0
+    ERstar = (ERstar_up0 + ERstarstar_up0) / 2
+    GPPstar = (GPPstar_up0 + GPPstarstar_up0) / 2
     
     # determine the scaling parameter between C uptake and emissions:
-    # (GPP*up + GPP*down + GPP**up + GPP**down) = alpha(ER*up + ER*down + ER**up + ER**down)
+    # (GPP*up + GPP**up) = alpha(ER*up + ER**up)
     alpha = ERstar / GPPstar
     log.info(' GPP*up: '+str(GPPstar_up0))
-    log.info(' GPP*down:  '+str(GPPstar_down0))
     log.info(' GPP**up:  '+str(GPPstarstar_up0))
-    log.info(' GPP**down:  '+str(GPPstarstar_down0))
     log.info(' ER*up: '+str(ERstar_up0))
-    log.info(' ER*down:  '+str(ERstar_down0))
     log.info(' ER**up:  '+str(ERstarstar_up0))
-    log.info(' ER**down:  '+str(ERstarstar_down0))
     
     net = ERstar - GPPstar
     gross = ERstar + GPPstar
     delta = NEE - net
     ERstarhat = ERstar + (delta / 2)
     GPPstarhat = GPPstar - (delta / 2)
+    if GPPstarhat < 0:
+        GPPstarhat = 0
+        ERadd = ERstarhat + GPPstarhat
+        ERstarhat = ERadd
     grosshat = ERstarhat + GPPstarhat
     alphahat = ERstarhat / GPPstarhat
     
@@ -347,25 +319,14 @@ def conditional_correlation(cf,ds):
             ER_2 = dER
         GPP_2 = -(NEE-ER_2)
         PD_2 = ER_2 - dER
-        # sort cases by the relative values of grosshat to NEE (large case when RE+GPP is larger than NEE
-        if (grosshat > (2 * NEE)):
-            if ER_1 > ER_2:
-                PD = PD_1
-                ER = ER_1
-                GPP = GPP_1
-            else:
-                PD = PD_2
-                ER = ER_2
-                GPP = GPP_2
+        if ER_1 > ER_2:
+            PD = PD_2
+            ER = ER_2
+            GPP = GPP_2
         else:
-            if ER_1 > ER_2:
-                PD = PD_2
-                ER = ER_2
-                GPP = GPP_2
-            else:
-                PD = PD_1
-                ER = ER_1
-                GPP = GPP_1
+            PD = PD_1
+            ER = ER_1
+            GPP = GPP_1
     else:
         # case 1:  GPP from 1/alpha-hat
         GPP0_1 = -NEE + (-NEE/alphahat)
@@ -385,25 +346,14 @@ def conditional_correlation(cf,ds):
             ER_2 = dER
         GPP_2 = -(NEE-ER_2)
         PD_2 = ER_2 - dER
-        # sort cases by the relative values of grosshat to NEE (large case when RE+GPP is larger than NEE
-        if (grosshat > -(2 * NEE)):
-            if ER_1 > ER_2:
-                PD = PD_1
-                ER = ER_1
-                GPP = GPP_1
-            else:
-                PD = PD_2
-                ER = ER_2
-                GPP = GPP_2
+        if ER_1 > ER_2:
+            PD = PD_2
+            ER = ER_2
+            GPP = GPP_2
         else:
-            if ER_1 > ER_2:
-                PD = PD_2
-                ER = ER_2
-                GPP = GPP_2
-            else:
-                PD = PD_1
-                ER = ER_1
-                GPP = GPP_1
+            PD = PD_1
+            ER = ER_1
+            GPP = GPP_1
     
     filename = str(cf['Files']['L1']['in_filename'])
     log.info(' alpha: '+str(alpha))
@@ -411,6 +361,8 @@ def conditional_correlation(cf,ds):
     log.info(' gross:  '+str(gross))
     log.info(' ER*hat:  '+str(ERstarhat))
     log.info(' GPP*hat:  '+str(GPPstarhat))
+    log.info(' alpha_hat: '+str(alphahat))
+    log.info(' gross_hat:  '+str(grosshat))
     log.info('  PD case 1:  '+str(PD_1))
     log.info('  PD case 2:  '+str(PD_2))
     log.info('  ER case 1:  '+str(ER_1))
