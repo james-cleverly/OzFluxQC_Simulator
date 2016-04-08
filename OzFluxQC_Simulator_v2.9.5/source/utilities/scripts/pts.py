@@ -290,13 +290,12 @@ def conditional_correlation(cf,ds):
     net = ERstar - GPPstar
     gross = ERstar + GPPstar
     delta = NEE - net
-    ERstarhat = ERstar + (delta / 2)
-    GPPstarhat = GPPstar - (delta / 2)
-    if GPPstarhat < 0:
-        GPPstarhat = 0
-        ERadd = ERstarhat + GPPstarhat
-        ERstarhat = ERadd
-    grosshat = ERstarhat + GPPstarhat
+    if delta < 0:
+        GPPstarhat = GPPstar - delta
+        ERstarhat = ERstar
+    else:
+        GPPstarhat = GPPstar
+        ERstarhat = ERstar + delta
     alphahat = ERstarhat / GPPstarhat
     
     # ER0: SR+PD
@@ -359,6 +358,9 @@ def conditional_correlation(cf,ds):
     log.info(' alpha: '+str(alpha))
     log.info(' net:  '+str(net))
     log.info(' gross:  '+str(gross))
+    log.info(' delta:  '+str(delta))
+    log.info(' ER*:  '+str(ERstar))
+    log.info(' GPP*:  '+str(GPPstar))
     log.info(' ER*hat:  '+str(ERstarhat))
     log.info(' GPP*hat:  '+str(GPPstarhat))
     log.info(' alpha_hat: '+str(alphahat))
