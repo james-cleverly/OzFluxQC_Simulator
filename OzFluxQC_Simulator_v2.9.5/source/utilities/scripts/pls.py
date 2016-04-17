@@ -60,28 +60,21 @@ def l3partition(cf,ds2):
     return ds3
     
 
-def l6partition(cf,ds3):
+def l6partition(cf,ds5):
     '''Processing OzFlux_Level4 data to partition daytime ER and GPP'''
     # make a copy of the OzFlux_Level4 data
-    ds4 = copy.deepcopy(ds3)
-    ds4.globalattributes['Level'] = 'L4'
-    if putils.cfkeycheck(cf,Base='Params',ThisOne='Fc_in'):
-        Fc_in = ast.eval_literal(cf['Params']['Fc_in'])
-    else:
-        Fc_in = 'Fc'
+    ds6 = copy.deepcopy(ds5)
+    ds6.globalattributes['Level'] = 'L6'
     # prep nighttime ER observations
-    if (putils.cfkeycheck(cf,Base='General',ThisOne='PD') and (cf['General']['PD'] == 'True')):
-        Fc_in = 'NEE'
-        pts.DayPD_ERGPP_TTE(cf,ds4,Fc_in)
+    pts.ER_nightL6(cf,ds6,'ER_night_gapfilled')
+    if 'AliceSpringsMulga' in ds6.globalattributes['site_name']:
+        pts.DayERGPP_ASM(cf,ds6,'Fc')
+    elif 'TiTreeEast' in ds6.globalattributes['site_name']:
+        pts.DayERdark_TTE(cf,ds6,'Fc')
+        pts.DayPD_ER_GPP_TTE(cf,ds6,'NEE')
     else:
-        pts.ER_nightL4(cf,ds4,'ER_night_gapfilled')
-        if 'AliceSpringsMulga' in ds4.globalattributes['site_name']:
-            pts.DayERGPP_ASM(cf,ds4,Fc_in)
-        elif 'TiTreeEast' in ds4.globalattributes['site_name']:
-            pts.DayERGPP_TTE(cf,ds4,Fc_in)
-        else:
-            log.error(' Site designation undefined in ds4.globalattributes:xl_filename')
+        log.error(' Site designation undefined in ds6.globalattributes:xl_filename')
     
-    log.info('L4 Partitioning: All done')
-    return ds4
+    log.info('L6 Partitioning: All done')
+    return ds6
     

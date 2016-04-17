@@ -643,9 +643,9 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
-    for ThisOne in ['Fg_tmp','Ts_tmp','Sws_tmp']:
-        if ThisOne in ds3.series.keys():
-            ds4x.series[ThisOne] = ds3.series[ThisOne].copy()
+    for ThisOne in ['dTs_tmp','Fg_tmp','Ts_tmp','Sws_tmp']:
+        var, var_flag, var_attr = qcutils.GetSeriesasMA(ds3,ThisOne)
+        qcutils.CreateSeries(ds4x,ThisOne,var,Flag=var_flag,Attr=var_attr)
     if InLevel == 'L4' or AttrLevel == 'L3':
         ds4,x = l4qc(cf,ds4x,InLevel,x)
         qcutils.get_coverage_individual(ds4)
@@ -853,6 +853,14 @@ def l5qc(cf,ds4,y):
             ds5.globalattributes['L5Functions'] = 'PenmanMonteith'
         
         qcts.do_PenmanMonteith(cf,ds5)
+    
+    # re-calculate the available energy from L5 (gapfilled) fluxes
+        try:
+            ds5.globalattributes['L5Functions'] = ds5.globalattributes['L5Functions']+', CalculateAvailableEnergy'
+        except:
+            ds.globalattributes['L5Functions'] = 'CalculateAvailableEnergy'
+        
+        qcts.CalculateAvailableEnergy(ds5)
     
     # re-apply the quality control checks (range, diurnal and rules)
     if y > 0:

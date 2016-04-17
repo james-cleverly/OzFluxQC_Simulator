@@ -296,6 +296,7 @@ def conditional_correlation(cf,ds):
     else:
         GPPstarhat = GPPstar
         ERstarhat = ERstar + delta
+    grosshat = ERstarhat + GPPstarhat
     alphahat = ERstarhat / GPPstarhat
     
     # ER0: SR+PD
@@ -385,82 +386,93 @@ def conditional_correlation(cf,ds):
 def DayERGPP_ASM(cf,ds,Fc_in):
     log.info('Beginning: Daytime ER/GPP partitioning')
     Fcmg,Fc_flag = putils.GetSeriesasMA(ds,Fc_in)
-    ER_umol,ER_flag = putils.GetSeriesasMA(ds,'ER_night')
+    Fc = Fcmg / c.Mco2
+    ER_night,ER_night_flag = putils.GetSeriesasMA(ds,'ER_night')
     Ts,f = putils.GetSeriesasMA(ds,'Ts')
     Fsd,f = putils.GetSeriesasMA(ds,'Fsd')
     nRecs = len(Fcmg)
     
-    ER_day = numpy.ma.zeros(nRecs,numpy.float64)
-    
-    # calculate ecosystem respiration in umol/(m2 s) modeled from light response curve (Fc-Fsd)
-    Fsd_low_Ts_low_index = numpy.where((Ts < 27.5) & (Fsd < 500))[0]
-    Fsd_low_Ts_high_index = numpy.where((Ts > 27.5) & (Fsd < 500))[0]
-    Fsd_high_Ts_low_index = numpy.where((Ts < 36.75) & (Fsd > 500))[0]
-    Fsd_high_Ts_high_index = numpy.where((Ts > 36.75) & (Fsd > 500))[0]
-    
-    a_low_low = 0.3687931
-    b_low_low = 0.005857659
-    a_low_high = 12.28563
-    b_low_high = -0.06888701
-    a_high_low = 0.4060834
-    b_high_low = 0.06666102
-    a_high_high = 29.96834
-    b_high_high = -0.05043531
-    
-    ER_day = numpy.ma.zeros(nRecs,numpy.float64)
-    ER_day[Fsd_low_Ts_low_index] = a_low_low * numpy.exp(b_low_low * Ts[Fsd_low_Ts_low_index])
-    ER_day[Fsd_low_Ts_high_index] = a_low_high * numpy.exp(b_low_high * Ts[Fsd_low_Ts_high_index])
-    ER_day[Fsd_high_Ts_low_index] = a_high_low * numpy.exp(b_high_low * Ts[Fsd_high_Ts_low_index])
-    ER_day[Fsd_high_Ts_high_index] = a_high_high * numpy.exp(b_high_high * Ts[Fsd_high_Ts_high_index])
-    
-    day_index = numpy.where(Fsd > 1)
-    
-    Fc = ((Fcmg * (10 ** 6)) / (1000 * 44))
-    Fc_day = numpy.ma.masked_where(Fsd < 1,Fc)
+    ER_umol = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    ER_day = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    ER_dark = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    ER_NEEmax = numpy.ma.zeros(nRecs,numpy.float64) -9999
     GPP = numpy.ma.zeros(nRecs,numpy.float64)
-    GPP.mask = Fc_day.mask
+    ER_day_flag = numpy.zeros(nRecs,numpy.int32)
+    ER_dark_flag = numpy.zeros(nRecs,numpy.int32)
+    ER_NEEmax_flag = numpy.zeros(nRecs,numpy.int32)
+    ER_umol_flag = numpy.zeros(nRecs,numpy.int32)
     GPP_flag = numpy.zeros(nRecs,numpy.int32)
     
-    for i in range(nRecs):
-        if Fc_day.mask[i] == True:
-            GPP[i] = 0
-            GPP.mask[i] = False
-            if Fc_flag[i] == 0 or Fc_flag[i] == 10 or Fc_flag[i] == 30:
-                GPP_flag[i] = numpy.int32(110)
-            else:
-                GPP_flag[i] = Fc_flag[i]
-        else:
-            if Fc_day[i] < ER_day[i]:
-                GPP[i] = ER_day[i] - Fc_day[i]
-                GPP.mask[i] = False
-                GPP_flag[i] = 100
-                ER_flag[i] = 100
-            else:
-                if ER_day[i] == -9999:
-                    GPP[i] = -9999
-                    GPP.mask[i] = True
-                    GPP_flag[i] = Fc_flag[i]
-                    ER_flag[i] = Fc_flag[i]
-                else:
-                    ER_day[i] = Fc_day[i]
-                    GPP[i] = 0
-                    GPP.mask[i] = False
-                    GPP_flag[i] = numpy.int32(120)
-                    ER_flag[i] = numpy.int32(120)
+    # calculate ecosystem respiration in umol/(m2 s) modeled from light response curve (Fc-Fsd)
+    day_index = numpy.where(Fsd > 1)[0]
+    night_index = numpy.where(Fsd < 1)[0]
+    Fsd_dark_index = numpy.where((Fsd < 500) & (Fsd > 1))[0]
+    Fsd_max_index = numpy.where(Fsd > 500)[0]
+    ER_dark_Ts_low_index = numpy.where((Ts < 27.5) & (Fsd > 1))[0]
+    ER_dark_Ts_high_index = numpy.where((Ts > 27.5) & (Fsd > 1))[0]
+    ER_NEEmax_Ts_low_index = numpy.where((Ts < 36.75) & (Fsd > 500))[0]
+    ER_NEEmax_Ts_high_index = numpy.where((Ts > 36.75) & (Fsd > 500))[0]
+    ER_dark_flag[ER_dark_Ts_low_index] = numpy.int32(100)
+    ER_dark_flag[ER_dark_Ts_high_index] = numpy.int32(100)
+    ER_NEEmax_flag[ER_NEEmax_Ts_low_index] = numpy.int32(100)
+    ER_NEEmax_flag[ER_NEEmax_Ts_high_index] = numpy.int32(100)
+    
+    a_dark_low = 0.3687931
+    b_dark_low = 0.005857659
+    a_dark_high = 12.28563
+    b_dark_high = -0.06888701
+    a_max_low = 0.4060834
+    b_max_low = 0.06666102
+    a_max_high = 29.96834
+    b_max_high = -0.05043531
+    
+    ER_dark[ER_dark_Ts_low_index] = a_dark_low * numpy.exp(b_dark_low * Ts[ER_dark_Ts_low_index])
+    ER_dark[ER_dark_Ts_high_index] = a_dark_high * numpy.exp(b_dark_high * Ts[ER_dark_Ts_high_index])
+    ER_NEEmax[ER_NEEmax_Ts_low_index] = a_max_low * numpy.exp(b_max_low * Ts[ER_NEEmax_Ts_low_index])
+    ER_NEEmax[ER_NEEmax_Ts_high_index] = a_max_high * numpy.exp(b_max_high * Ts[ER_NEEmax_Ts_high_index])
+    ER_day[Fsd_dark_index] = ER_dark[Fsd_dark_index]
+    ER_day[Fsd_max_index] = ER_NEEmax[Fsd_max_index]
+    
+    Fc_day = numpy.ma.masked_where(Fsd < 1,Fc)
+    max_index = numpy.where(Fc_day > ER_day)[0]
+    submax_index = numpy.where(Fc_day < ER_day)[0]
+    bad_index = numpy.where(ER_day == -9999)[0]
+    GPP[max_index] = 0
+    ER_day[max_index] = Fc_day[max_index]
+    ER_day_flag[max_index] = numpy.int32(120)
+    GPP_flag[max_index] = numpy.int32(120)
+    GPP[submax_index] = ER_day[submax_index] - Fc_day[submax_index]
+    ER_day_flag[submax_index] = numpy.int32(100)
+    GPP_flag[submax_index] = numpy.int32(100)
+    GPP[bad_index] = numpy.float64(-9999)
+    ER_day_flag[bad_index] = Fc_flag[bad_index]
+    GPP_flag[bad_index] = Fc_flag[bad_index]
+    
+    ER_dark[night_index] = numpy.float64(0)
+    ER_day[night_index] = numpy.float64(0)
+    ER_NEEmax[night_index] = numpy.float64(0)
+    GPP[night_index] = numpy.float64(0)
+    ER_dark_flag[night_index] = numpy.int32(110)
+    ER_day_flag[night_index] = numpy.int32(110)
+    ER_NEEmax_flag[night_index] = numpy.int32(110)
+    GPP_flag[night_index] = numpy.int32(110)
+    noNEEmax_index = numpy.where(ER_NEEmax_flag == 0)[0]
+    ER_NEEmax[noNEEmax_index] = numpy.float64(0)
     
     ER_umol[day_index] = ER_day[day_index]
+    ER_umol_flag[day_index] = ER_day_flag[day_index]
+    ER_umol[night_index] = ER_night[night_index]
+    ER_umol_flag[night_index] = ER_night_flag[night_index]
     
-    putils.CreateSeries(ds,'ER_day',ER_day,Flag=0,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
-    putils.CreateSeries(ds,'ER',ER_umol,Flag=0,Descr='Ecosystem respiration',Units='umol/(m2 s)')
-    putils.CreateSeries(ds,'GPP',GPP,Flag=0,Descr='Ecosystem Gross Primary Production',Units='umol/(m2 s)')
-    
-    ds.series['ER_day']['Flag'] = ER_flag
-    ds.series['ER']['Flag'] = ER_flag
-    ds.series['GPP']['Flag'] = GPP_flag
+    putils.CreateSeries(ds,'ER_day',ER_day,Flag=ER_day_flag,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'ER_dark',ER_dark,Flag=ER_dark_flag,Descr='Daytime dark ecosystem respiration',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'ER_NEEmax',ER_NEEmax,Flag=ER_NEEmax_flag,Descr='Daytime ecosystem respiration from NEEmax-Ts function',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'ER',ER_umol,Flag=ER_umol_flag,Descr='Ecosystem respiration',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'GPP',GPP,Flag=GPP_flag,Descr='Ecosystem Gross Primary Production',Units='umol/(m2 s)')
     
     log.info('Day ER and GPP: All done')
 
-def DayERGPP_TTE(cf,ds,Fc_in,PD='False'):
+def DayERdark_TTE(cf,ds,Fc_in,PD='False'):
     log.info('Beginning: ER_night and ER_dark partitioning')
     monthabr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
     
@@ -556,14 +568,14 @@ def DayERGPP_TTE(cf,ds,Fc_in,PD='False'):
     
     log.info('Night ER and day ER_dark: All done')
 
-def DayPD_ERGPP_TTE(cf,ds,Fc_in):
+def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
     log.info('Beginning: Daytime PD/ER/GPP partitioning')
     
     Fsd,f = putils.GetSeriesasMA(ds,'Fsd')
+    Fc,Fc_flag = putils.GetSeriesasMA(ds,'Fc')
     NEE,NEE_flag = putils.GetSeriesasMA(ds,Fc_in)
     ER_night,nER_flag = putils.GetSeriesasMA(ds,'ER_night')
     ER_dark,dER_flag = putils.GetSeriesasMA(ds,'ER_dark')
-    Month,f = putils.GetSeriesasMA(ds,'Month')
     nRecs = len(NEE)
     MergeSeries(cf,ds,'ER_bio',[0,10,20,30,40,50,60,70,80,90,100,120,130,140,150,160,170,180,190,200])
     ER_bio,ER_bio_flag = putils.GetSeriesasMA(ds,'ER_bio')
@@ -571,105 +583,46 @@ def DayPD_ERGPP_TTE(cf,ds,Fc_in):
     ER_day = numpy.ma.zeros(nRecs,numpy.float64) -9999
     PD = numpy.ma.zeros(nRecs,numpy.float64) -9999
     GPP = numpy.ma.zeros(nRecs,numpy.float64) -9999
-    analysis_months = numpy.int32(cf['Coefficients'].keys())
     GPP_flag = numpy.zeros(nRecs,numpy.int32)
     PD_flag = numpy.zeros(nRecs,numpy.int32)
     ERday_flag = numpy.zeros(nRecs,numpy.int32)
     
-    ldt = ds.series['DateTime']['Data']
-    IncludeList = cf['Periods'].keys()
-    NumDates = len(IncludeList)
-    allflag = numpy.zeros(nRecs,dtype=numpy.int32) + 1
+    PDm3_posNEE = -4.048393e-2
+    PDm2_posNEE = 1.456067e-1
+    PDm1_posNEE = 2.288639
+    PDb_posNEE = -1.210116e-1
     
-    for data_month in range(NumDates):
-        if data_month in analysis_months:
-            analysisflag = numpy.zeros(nRecs,dtype=numpy.int32) + 1
-            tempkey = str(data_month)
-            IncludeDateList = ast.literal_eval(cf['Periods'][tempkey])
-            try:
-                si = ldt.index(datetime.datetime.strptime(IncludeDateList[0],'%Y-%m-%d %H:%M'))
-            except ValueError:
-                si = 0
-            
-            try:
-                ei = ldt.index(datetime.datetime.strptime(IncludeDateList[1],'%Y-%m-%d %H:%M')) + 1
-            except ValueError:
-                ei = -1
-            
-            analysisflag[si:ei] = numpy.int32(0)
-            allflag[si:ei] = numpy.int32(0)
-            
-            zero0index = []
-            zero1index = []
-            if putils.cfkeycheck(cf,Base='Coefficients',ThisOne=tempkey,key='PDzero'):
-                if '0' in cf['Coefficients'][tempkey]['PDzero'].keys():
-                    #pdb.set_trace()
-                    PDzero0 = numpy.float64(ast.literal_eval(cf['Coefficients'][tempkey]['PDzero']['0']))
-                    PDzero0a = PDzero0[0]
-                    PDzero0b = PDzero0[1]
-                    zero0index = numpy.where((analysisflag == 0) & ((NEE > PDzero0a) & (NEE < PDzero0b)))[0]
-                if '1' in cf['Coefficients'][tempkey]['PDzero'].keys():
-                    PDzero1 = numpy.float64(ast.literal_eval(cf['Coefficients'][tempkey]['PDzero']['1']))
-                    PDzero1a = PDzero1[0]
-                    PDzero1b = PDzero1[1]
-                    zero1index = numpy.where((analysisflag == 0) & ((NEE > PDzero1a) & (NEE < PDzero1b)))[0]
-            PDm3_posNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDm3_posNEE'])
-            PDm2_posNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDm2_posNEE'])
-            PDm1_posNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDm1_posNEE'])
-            PDb_posNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDb_posNEE'])
-            PDm3_negNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDm3_negNEE'])
-            PDm2_negNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDm2_negNEE'])
-            PDm1_negNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDm1_negNEE'])
-            PDb_negNEE = ast.literal_eval(cf['Coefficients'][tempkey]['PDb_negNEE'])
-            
-            posmonth_index = numpy.where((analysisflag == 0) & (NEE > 0))[0]
-            negmonth_index = numpy.where((analysisflag == 0) & (NEE < 0))[0]
-            #pdb.set_trace()
-            PD[posmonth_index] = (PDm3_posNEE * (NEE[posmonth_index]*NEE[posmonth_index]*NEE[posmonth_index])) + (PDm2_posNEE * (NEE[posmonth_index]*NEE[posmonth_index])) + (PDm1_posNEE * (NEE[posmonth_index])) + PDb_posNEE
-            PD[negmonth_index] = (PDm3_negNEE * (NEE[negmonth_index]*NEE[negmonth_index]*NEE[negmonth_index])) + (PDm2_negNEE * NEE[negmonth_index]*NEE[negmonth_index]) + (PDm1_negNEE * NEE[negmonth_index]) + PDb_negNEE
-            
-            try:
-                PD[zero0index] = 0
-            except:
-                log.warn('no PD zero index near NEE == 0')
-            
-            try:
-                PD[zero1index] = 0
-            except:
-                log.warn('no PD zero index at extreme NEE << 0')
-            
-            ER_day = PD + ER_dark
-            GPP = ER_day - NEE
+    posmonth_index = numpy.where((Fsd > 1) & (NEE > 0.053))[0]
+    negmonth_index = numpy.where((Fsd > 1) & (NEE < 0.053))[0]
+    #pdb.set_trace()
+    PD[posmonth_index] = (PDm3_posNEE * (NEE[posmonth_index]*NEE[posmonth_index]*NEE[posmonth_index])) + (PDm2_posNEE * (NEE[posmonth_index]*NEE[posmonth_index])) + (PDm1_posNEE * (NEE[posmonth_index])) + PDb_posNEE
+    PD[negmonth_index] = 0
     
-    Fc_day = numpy.ma.masked_where(Fsd < 1,NEE)
+    ER_day = PD + ER_dark
+    GPP = ER_day - NEE
+    
+    Fc_day = numpy.ma.masked_where(Fsd < 1,Fc)
     nightflag = numpy.where(Fsd < 1)[0]
-    Fc_day_only = numpy.ma.masked_where(allflag == 1,Fc_day)
-    GPP.mask = Fc_day_only.mask
-    PD.mask = Fc_day_only.mask
-    ER_day.mask = Fc_day_only.mask
+    GPP.mask = Fc_day.mask
+    PD.mask = Fc_day.mask
+    ER_day.mask = Fc_day.mask
+    ER_dark.mask = Fc_day.mask
     
     for i in range(nRecs):
         if Fc_day.mask[i] == True:
-            if allflag[i] == 1:
-                PD[i] = -9999
-                GPP[i] = -9999
-                ER_day[i] = -9999
-                GPP.mask[i] = True
-                PD.mask[i] = True
-                ER_day.mask[i] = True
-                GPP_flag[i] = NEE_flag[i]
-                PD_flag[i] = NEE_flag[i]
-                ERday_flag[i] = NEE_flag[i]
-            elif i in nightflag:
+            if i in nightflag:
                 PD[i] = 0
                 GPP[i] = 0
                 ER_day[i] = 0
+                ER_dark[i] = 0
                 GPP.mask[i] = False
                 PD.mask[i] = False
                 ER_day.mask[i] = False
+                ER_dark.mask[i] = False
                 GPP_flag[i] = numpy.int32(110)
                 PD_flag[i] = numpy.int32(110)
                 ERday_flag[i] = numpy.int32(110)
+                dER_flag[i] = numpy.int32(110)
             else:
                 PD[i] = -9999
                 GPP[i] = -9999
@@ -677,21 +630,11 @@ def DayPD_ERGPP_TTE(cf,ds,Fc_in):
                 GPP.mask[i] = True
                 PD.mask[i] = True
                 ER_day.mask[i] = True
-                GPP_flag[i] = NEE_flag[i]
-                PD_flag[i] = NEE_flag[i]
-                ERday_flag[i] = NEE_flag[i]
+                GPP_flag[i] = Fc_flag[i]
+                PD_flag[i] = Fc_flag[i]
+                ERday_flag[i] = Fc_flag[i]
         else:
-            if allflag[i] == 1:
-                PD[i] = -9999
-                GPP[i] = -9999
-                ER_day[i] = -9999
-                GPP.mask[i] = True
-                PD.mask[i] = True
-                ER_day.mask[i] = True
-                GPP_flag[i] = NEE_flag[i]
-                PD_flag[i] = NEE_flag[i]
-                ERday_flag[i] = NEE_flag[i]
-            elif ER_day[i] == -9999:
+            if ER_day[i] == -9999:
                 GPP[i] = -9999
                 PD[i] = -9999
                 GPP.mask[i] = True
@@ -1163,13 +1106,13 @@ def ER_nightL3(cf,ds,M1st,M2nd,Fc_in):
     
     log.info('Night sums: All done')
 
-def ER_nightL4(cf,ds,ER_in):
+def ER_nightL6(cf,ds,ER_in):
     '''Ingests gap-filled nocturnal ER from seasonal/swc/temperature exponential models.'''
     log.info('Beginning: Integrating nocturnal ER')
-    InLevel = 'L4ER'
-    OutLevel = 'L4ER'
+    InLevel = 'L6ER'
+    OutLevel = 'L6ER'
     pio.autoxl2nc(cf,InLevel,OutLevel)
-    ds4day = pio.nc_read_series(cf,'L4ER')
+    ds4day = pio.nc_read_series(cf,'L6ER')
     
     ER,fd = putils.GetSeriesasMA(ds4day,ER_in)
     ER_day,fd = putils.GetSeriesasMA(ds4day,'Day')
@@ -1180,34 +1123,12 @@ def ER_nightL4(cf,ds,ER_in):
     Month,f = putils.GetSeriesasMA(ds,'Month')
     nRecs = len(Fsd)
     nNights = len(ER)
-    ER_night = numpy.ma.zeros(nRecs,numpy.float64)
+    ER_night = numpy.ma.zeros(nRecs,numpy.float64) - 9999
     Night = numpy.ma.zeros(nRecs)
     night_flag = numpy.ma.zeros(nRecs,numpy.int32)
     
     log.info(' Night ER: shifting night/times to center on midnight')
     for i in range(nRecs):
-        #if Month[i] == 1 or Month[i] == 3 or Month[i] == 5 or Month[i] == 7 or Month[i] == 8 or Month[i] == 10 or Month[i] == 12:
-        #    dRan = 31
-        #if Month[i] == 2:
-        #    if ds.series['Year']['Data'][0] % 4 == 0:
-        #        dRan = 29
-        #    else:
-        #        dRan = 28
-        #if Month[i] == 4 or Month[i] == 6 or Month[i] == 9 or Month[i] == 11:
-        #    dRan = 30
-        #    
-        #if Hdh[i] < 12:
-        #    if Day[i] > 1:
-        #        Night[i] = Day[i] - 1
-        #    else:
-        #        if Month[i] > 1:
-        #            prevMonth = Month[i] - 1
-        #        else:
-        #            prevMonth = 12
-        #        Night[i] = dRan
-        #        Month[i] = prevMonth
-        #else:
-        #    Night[i] = Day[i]
         if Hdh[i] < 12:
             if Day[i] > 1:
                 Night[i] = Day[i] - 1
@@ -1238,7 +1159,7 @@ def ER_nightL4(cf,ds,ER_in):
                     ER_night[i] = ER[z]
                     night_flag[i] = ds4day.series[ER_in]['Flag'][z]
     
-    noindex = numpy.where(ER_night == 0)
+    noindex = numpy.where(ER_night == -9999)
     ER_night[noindex] = numpy.float64(-9999)
     night_flag[noindex] = 1
     index = numpy.where(Fsd > 1)

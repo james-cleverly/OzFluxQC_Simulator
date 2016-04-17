@@ -912,8 +912,8 @@ def nc_write_series(ncFile,ds,outputlist=None,ndims=3):
         if ThisOne in outputlist: outputlist.remove(ThisOne)
     # write everything else to the netCDF file
     for ThisOne in sorted(outputlist):
+        #pdb.set_trace()
         nc_write_var(ncFile,ds,ThisOne,dims)
-    #pdb.set_trace()
     # write the coordinate reference system (crs) variable
     if "crs" not in outputlist:
         ncVar = ncFile.createVariable("crs","i",())

@@ -49,9 +49,9 @@ class qcgui(Tkinter.Frame):
     def createWidgets(self):
         self.process2Label = Tkinter.Label(self,text='L3: ER_night')
         self.process2Label.grid(row=0,column=1,columnspan=1)
-        self.process3Label = Tkinter.Label(self,text='L6: Day ER_dark & GPP')
+        self.process3Label = Tkinter.Label(self,text='L6: ER_dark PD ER_day ER & GPP')
         self.process3Label.grid(row=0,column=2,columnspan=1)
-        self.process3Label = Tkinter.Label(self,text='L6: Day PD, ER & GPP')
+        self.process3Label = Tkinter.Label(self,text='L3: Conditional correlation')
         self.process3Label.grid(row=0,column=3,columnspan=1)
         
         self.fileloadLabel = Tkinter.Label(self,text='Xcel ->')
@@ -67,10 +67,8 @@ class qcgui(Tkinter.Frame):
         self.initiateLabel.grid(row=2,column=0,columnspan=1)
         self.doL3Button = Tkinter.Button (self, text="ER_night", command=self.do_l3_er_night )
         self.doL3Button.grid(row=2,column=1,columnspan=1)
-        self.doL6aButton = Tkinter.Button (self, text="Day ER_dark & ASM-GPP", command=self.do_l6_partition )
+        self.doL6aButton = Tkinter.Button (self, text="Day ER & GPP", command=self.do_l6_partition )
         self.doL6aButton.grid(row=2,column=2,columnspan=1)
-        self.doL6bButton = Tkinter.Button (self, text="Day PD, ER & TTE-GPP", command=self.do_l6_partition )
-        self.doL6bButton.grid(row=2,column=3,columnspan=1)
         
         self.filesave2Label = Tkinter.Label(self,text='-> Xcel')
         self.filesave2Label.grid(row=3,column=0,columnspan=1)
@@ -78,8 +76,6 @@ class qcgui(Tkinter.Frame):
         self.savexL3Button.grid(row=3,column=1,columnspan=1)
         self.savexL6aButton = Tkinter.Button (self, text="Save L6 Data", command=self.do_savexL6 )
         self.savexL6aButton.grid(row=3,column=2,columnspan=1)
-        self.savexL6bButton = Tkinter.Button (self, text="Save L6 Data", command=self.do_savexL6 )
-        self.savexL6bButton.grid(row=3,column=3,columnspan=1)
         
         self.quitButton = Tkinter.Button (self, text="Quit", command=self.do_quit )
         self.quitButton.grid(row=4,column=0,columnspan=1)
@@ -88,7 +84,7 @@ class qcgui(Tkinter.Frame):
 
     def do_cc(self):
         self.do_progress(text='Performing conditional correlation')
-        self.cf = pio.loadcontrolfile('controlfiles')
+        self.cf = pio.loadcontrolfile('../controlfiles')
         InLevel = 'L1'
         self.ds = pio.xl_read_series_hf(self.cf,InLevel)
         pts.conditional_correlation(self.cf,self.ds)
@@ -96,7 +92,7 @@ class qcgui(Tkinter.Frame):
         print '\a'
     
     def do_l3_er_night(self):
-        self.cf = pio.loadcontrolfile('controlfiles')
+        self.cf = pio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -119,7 +115,7 @@ class qcgui(Tkinter.Frame):
         print '\a'
     
     def do_l6_partition(self):
-        self.cf = pio.loadcontrolfile('controlfiles')
+        self.cf = pio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -137,7 +133,7 @@ class qcgui(Tkinter.Frame):
         else:
             OutLevel = 'Partitioning'
         pio.nc_write_series(self.cf,self.ds6,OutLevel)                   # save the L3 data
-        self.do_progress(text='Finished L4 Partitioning')              # tell the user we are done
+        self.do_progress(text='Finished L6 Partitioning')              # tell the user we are done
         log.info(' Finished saving L6 Partitioning NetCDF data')
         print '\a'
     
@@ -156,7 +152,7 @@ class qcgui(Tkinter.Frame):
     def do_savexL3(self):
         self.do_progress(text='Exporting L3 Diurnal NetCDF -> Xcel ...')                     # put up the progress message
         if (putils.cfkeycheck(self.cf,'Output','DefaultXl') and self.cf['Output']['DefaultXl'] == 'False'):
-            self.cf = pio.loadcontrolfile('controlfiles')
+            self.cf = pio.loadcontrolfile('../controlfiles')
             if len(self.cf)==0:
                 self.do_progress(text='Waiting for input ...')
                 return
@@ -175,7 +171,7 @@ class qcgui(Tkinter.Frame):
     def do_savexL6(self):
         self.do_progress(text='Exporting L4 Diurnal NetCDF -> Xcel ...')                     # put up the progress message
         if (putils.cfkeycheck(self.cf,'Output','DefaultXl') and self.cf['Output']['DefaultXl'] == 'False'):
-            self.cf = pio.loadcontrolfile('controlfiles')
+            self.cf = pio.loadcontrolfile('../controlfiles')
             if len(self.cf)==0:
                 self.do_progress(text='Waiting for input ...')
                 return
@@ -193,7 +189,7 @@ class qcgui(Tkinter.Frame):
     
     def do_xl2ncCall(self):
         self.do_progress(text='Load xl2nc Control File ...')
-        self.cf = pio.loadcontrolfile('controlfiles')
+        self.cf = pio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -211,7 +207,7 @@ class qcgui(Tkinter.Frame):
 
 
 if __name__ == "__main__":
-    log = putils.startlog('partition','logfiles/partition.log')
+    log = putils.startlog('partition','../logfiles/partition.log')
     qcGUI = qcgui()
     qcGUI.master.title("Carbon Partitioning Main GUI")
     qcGUI.mainloop()
