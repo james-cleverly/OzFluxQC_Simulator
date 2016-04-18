@@ -397,11 +397,13 @@ def DayERGPP_ASM(cf,ds,Fc_in):
     ER_dark = numpy.ma.zeros(nRecs,numpy.float64) -9999
     ER_NEEmax = numpy.ma.zeros(nRecs,numpy.float64) -9999
     GPP = numpy.ma.zeros(nRecs,numpy.float64)
+    NEE_day = numpy.ma.zeros(nRecs,numpy.float64) + Fc
     ER_day_flag = numpy.zeros(nRecs,numpy.int32)
     ER_dark_flag = numpy.zeros(nRecs,numpy.int32)
     ER_NEEmax_flag = numpy.zeros(nRecs,numpy.int32)
     ER_umol_flag = numpy.zeros(nRecs,numpy.int32)
     GPP_flag = numpy.zeros(nRecs,numpy.int32)
+    NEE_day_flag = numpy.zeros(nRecs,numpy.int32) + Fc_flag
     
     # calculate ecosystem respiration in umol/(m2 s) modeled from light response curve (Fc-Fsd)
     day_index = numpy.where(Fsd > 1)[0]
@@ -464,6 +466,10 @@ def DayERGPP_ASM(cf,ds,Fc_in):
     ER_umol[night_index] = ER_night[night_index]
     ER_umol_flag[night_index] = ER_night_flag[night_index]
     
+    NEE_day[night_index] = numpy.float64(0)
+    NEE_day_flag[night_index] = numpy.int32(110)
+    
+    putils.CreateSeries(ds,'NEE_day',NEE_day,Flag=NEE_day_flag,Descr='Daytime net ecosystem exchange of carbon',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'ER_day',ER_day,Flag=ER_day_flag,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'ER_dark',ER_dark,Flag=ER_dark_flag,Descr='Daytime dark ecosystem respiration',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'ER_NEEmax',ER_NEEmax,Flag=ER_NEEmax_flag,Descr='Daytime ecosystem respiration from NEEmax-Ts function',Units='umol/(m2 s)')
@@ -574,6 +580,7 @@ def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
     Fsd,f = putils.GetSeriesasMA(ds,'Fsd')
     Fc,Fc_flag = putils.GetSeriesasMA(ds,'Fc')
     NEE,NEE_flag = putils.GetSeriesasMA(ds,Fc_in)
+    NEE_day,NEE_day_flag = putils.GetSeriesasMA(ds,Fc_in)
     ER_night,nER_flag = putils.GetSeriesasMA(ds,'ER_night')
     ER_dark,dER_flag = putils.GetSeriesasMA(ds,'ER_dark')
     nRecs = len(NEE)
@@ -649,6 +656,11 @@ def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
                 PD_flag[i] = numpy.int32(150)
                 ERday_flag[i] = numpy.int32(150)
     
+    night_index = numpy.where(Fsd < 1)[0]
+    NEE_day[night_index] = numpy.float64(0)
+    NEE_day_flag[night_index] = numpy.int32(110)
+    
+    putils.CreateSeries(ds,'NEE_day',NEE_day,Flag=NEE_day_flag,Descr='Daytime net ecosystem exchange of carbon',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'ER_day',ER_day,Flag=0,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'GPP',GPP,Flag=0,Descr='Ecosystem Gross Primary Production',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'PD',PD,Flag=0,Descr='Ecosystem decomposition by way of photodegradation',Units='umol/(m2 s)')

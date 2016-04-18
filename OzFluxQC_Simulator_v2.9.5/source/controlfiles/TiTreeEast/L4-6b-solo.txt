@@ -10,7 +10,7 @@
     L5_offline = True
     L5_keys = GapFillUsingSOLO
     L6_offline = True
-    L6_keys = "['Nocturnal Q10','Light response function','Conditional correlation']"
+    L6_keys = "['ER_night_Cleverlyetal2013JGRBiogeosciences','ER_dark_Cleverlyetal2016Biogeosciences','ER_PD_ConditionalCorrelation']"
     
     Sums = L6    # L4 L5 L6 False
     convertFc = True
@@ -45,7 +45,7 @@
         flag_file_path = ../TiTreeEast/level5/flagstats/
     [[L6]]
         xlSumFilePath = ../TiTreeEast/level6_summaries/
-        xlSumFileName = TTE_EC_2015_DailyL6.xls
+        xlSumFileName = TTE_EC_2015_L6_Daily.xls
         in_file_path = ncData/TTE/
         in_filename = TTE_EC_2015_L6int.nc
         out_file_path = ncData/TTE/
@@ -97,11 +97,10 @@
     SumList = "['Precip','ET','Energy','Radiation','Carbon','PM']"
     SubSumList = "['ET','Energy']"
     MinMaxList = "['PM','VPD','Ta','Vbat','Tpanel','Carbon']"
-    #MeanList = "['PM','VPD','Ta','Ts','Sws','ps','Tpanel']"
-    MeanList = "['PM','VPD','Ta','Tpanel','GPP','ER','Ts','Sws','ps']"
-    #
-    GPPin = "['GPP','ER', 'ER_night', 'ER_dark', 'ER_bio', 'ER_day', 'PD']"
-    #
+    MeanList = "['PM','VPD','Ta','Ts','Tpanel','Sws','ps','GPP','ER']"
+    
+    GPPin = "['GPP', 'ER', 'ER_night', 'ER_dark', 'ER_bio', 'ER_day', 'PD', 'NEE_day']"
+    
     SoilList = "['SWCsurface','SWC10cm','SWC60cm','SWC100cm']"
     SWCsurface = "['Sws_spinifex_0cm','Sws_mulga_0cm','Sws_grass_0cm']"
     SWC10cm = "['Sws_spinifex_10cm','Sws_mulga_10cm','Sws_grass_10cm']"

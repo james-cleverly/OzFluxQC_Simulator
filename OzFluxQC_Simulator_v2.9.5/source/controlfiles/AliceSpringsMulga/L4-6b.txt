@@ -45,7 +45,7 @@
         flag_file_path = ../AliceSpringsMulga/level5/flagstats/
     [[L6]]
         xlSumFilePath = ../AliceSpringsMulga/level6_summaries/
-        xlSumFileName = ASM_EC_2013_Daily.xls
+        xlSumFileName = ASM_EC_2013_L6_Daily.xls
         in_file_path = ncData/ASM/
         in_filename = ASM_EC_2013_L6int.nc
         out_file_path = ncData/ASM/
@@ -126,9 +126,9 @@
     SubSumList = "['ET','Energy']"
     MinMaxList = "['PM','VPD','Ta','Ta_150cm','Ta_200cm','Vbat','Tpanel','Carbon']"
     #MeanList = "['PM','VPD','Ta','Ta_150cm','Ta_200cm','Tpanel']"
-    MeanList = "['PM','VPD','Ta','Ta_150cm','Ta_200cm','Tpanel','GPP','ER']"
+    MeanList = "['PM','VPD','Ta','Ta_150cm','Ta_200cm','Ts','Sws','ps','GPP','ER']"
     #
-    GPPin = "['GPP','ER']"
+    GPPin = "['GPP', 'ER', 'ER_night', 'ER_dark', 'ER_day', 'ER_NEEmax', 'NEE_day']"
     #
     SoilList = "['SWCsurface','SWC10cm','SWC60cm','SWC100cm']"
     SWCsurface = "['svwc_s_baresoil', 'svwc_s_mulga', 'svwc_s_understory']"

@@ -32,8 +32,9 @@
     elevation = "600m"
     metadata_url = "http://www.ozflux.org.au/monitoringsites/titreeeast/index.html"
     ozflux_url = "http://ozflux.org.au/"
-    reference_list = "1: Cleverly et al. 2013"
+    reference_list = "1: Cleverly et al. 2013; 2: Cleverly et al. 2016"
     reference1 = "Cleverly, J., C. Chen, N. Boulain, R. Villalobos-Vega, R. Faux, N. Grant, Q. Yu, and D. Eamus (2013), Aerodynamic Resistance and Penman-Monteith Evapotranspiration over a Seasonally Two-Layered Canopy in Semiarid Central Australia, J. Hydrometeor., 14, 1562-1570, doi: 10.1175/jhm-d-13-080.1."
+    reference2 = "Cleverly, J, D Eamus, E Van Gorsel, C Chen, R Rumman, Q Luo, NR Coupe, L Li, N Kljun, R Faux, Q Yu, and A Huete (2016), Productivity and evapotranspiration of two contrasting semiarid ecosystems following the 2011 global carbon land sink anomaly, Agric. For. Meteor., 220, 151-159, doi: 10.1016/j.agrformet.2016.01.086."
     site_name = "TiTreeEast"
     site = "Ti Tree East, Northern Territory, Australia"
     soil = "red kandosol, loamy sand"
@@ -46,7 +47,7 @@
     vegetation1 = "Mulga trees with grassy interspaces and understorey"
     vegetation2 = "Corymbia/Triodia savanna"
     version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J, and P Isaac (2015), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.14083."
+    version_citation = "Cleverly, J, and P Isaac (2016), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.46671."
 
 [Output]
     DefaultXl = False

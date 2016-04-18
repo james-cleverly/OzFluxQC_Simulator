@@ -37,7 +37,7 @@
     elevation = "600m"
     metadata_url = "http://www.ozflux.org.au/monitoringsites/alicesprings/index.html"
     ozflux_url = "http://ozflux.org.au/"
-    reference_list = "1: Eamus et al. 2013; 2,3: Cleverly et al. 2013; 4: Ma et al. 2013; 5: Chen et al. 2014; 6: Ma et al. 2014; 7: Shi et al. 2014; 8: Donohue et al. 2014; 9: Chen et al. 2015; 10: Haverd et al. 2015; 11: Restrepo Coupe et al. 2015"
+    reference_list = "1: Eamus et al. 2013; 2,3: Cleverly et al. 2013; 4: Ma et al. 2013; 5: Chen et al. 2014; 6: Ma et al. 2014; 7: Shi et al. 2014; 8: Donohue et al. 2014; 9: Cleverly et al. 2016; 10: Chen et al. 2016; 11: Haverd et al. 2015; 12: Restrepo Coupe et al. 2015"
     reference1 = "Eamus, D., J. Cleverly, N. Boulain, N. Grant, R. Faux, and R. Villalobos-Vega (2013), Carbon and water fluxes in an arid-zone Acacia savanna woodland: An analyses of seasonal patterns and responses to rainfall events, Agric. For. Meteor., 182-183, 225-238, doi: 10.1016/j.agrformet.2013.04.020."
     reference2 = "Cleverly, J., N. Boulain, R. Villalobos-Vega, N. Grant, R. Faux, C. Wood, P. G. Cook, Q. Yu, A. Leigh, and D. Eamus (2013), Dynamics of component carbon fluxes in a semi-arid Acacia woodland, central Australia, J. Geophys. Res. Biogeosci., 118, 1168-1185, doi: 10.1002/jgrg.20101."
     reference3 = "Cleverly, J., C. Chen, N. Boulain, R. Villalobos-Vega, R. Faux, N. Grant, Q. Yu, and D. Eamus (2013), Aerodynamic Resistance and Penman-Monteith Evapotranspiration over a Seasonally Two-Layered Canopy in Semiarid Central Australia, J. Hydrometeor., 14, 1562-1570, doi: 10.1175/jhm-d-13-080.1."
@@ -46,9 +46,10 @@
     reference6 = "Ma, X, A Huete, Q Yu, N Restrepo-Coupe, J Beringer, LB Hutley, KD Kanniah, J Cleverly, and D Eamus (2014), Parameterization of an ecosystem light-use-efficiency model for predicting savanna GPP using MODIS EVI, Remote Sens. Environ., 154, 253-271, doi: 10.1016/j.rse.2014.08.025."
     reference7 = "Shi, H, L Li, D Eamus, J Cleverly, A Huete, J Beringer, Q Yu, E van Gorsel, and L Hutley (2014), Intrinsic climate dependency of ecosystem light and water-use-efficiencies across Australian biomes, Environ. Res. Lett., 9, 104002, doi: 10.1088/1748-9326/9/10/104002."
     reference8 = "Donohue, RJ, IH Hume, ML Roderick, TR McVicar, J Beringer, LB Hutley, JC Gallant, JM Austin, E van Gorsel, JR Cleverly, WS Meyer, and SK Arndt (2014), Evaluation of the remote-sensing-based DIFFUSE model for estimating photosynthesis of vegetation, Remote Sens. Environ., 155, 349-365, doi: 10.1016/j.rse.2014.09.007."
-    reference9 = "Chen, C, J Cleverly, L Zhang, Q Yu, and D Eamus (2015), Modelling seasonal and inter-annual variations in carbon and water fluxes in an arid-zone Acacia savanna woodland, 1981-2012, Ecosystems, Accepted 15 November 2015."
-    reference10 = "Haverd, V, B Smith, M Raupach, P Briggs, L Nieradzik, J Beringer, L Hutley, CM Trudinger, and J Cleverly (2015), Coupling carbon allocation with leaf and root phenology predicts tree-grass partitioning along a savanna rainfall gradient, Biogeosciences Discuss., 12, 16313-16357, doi: 10.5194/bgd-12-16313-2015."
-    reference11 = "Restrepo Coupe, N, A Huete, K Davies, J Cleverly, J Beringer, D Eamus, E van Gorsel, LB Hutley, and WS Meyer (2015), MODIS vegetation products as proxies of photosynthetic potential: a look across meteorological and biologic driven ecosystem productivity, Biogeosciences Discuss., 12, 19213-19267, doi: 10.5194/bgd-12-19213-2015."
+    reference9 = "Cleverly, J, D Eamus, E Van Gorsel, C Chen, R Rumman, Q Luo, NR Coupe, L Li, N Kljun, R Faux, Q Yu, and A Huete (2016), Productivity and evapotranspiration of two contrasting semiarid ecosystems following the 2011 global carbon land sink anomaly, Agric. For. Meteor., 220, 151-159, doi: 10.1016/j.agrformet.2016.01.086."
+    reference10 = "Chen, C, J Cleverly, L Zhang, Q Yu, and D Eamus (2016), Modelling seasonal and inter-annual variations in carbon and water fluxes in an arid-zone Acacia savanna woodland, 1981-2012, Ecosystems, Accepted 15 November 2015."
+    reference11 = "Haverd, V, B Smith, M Raupach, P Briggs, L Nieradzik, J Beringer, L Hutley, CM Trudinger, and J Cleverly (2015), Coupling carbon allocation with leaf and root phenology predicts tree-grass partitioning along a savanna rainfall gradient, Biogeosciences Discuss., 12, 16313-16357, doi: 10.5194/bgd-12-16313-2015."
+    reference12 = "Restrepo Coupe, N, A Huete, K Davies, J Cleverly, J Beringer, D Eamus, E van Gorsel, LB Hutley, and WS Meyer (2015), MODIS vegetation products as proxies of photosynthetic potential: a look across meteorological and biologic driven ecosystem productivity, Biogeosciences Discuss., 12, 19213-19267, doi: 10.5194/bgd-12-19213-2015."
     site_name = "AliceSpringsMulga"
     site = "Alice Springs Mulga, Northern Territory, Australia"
     soil = "red kandosol, sandy loam"
@@ -62,8 +63,8 @@
     vegetation2 = "C3 understorey forbs and shrubs:  Psydrax latifolia, Eremophila gilesii, E. latrobei ssp glabra (Crimson turkey bush), Sida and Abutilon spp, and Solanum ellipticum (Potato bush)"
     vegetation3 = "C3 understorey grass:  perennial Thyridolepsis mitchelliana (Window mulga-grass)"
     vegetation4 = "C4 understorey grasses:  perennial Eragrostis eriopoda (Naked woolybutt) and annual Eriachne pulchella ssp pulchella (Pretty wanderrie)"
-    version = "OzFluxQC Simulator v.2.8.6, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.6, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13730"
+    version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
+    version_citation = "Cleverly, J, and P Isaac (2015), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.14083."
 
 [Output]
     DefaultXl = False
@@ -1307,6 +1308,42 @@
             long_name = "Ecosystem respiration gapfilled using modelled from Q10 response curve binned by soil volumetric moisture content class (night) and intercept of light response curve binned by temperature class (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
+    [[ER_night]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_night
+        [[[Attr]]]
+            ancillary_variables = "ER_night QC flag"
+            long_name = "Nocturnal ecosystem respiration from Q10 response curve binned by soil volumetric moisture content class and season (night)"
+            units    = "umol/(m2 s)"
+            standard_name = "not defined"
+    [[ER_dark]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_dark
+        [[[Attr]]]
+            ancillary_variables = "ER_dark QC flag"
+            long_name = "Ecosystem dark respiration from the intercept of a light response curve (day)"
+            units    = "umol/(m2 s)"
+            standard_name = "not defined"
+    [[ER_day]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_day
+        [[[Attr]]]
+            ancillary_variables = "ER_day QC flag"
+            long_name = "Daytime ecosystem decomposition attributed to biotic respiration (ER_bio) and physical decomposition (PD)"
+            units    = "umol/(m2 s)"
+            standard_name = "not defined"
+    [[ER_NEEmax]]
+        [[[xl]]]
+            sheet    = Data
+            name     = ER_NEEmax
+        [[[Attr]]]
+            ancillary_variables = "ER_NEEmax QC flag"
+            long_name = "Daytime ecosystem decomposition attributed to maximal NEE rates in the absence of GPP as a function of temperature"
+            units    = "umol/(m2 s)"
+            standard_name = "not defined"
     [[GPP]]
         [[[xl]]]
             sheet    = Data
@@ -1656,6 +1693,15 @@
         [[[Attr]]]
             ancillary_variables = "NEE QC flag"
             long_name = "NEE (Net ecosystem exchange of carbon), Flux of carbon, Raw uncorrected, rotated to natural wind coordinates, frequency response corrected, WPL"
+            units    = "umol/m2/s"
+            standard_name = "surface_upward_mole_flux_of_carbon_dioxide"
+    [[NEE_day]]
+        [[[xl]]]
+            sheet    = Data
+            name     = NEE_day
+        [[[Attr]]]
+            ancillary_variables = "NEE_day QC flag"
+            long_name = "daytime NEE (Net ecosystem exchange of carbon), Flux of carbon, Raw uncorrected, rotated to natural wind coordinates, frequency response corrected, WPL"
             units    = "umol/m2/s"
             standard_name = "surface_upward_mole_flux_of_carbon_dioxide"
     [[ET]]

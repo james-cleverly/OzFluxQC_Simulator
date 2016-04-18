@@ -1131,6 +1131,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                     ER_dark,f,a = qcutils.GetSeriesasMA(ds,GPPIn[3])
                     ER_day,f,a = qcutils.GetSeriesasMA(ds,GPPIn[4])
                     ER_NEEmax,f,a = qcutils.GetSeriesasMA(ds,GPPIn[5])
+                    NEE_day,NEE_day_flag,a = qcutils.GetSeriesasMA(ds,GPPIn[6])
                     Fsd,f,a = qcutils.GetSeriesasMA(ds,'Fsd')
                     GPP_mmol = GPP * 1800 / 1000
                     GPP_gC = GPP_mmol  * c.Mc
@@ -1150,6 +1151,9 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                     ER_NEEmax_mmol = ER_NEEmax * 1800 / 1000
                     ER_NEEmax_gC = ER_NEEmax_mmol * c.Mc
                     ER_NEEmax_gCO2 = ER_NEEmax_mmol * c.Mco2
+                    NEE_day_mmol = NEE_day * 1800 / 1000
+                    NEE_day_gC = NEE_day_mmol * c.Mc
+                    NEE_day_gCO2 = NEE_day_mmol * c.Mco2
                     attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2')
                     qcutils.CreateSeries(ds,'GPP_mmol',GPP_mmol,FList=[GPPIn[0]],Attr=attr)
                     attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gC/m2',standard_name='gross_primary_productivity_of_carbon')
@@ -1186,8 +1190,14 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                     qcutils.CreateSeries(ds,'ER_NEEmax_gC',ER_NEEmax_gC,FList=[GPPIn[4]],Attr=attr)
                     attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min ER, maximal NEE rates in the absence of GPP as a function of temperature',units='gCO2/m2')
                     qcutils.CreateSeries(ds,'ER_NEEmax_gCO2',ER_NEEmax_gCO2,FList=[GPPIn[4]],Attr=attr)
-                    GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','ER_mmol','ER_gC','ER_gCO2','ER_night_mmol','ER_night_gC','ER_night_gCO2','ER_dark_mmol','ER_dark_gC','ER_dark_gCO2','ER_day_mmol','ER_day_gC','ER_day_gCO2','ER_NEEmax_mmol','ER_NEEmax_gC','ER_NEEmax_gCO2']
-                    for listindex in range(0,18):
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min NEE, daytime accumulation',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'NEE_day_mmol',NEE_day_mmol,Flag=NEE_day_flag,Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min NEE, daytime accumulation',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'NEE_day_gC',NEE_day_gC,Flag=NEE_day_flag,Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min NEE, daytime accumulation',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'NEE_day_gCO2',NEE_day_gCO2,Flag=NEE_day_flag,Attr=attr)
+                    GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','ER_mmol','ER_gC','ER_gCO2','ER_night_mmol','ER_night_gC','ER_night_gCO2','ER_dark_mmol','ER_dark_gC','ER_dark_gCO2','ER_day_mmol','ER_day_gC','ER_day_gCO2','ER_NEEmax_mmol','ER_NEEmax_gC','ER_NEEmax_gCO2','NEE_day_mmol','NEE_day_gC','NEE_day_gCO2']
+                    for listindex in range(0,21):
                         OutList.append(GPPOut[listindex])
                         SumOutList.append(GPPOut[listindex])
             elif 'TiTreeEast' in ds.globalattributes['site_name']:
@@ -1200,6 +1210,7 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                     ER_bio,f,a = qcutils.GetSeriesasMA(ds,GPPIn[4])
                     ER_day,f,a = qcutils.GetSeriesasMA(ds,GPPIn[5])
                     PD,f,a = qcutils.GetSeriesasMA(ds,GPPIn[6])
+                    NEE_day,NEE_day_flag,a = qcutils.GetSeriesasMA(ds,GPPIn[7])
                     Fsd,f,a = qcutils.GetSeriesasMA(ds,'Fsd')
                     GPP_mmol = GPP * 1800 / 1000
                     GPP_gC = GPP_mmol  * c.Mc
@@ -1222,6 +1233,9 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                     PD_mmol = PD * 1800 / 1000
                     PD_gC = PD_mmol * c.Mc
                     PD_gCO2 = PD_mmol * c.Mco2
+                    NEE_day_mmol = NEE_day * 1800 / 1000
+                    NEE_day_gC = NEE_day_mmol * c.Mc
+                    NEE_day_gCO2 = NEE_day_mmol * c.Mco2
                     attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='mmol/m2')
                     qcutils.CreateSeries(ds,'GPP_mmol',GPP_mmol,FList=[GPPIn[0]],Attr=attr)
                     attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min GPP',units='gC/m2',standard_name='gross_primary_productivity_of_carbon')
@@ -1264,8 +1278,14 @@ def ComputeDailySums(cf,ds,SumList,SubSumList,MinMaxList,MeanList,SoilList):
                     qcutils.CreateSeries(ds,'PD_gC',PD_gC,FList=[GPPIn[6]],Attr=attr)
                     attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min photo-degradation',units='gCO2/m2')
                     qcutils.CreateSeries(ds,'PD_gCO2',PD_gCO2,FList=[GPPIn[6]],Attr=attr)
-                    GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','ER_mmol','ER_gC','ER_gCO2','ER_night_mmol','ER_night_gC','ER_night_gCO2','ER_dark_mmol','ER_dark_gC','ER_dark_gCO2','ER_bio_mmol','ER_bio_gC','ER_bio_gCO2','ER_day_mmol','ER_day_gC','ER_day_gCO2','PD_mmol','PD_gC','PD_gCO2']
-                    for listindex in range(0,21):
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min NEE, daytime accumulation',units='mmol/m2')
+                    qcutils.CreateSeries(ds,'NEE_day_mmol',NEE_day_mmol,Flag=NEE_day_flag,Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min NEE, daytime accumulation',units='gC/m2',standard_name='surface_upward_mass_flux_of_carbon_dioxide_expressed_as_carbon_due_to_emission_from_natural_sources')
+                    qcutils.CreateSeries(ds,'NEE_day_gC',NEE_day_gC,Flag=NEE_day_flag,Attr=attr)
+                    attr = qcutils.MakeAttributeDictionary(long_name='Cumulative 30-min NEE, daytime accumulation',units='gCO2/m2')
+                    qcutils.CreateSeries(ds,'NEE_day_gCO2',NEE_day_gCO2,Flag=NEE_day_flag,Attr=attr)
+                    GPPOut = ['GPP_mmol','GPP_gC','GPP_gCO2','ER_mmol','ER_gC','ER_gCO2','ER_night_mmol','ER_night_gC','ER_night_gCO2','ER_dark_mmol','ER_dark_gC','ER_dark_gCO2','ER_bio_mmol','ER_bio_gC','ER_bio_gCO2','ER_day_mmol','ER_day_gC','ER_day_gCO2','PD_mmol','PD_gC','PD_gCO2','NEE_day_mmol','NEE_day_gC','NEE_day_gCO2']
+                    for listindex in range(0,24):
                         OutList.append(GPPOut[listindex])
                         SumOutList.append(GPPOut[listindex])
         elif ThisOne == 'PM':

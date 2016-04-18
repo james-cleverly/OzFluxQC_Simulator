@@ -59,8 +59,8 @@
     vegetation2 = "C3 understorey forbs and shrubs:  Psydrax latifolia, Eremophila gilesii, E. latrobei ssp glabra (Crimson turkey bush), Sida and Abutilon spp, and Solanum ellipticum (Potato bush)"
     vegetation3 = "C3 understorey grass:  perennial Thyridolepsis mitchelliana (Window mulga-grass)"
     vegetation4 = "C4 understorey grasses:  perennial Eragrostis eriopoda (Naked woolybutt) and annual Eriachne pulchella ssp pulchella (Pretty wanderrie)"
-    version = "OzFluxQC Simulator v.2.8.6, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J and Isaac, P (2015) OzFluxQC Simulator version 2.8.6, GitHub repository, https://github.com/james-cleverly/OzFluxQC_Simulator. doi: 10.5281/zenodo.13730"
+    version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
+    version_citation = "Cleverly, J, and P Isaac (2015), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.14083."
 
 [Output]
     DefaultXl = False
