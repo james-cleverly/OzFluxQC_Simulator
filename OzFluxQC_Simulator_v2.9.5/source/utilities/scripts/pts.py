@@ -587,15 +587,13 @@ def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
     PD_flag = numpy.zeros(nRecs,numpy.int32)
     ERday_flag = numpy.zeros(nRecs,numpy.int32)
     
-    PDm3_posNEE = -4.048393e-2
-    PDm2_posNEE = 1.456067e-1
-    PDm1_posNEE = 2.288639
-    PDb_posNEE = -1.210116e-1
+    PDm_posNEE = 2.370716
+    PDb_posNEE = -9.616950E-2
     
-    posmonth_index = numpy.where((Fsd > 1) & (NEE > 0.053))[0]
-    negmonth_index = numpy.where((Fsd > 1) & (NEE < 0.053))[0]
+    posmonth_index = numpy.where((Fsd > 1) & (NEE > 0.063))[0]
+    negmonth_index = numpy.where((Fsd > 1) & (NEE < 0.063))[0]
     #pdb.set_trace()
-    PD[posmonth_index] = (PDm3_posNEE * (NEE[posmonth_index]*NEE[posmonth_index]*NEE[posmonth_index])) + (PDm2_posNEE * (NEE[posmonth_index]*NEE[posmonth_index])) + (PDm1_posNEE * (NEE[posmonth_index])) + PDb_posNEE
+    PD[posmonth_index] = (PDm_posNEE * NEE[posmonth_index]) + PDb_posNEE
     PD[negmonth_index] = 0
     
     ER_day = PD + ER_dark
