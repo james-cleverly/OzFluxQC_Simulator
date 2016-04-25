@@ -1,0 +1,22 @@
+[General]
+Platform = Mac    # Mac or PC
+InputLevel = L3
+OutputLevel = Envelope
+netCDFv3 = False
+
+[Files]
+    [[L3]]
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2015_L3envin.nc
+    [[Envelope]]
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2015_L3envelope.nc
+        xlFilePath = ../../TiTreeEast/level6partitioning/
+        xlFileName = TTE_EC_2015_L6_PD_LRF_D.xls
+
+[Output]
+    Envelope = "['PD', 'Fsd', 'VPD', 'Sws', 'Sws0D65Es0', 'Sws0D65Es100', 'Sws0D65Es200', 'Sws0D65Es300', 'Sws0D65Es400', 'Sws0D65Es500', 'Sws0D65Es600', 'Sws0D65Es700', 'Sws0D65Es800', 'Sws0D65Es900', 'Sws0D0Es0', 'Sws0D0Es100', 'Sws0D0Es200', 'Sws0D0Es300', 'Sws0D0Es400', 'Sws0D0Es500', 'Sws0D0Es600', 'Sws0D0Es700', 'Sws0D0Es800', 'Sws0D0Es900', 'Sws0D130Es0', 'Sws0D130Es100', 'Sws0D130Es200', 'Sws0D130Es300', 'Sws0D130Es400', 'Sws0D130Es500', 'Sws0D130Es600', 'Sws0D130Es700', 'Sws0D130Es800', 'Sws0D130Es900', 'Sws0D195Es0', 'Sws0D195Es100', 'Sws0D195Es200', 'Sws0D195Es300', 'Sws0D195Es400', 'Sws0D195Es500', 'Sws0D195Es600', 'Sws0D195Es700', 'Sws0D195Es800', 'Sws0D195Es900', 'Sws0D260Es0', 'Sws0D260Es100', 'Sws0D260Es200', 'Sws0D260Es300', 'Sws0D260Es400', 'Sws0D260Es500', 'Sws0D260Es600', 'Sws0D260Es700', 'Sws0D260Es800', 'Sws0D260Es900', 'Sws0D325Es0', 'Sws0D325Es100', 'Sws0D325Es200', 'Sws0D325Es300', 'Sws0D325Es400', 'Sws0D325Es500', 'Sws0D325Es600', 'Sws0D325Es700', 'Sws0D325Es800', 'Sws0D325Es900', 'Sws0D390Es0', 'Sws0D390Es100', 'Sws0D390Es200', 'Sws0D390Es300', 'Sws0D390Es400', 'Sws0D390Es500', 'Sws0D390Es600', 'Sws0D390Es700', 'Sws0D390Es800', 'Sws0D390Es900', 'Sws0D455Es0', 'Sws0D455Es100', 'Sws0D455Es200', 'Sws0D455Es300', 'Sws0D455Es400', 'Sws0D455Es500', 'Sws0D455Es600', 'Sws0D455Es700', 'Sws0D455Es800', 'Sws0D455Es900', 'Sws0D520Es0', 'Sws0D520Es100', 'Sws0D520Es200', 'Sws0D520Es300', 'Sws0D520Es400', 'Sws0D520Es500', 'Sws0D520Es600', 'Sws0D520Es700', 'Sws0D520Es800', 'Sws0D520Es900', 'Sws0D585Es0', 'Sws0D585Es100', 'Sws0D585Es200', 'Sws0D585Es300', 'Sws0D585Es400', 'Sws0D585Es500', 'Sws0D585Es600', 'Sws0D585Es700', 'Sws0D585Es800', 'Sws0D585Es900']"
+#    DefaultXl = False
+
+[Params]
+    dependent = PD

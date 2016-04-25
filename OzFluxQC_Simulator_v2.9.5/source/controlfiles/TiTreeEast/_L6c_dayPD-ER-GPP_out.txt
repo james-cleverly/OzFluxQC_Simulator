@@ -13,7 +13,7 @@
         xlFileName = TTE_EC_2015_L6_PD_ER_GPP.xls
 
 [Output]
-    Partitioning = "['ER_night', 'ER_dark', 'ER_bio', 'ER_day', 'ER', 'PD', 'GPP', 'NEE_day']"
+    Partitioning = "['GPP', 'ER', 'ER_night', 'ER_bio', 'ER_dark', 'ER_day', 'PD', 'NEE_day']"
     Format = Subset   # Full (default) or Subset
     DefaultXl = False
 

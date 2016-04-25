@@ -94,7 +94,7 @@ class qcgui(Tkinter.Frame):
         self.progress.grid(row=4,column=1,columnspan=6)
 
     def do_qcEs(self):
-        self.cf = metio.loadcontrolfile('controlfiles')
+        self.cf = metio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -116,7 +116,7 @@ class qcgui(Tkinter.Frame):
         log.info(' Finished saving NetCDF data')
     
     def do_qcLRF(self):
-        self.cf = metio.loadcontrolfile('controlfiles')
+        self.cf = metio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -138,7 +138,7 @@ class qcgui(Tkinter.Frame):
         log.info(' Finished saving NetCDF data')
     
     def do_qcD(self):
-        self.cf = metio.loadcontrolfile('controlfiles')
+        self.cf = metio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -160,7 +160,7 @@ class qcgui(Tkinter.Frame):
         log.info(' Finished saving NetCDF data')
     
     def do_qcTs(self):
-        self.cf = metio.loadcontrolfile('controlfiles')
+        self.cf = metio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -182,7 +182,7 @@ class qcgui(Tkinter.Frame):
         log.info(' Finished saving NetCDF data')
     
     def do_qcLRFD(self):
-        self.cf = metio.loadcontrolfile('controlfiles')
+        self.cf = metio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -218,23 +218,23 @@ class qcgui(Tkinter.Frame):
         check = 'True'
         self.do_progress(text='Exporting Diurnal NetCDF -> Xcel ...')                     # put up the progress message
         #if metutils.cfkeycheck(self.cf,'Output','noDefaultXl'):
-        #    self.cf = metio.loadcontrolfile('controlfiles')
+        #    self.cf = metio.loadcontrolfile('../controlfiles')
         #    if len(self.cf)==0:
         #        self.do_progress(text='Waiting for input ...')
         #        return
         try:
             self.cf
             if len(self.cf)==0:
-                self.cf = metio.loadcontrolfile('controlfiles')
+                self.cf = metio.loadcontrolfile('../controlfiles')
                 if len(self.cf)==0: self.do_progress(text='Waiting for input ...'); return
                 check = 'False'
         except:
-            self.cf = metio.loadcontrolfile('controlfiles')
+            self.cf = metio.loadcontrolfile('../controlfiles')
             if len(self.cf)==0: self.do_progress(text='Waiting for input ...'); return
             check = 'False'
         
         if (metutils.cfkeycheck(self.cf,Base='Output',ThisOne='DefaultXl') and self.cf['Output']['DefaultXl'] == 'False') and check == 'True':
-            self.cf = metio.loadcontrolfile('controlfiles')
+            self.cf = metio.loadcontrolfile('../controlfiles')
             if len(self.cf)==0: self.do_progress(text='Waiting for input ...'); return
         
         
@@ -248,7 +248,7 @@ class qcgui(Tkinter.Frame):
     
     def do_xl2ncCall(self):
         self.do_progress(text='Load xl2nc Control File ...')
-        self.cf = metio.loadcontrolfile('controlfiles')
+        self.cf = metio.loadcontrolfile('../controlfiles')
         if len(self.cf)==0:
             self.do_progress(text='Waiting for input ...')
             return
@@ -265,7 +265,7 @@ class qcgui(Tkinter.Frame):
 
 
 if __name__ == "__main__":
-    log = metutils.startlog('envelope','logfiles/envelope.log')
+    log = metutils.startlog('envelope','../logfiles/envelope.log')
     qcGUI = qcgui()
     qcGUI.master.title("Meteorology-Carbon envelope main GUI")
     qcGUI.mainloop()

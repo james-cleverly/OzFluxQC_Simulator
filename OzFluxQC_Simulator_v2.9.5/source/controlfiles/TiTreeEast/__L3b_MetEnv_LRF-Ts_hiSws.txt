@@ -1,0 +1,22 @@
+[General]
+Platform = Mac    # Mac or PC
+InputLevel = L3
+OutputLevel = Envelope
+netCDFv3 = False
+
+[Files]
+    [[L3]]
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2015_L3envin.nc
+    [[Envelope]]
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2015_L3envelope.nc
+        xlFilePath = ../../TiTreeEast/level6partitioning/
+        xlFileName = TTE_EC_2015_L6_PD_LRF_Ts_highSws.xls
+
+[Output]
+    Envelope = "['PD', 'Fsd', 'Ts', 'Sws', 'Sws5Ts6Es0', 'Sws5Ts6Es100', 'Sws5Ts6Es200', 'Sws5Ts6Es300', 'Sws5Ts6Es400', 'Sws5Ts6Es500', 'Sws5Ts6Es600', 'Sws5Ts6Es700', 'Sws5Ts6Es800', 'Sws5Ts6Es900', 'Sws5Ts16Es0', 'Sws5Ts16Es100', 'Sws5Ts16Es200', 'Sws5Ts16Es300', 'Sws5Ts16Es400', 'Sws5Ts16Es500', 'Sws5Ts16Es600', 'Sws5Ts16Es700', 'Sws5Ts16Es800', 'Sws5Ts16Es900', 'Sws5Ts26Es0', 'Sws5Ts26Es100', 'Sws5Ts26Es200', 'Sws5Ts26Es300', 'Sws5Ts26Es400', 'Sws5Ts26Es500', 'Sws5Ts26Es600', 'Sws5Ts26Es700', 'Sws5Ts26Es800', 'Sws5Ts26Es900', 'Sws5Ts36Es0', 'Sws5Ts36Es100', 'Sws5Ts36Es200', 'Sws5Ts36Es300', 'Sws5Ts36Es400', 'Sws5Ts36Es500', 'Sws5Ts36Es600', 'Sws5Ts36Es700', 'Sws5Ts36Es800', 'Sws5Ts36Es900', 'Sws5Ts46Es0', 'Sws5Ts46Es100', 'Sws5Ts46Es200', 'Sws5Ts46Es300', 'Sws5Ts46Es400', 'Sws5Ts46Es500', 'Sws5Ts46Es600', 'Sws5Ts46Es700', 'Sws5Ts46Es800', 'Sws5Ts46Es900']"
+#    DefaultXl = False
+
+[Params]
+    dependent = PD

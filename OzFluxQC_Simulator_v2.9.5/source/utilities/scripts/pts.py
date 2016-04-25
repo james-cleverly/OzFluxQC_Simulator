@@ -1148,14 +1148,14 @@ def ER_nightL6(cf,ds,ER_in):
                 else:
                     prevMonth = 12
                 if prevMonth == 1 or prevMonth == 3 or prevMonth == 5 or prevMonth == 7 or prevMonth == 8 or prevMonth == 10 or prevMonth == 12:
-                    dRan = 31
+                    dRan = numpy.int32(31)
                 if prevMonth == 2:
                     if ds.series['Year']['Data'][0] % 4 == 0:
-                        dRan = 29
+                        dRan = numpy.int32(29)
                     else:
-                        dRan = 28
+                        dRan = numpy.int32(28)
                 if prevMonth == 4 or prevMonth == 6 or prevMonth == 9 or prevMonth == 11:
-                    dRan = 30
+                    dRan = numpy.int32(30)
                 Night[i] = dRan
                 Month[i] = prevMonth
         else:

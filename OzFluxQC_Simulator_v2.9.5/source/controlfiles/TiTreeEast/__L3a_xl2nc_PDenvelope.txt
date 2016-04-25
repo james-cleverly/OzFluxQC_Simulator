@@ -1,0 +1,97 @@
+[General]
+InLevel = 'L3'
+OutLevel = 'L3'
+Platform = Mac    # comment out if PC excel
+netCDFv3 = False
+
+[Files]
+    [[L3]]
+        xlFilePath = ../../TiTreeEast/level3_intermediates/
+        xlFileName = TTE_EC_2015_FullPreFilled.xls
+        xlHeaderRow  = 10
+        xl1stDataRow = 11
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2015_L3envin.nc
+
+[Global]
+    study = "Carbon-Met Envelope"
+    contact  = "james.cleverly@uts.edu.au"
+    canopy_height = "blank"
+    comment = "CF convention version"
+    data_url = "http://ozflux.its.monash.edu.au/"
+    end_datetime = "blank"
+    history = ""
+    institution = "University of Technology, Sydney"
+    latitude = -22.283
+    longitude = 133.249
+    elevation = "600m"
+    metadata_url = "blank"
+    ozflux_url = "http://ozflux.org.au/"
+    references = "blank"
+    site_name = "TiTreeEast"
+    site = "Ti Tree East"
+    soil_type = "Red Sand"
+    source = "10m flux tower plus array of soil sensors"
+    start_datetime = "2015-07-01 00:00"
+    title = "Flux tower data set from the Ti Tree East site"
+    time_step = 30
+    vegetation = "blank"
+
+[Variables]
+    [[xlDateTime]]
+        [[[xl]]]
+            sheet    = Data
+            name     = TIMESTAMP
+        [[[Attr]]]
+            ancillary_variables = ""
+            long_name = "Date/time in Excel format"
+            units    = ""
+            standard_name = "not defined"
+    [[PD]]
+        [[[xl]]]
+            sheet    = Data
+            name     = PD
+        [[[Attr]]]
+            ancillary_variables = "PD_wpl QC flag"
+            long_name = "Flux of carbon, Raw uncorrected, CO2 flux, rotated to natural wind coordinates and frequency response corrected, WPL corrected Fc"
+            units    = "mg/(m2 s)"
+            standard_name = "not defined"
+    [[Fsd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fsd
+        [[[Attr]]]
+            ancillary_variables = "Fsd QC flag"
+            instrument = "Kipp and Zonen CNR1"
+            long_name = "Down-welling short wave"
+            standard_name = "surface_downwelling_shortwave_flux_in_air"
+            units = "W/m2"
+    [[Ts]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Ts
+        [[[Attr]]]
+            long_name = "Soil temperature"
+            units    = "C"
+            ancillary_variables = "Ts QC flag"
+            standard_name = "soil_temperature"
+    [[Sws]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Sws
+        [[[Attr]]]
+            long_name = "Soil moisture content"
+            units    = "frac"
+            ancillary_variables = "Sws QC flag"
+            standard_name = "soil_moisture_content"
+    [[VPD]]
+        [[[xl]]]
+            sheet    = Data
+            name     = VPD
+        [[[Attr]]]
+            long_name = "Vapour pressure deficit"
+            units    = "C"
+            ancillary_variables = "VPD QC flag"
+            standard_name = "water_vapor_saturation_deficit_in_air"
+
+
