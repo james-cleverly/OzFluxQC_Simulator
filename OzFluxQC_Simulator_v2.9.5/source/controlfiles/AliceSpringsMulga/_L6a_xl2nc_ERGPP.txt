@@ -7,11 +7,11 @@ netCDFv3 = False
 [Files]
     [[L5]]
         xlFilePath = ../../AliceSpringsMulga/level3_intermediates/
-        xlFileName = ASM_EC_2015_FullPreFilled.xls
+        xlFileName = ASM_EC_2016_FullPreFilled.xls
         xlHeaderRow  = 10
         xl1stDataRow = 11
         ncFilePath = ../ncData/ASM/
-        ncFileName = ASM_EC_2015_L5pin.nc
+        ncFileName = ASM_EC_2016_L5pin.nc
 
 [Global]
     study = "Carbon Partitioning"

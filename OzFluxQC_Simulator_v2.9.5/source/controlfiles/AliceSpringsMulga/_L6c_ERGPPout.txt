@@ -7,13 +7,13 @@
 [Files]
     [[L6]]
         ncFilePath = ../ncData/ASM/
-        ncFileName = ASM_EC_2015_L6part.nc
+        ncFileName = ASM_EC_2016_L6part.nc
     [[Partitioning]]
         xlFilePath = ../../AliceSpringsMulga/level3_intermediates/Partitioning/
-        xlFileName = ASM_EC_2015_L6_ER_GPP.xls
+        xlFileName = ASM_EC_2016_L6_CE_GPP.xls
 
 [Output]
-    Partitioning = "['GPP', 'ER', 'ER_night', 'ER_dark', 'ER_day', 'ER_NEEmax', 'NEE_day']"
+    Partitioning = "['GPP', 'CE', 'ER_night', 'ER_dark', 'CE_day', 'CE_NEEmax', 'NEE_day']"
     Format = Subset   # Full (default) or Subset
     DefaultXl = False
 

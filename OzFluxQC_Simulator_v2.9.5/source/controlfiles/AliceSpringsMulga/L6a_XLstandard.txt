@@ -5,9 +5,9 @@
 [Files]
     [[L6_CPartitioned]]
         in_file_path = ../AliceSpringsMulga/level6/
-        in_filename = ASM_EC_2013_L6_CPartitioned.nc
+        in_filename = ASM_EC_2016_L6_CPartitioned.nc
         out_file_path = ../AliceSpringsMulga/level6/
-        out_filename = ASM_EC_2013_L6_CPartitioned.xls
+        out_filename = ASM_EC_2016_L6_CPartitioned.xls
 
 [Output]
     DefaultXl = False

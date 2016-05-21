@@ -5,9 +5,10 @@
 [Files]
     [[L3_Corrected]]
         in_file_path = ../AliceSpringsMulga/level3/
-        in_filename = ASM_EC_2013_L3_Corrected.nc
+        in_filename = ASM_EC_2016_L3_Corrected.nc
         out_file_path = ../AliceSpringsMulga/level3/
-        out_filename = ASM_EC_2013_L3_Corrected.xls
+        out_filename = ASM_EC_2016_L3_Corrected.xls
 
 [Output]
     DefaultXl = False
+

@@ -4,11 +4,11 @@
 [Files]
     [[L6]]
         in_file_path = ../TiTreeEast/level3_intermediates/
-        in_filename = TTE_EC_2015_FullPreFilled.xls
+        in_filename = TTE_EC_2016_FullPreFilled.xls
         in_headerrow  = 10
         in_firstdatarow = 11
         out_file_path = ncData/TTE/
-        out_filename = TTE_EC_2015_L6int.nc
+        out_filename = TTE_EC_2016_L6int.nc
 
 [Global]
     contact  = "james.cleverly@uts.edu.au"
@@ -24,6 +24,7 @@
     comment15 = "9 Mar-28 Mar 2015:  batteries failing, power loss at night; gaps in meteorology filled from TTE-SOLO"
     comment16 = "9 Mar-9 Apr:  Timestamp on grass array CR1000 behind, failed to keep time through power failure.  Without time-matching, data unusable and replaced by -9999"
     comment17 = "16 May 2015:  Fsu gaps filled from alternate information:  solar albedo as a function of Fsd"
+    comment18 = "11 May 2016: L6 semantics updated to Cleverly et al. (2016a, b; submitted to Biogeosciences): NEE = CE - GPP = (ER + CE) - GPP; CE:  ecosystem-scale CO2 efflux; ER: ecosystem respiration; GPP: gross primary production"
     conventions = "CF-1.6"    conventions_names = "CF convention standard names table version 27, 28 Nov 2013, audited 4 Jan 2015"
     data_url = "http://data.ozflux.org.au"
     institution = "University of Technology Sydney"
@@ -39,7 +40,7 @@
     site = "Ti Tree East, Northern Territory, Australia"
     soil = "red kandosol, sand"
     source = "10m flux tower plus array of soil sensors"
-    title = "Flux tower data set from the Ti Tree East site for the calendar year 2015"
+    title = "Flux tower data set from the Ti Tree East site for the calendar year 2016"
     time_step = 30
     time_zone = "Australia/Darwin"
     tower_height = "10 m"
@@ -47,7 +48,7 @@
     vegetation1 = "Mulga trees with grassy interspaces and understorey"
     vegetation2 = "Corymbia/Triodia savanna"
     version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J, and P Isaac (2016), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.46671."
+    version_citation = "Cleverly, J, and P Isaac (2016), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.50109."
 
 [Output]
     DefaultXl = False
@@ -985,13 +986,13 @@
             long_name = "Rainfall, 30 minute total"
             units    = "mm"
             standard_name = "rainfall_amount"
-    [[ER]]
+    [[CE]]
         [[[xl]]]
             sheet    = Data
-            name     = ER
+            name     = CE
         [[[Attr]]]
-            ancillary_variables = "ER QC flag"
-            long_name = "Ecosystem respiration (representing total ecosystem decomposition) from Q10 response curve binned by soil volumetric moisture content class (night) and light response function + conditional correlation analysis (day)"
+            ancillary_variables = "CE QC flag"
+            long_name = "Ecosystem CO2 efflux from Q10 response curve binned by soil volumetric moisture content class (night) and light response function + conditional correlation analysis (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
     [[ER_night]]
@@ -1021,13 +1022,13 @@
             long_name = "Ecosystem respiration (attributed to AR + HR) from Q10 response curve binned by soil volumetric moisture content class (night) and ecosystem dark respiration (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
-    [[ER_day]]
+    [[CE_day]]
         [[[xl]]]
             sheet    = Data
-            name     = ER_day
+            name     = CE_day
         [[[Attr]]]
-            ancillary_variables = "ER_day QC flag"
-            long_name = "Daytime ecosystem decomposition attributed to biotic respiration (ER_bio) and physical decomposition (PD)"
+            ancillary_variables = "CE_day QC flag"
+            long_name = "Daytime ecosystem CO2 efflux attributed to biotic respiration (ER_bio) and physical decomposition (PD)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
     [[PD]]
@@ -1157,3 +1158,13 @@
             units    = "mm/30min"
             standard_name = "lwe_water_evaporation_rate"
             Level = "L3"
+    [[Tb_Fl]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Tb_Fl
+        [[[Attr]]]
+            ancillary_variables = "Tb_Fl QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "CNR4 body temperature, used for computing Fld and Flu"
+            standard_name = "not defined"
+            units = "C"

@@ -941,8 +941,8 @@ def SetUnitsInds(ds, ThisOne, units):
     ds.series[ThisOne]['Attr']['units'] = units
 
 def prepOzFluxVars(cf,ds):
-    invars = ['Ux', 'Uy', 'Uz', 'UxUx', 'UxUy', 'UxA', 'UxC', 'UxT', 'UyA', 'UyC', 'UyT', 'UyUy', 'AhAh', 'CcCc', 'UxUz', 'UyUz', 'UzA', 'UzC', 'UzT', 'UzUz', 'ER_umol']
-    outvars = ['u', 'v', 'w', 'uu', 'uv', 'uA', 'uC', 'uT', 'vA', 'vC', 'vT', 'vv', 'AhAh', 'CcCc', 'uw', 'vw', 'wA', 'wC', 'wT', 'ww', 'ER']
+    invars = ['Ux', 'Uy', 'Uz', 'UxUx', 'UxUy', 'UxA', 'UxC', 'UxT', 'UyA', 'UyC', 'UyT', 'UyUy', 'AhAh', 'CcCc', 'UxUz', 'UyUz', 'UzA', 'UzC', 'UzT', 'UzUz', 'CE_umol']
+    outvars = ['u', 'v', 'w', 'uu', 'uv', 'uA', 'uC', 'uT', 'vA', 'vC', 'vT', 'vv', 'AhAh', 'CcCc', 'uw', 'vw', 'wA', 'wC', 'wT', 'ww', 'CE']
     for i in range(len(invars)):
         if invars[i] in ds.series.keys() and outvars[i] not in ds.series.keys():
             attr = MakeAttributeDictionary(long_name=ds.series[invars[i]]['Attr']['long_name'],units=ds.series[invars[i]]['Attr']['units'],standard_name=ds.series[invars[i]]['Attr']['standard_name'])

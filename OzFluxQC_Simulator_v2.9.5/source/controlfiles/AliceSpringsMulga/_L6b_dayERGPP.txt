@@ -7,19 +7,19 @@
 [Files]
     [[L5]]
         ncFilePath = ../ncData/ASM/
-        ncFileName = ASM_EC_2015_L5pin.nc
+        ncFileName = ASM_EC_2016_L5pin.nc
     [[L6ER]]
         xlFilePath = ../../AliceSpringsMulga/level3_intermediates/Partitioning/
-        xlFileName = ASM_EC_2015_NightER_Filled.xls
+        xlFileName = ASM_EC_2016_NightER_Filled.xls
         xlHeaderRow  = 2
         xl1stDataRow = 3
         ncFilePath = ../ncData/ASM/
-        ncFileName = ASM_EC_2015_L6ER_night.nc
+        ncFileName = ASM_EC_2016_L6ER_night.nc
     [[L6]]
         ncFilePath = ../ncData/ASM/
-        ncFileName = ASM_EC_2015_L6part.nc
+        ncFileName = ASM_EC_2016_L6part.nc
         xlFilePath = ../../AliceSpringsMulga/level3_intermediates/
-        xlFileName = ASM_EC_2015_L6_ER_GPP.xls
+        xlFileName = ASM_EC_2016_L6_CE_GPP.xls
 
 [Params]
     firstMonth = 1

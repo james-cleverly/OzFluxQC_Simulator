@@ -6,12 +6,12 @@ netCDFv3 = False
 
 [Files]
     [[L3]]
-        xlFilePath = ../AliceSpringsMulga/level3_intermediates/
-        xlFileName = ASM_EC_2013_L3_Corrected0.xls
+        xlFilePath = ../../AliceSpringsMulga/level3_intermediates/
+        xlFileName = ASM_EC_2016_L3_Corrected0.xls
         xlHeaderRow  = 10
         xl1stDataRow = 11
-        ncFilePath = ncData/ASM/
-        ncFileName = ASM_EC_2013_L3pin.nc
+        ncFilePath = ../ncData/ASM/
+        ncFileName = ASM_EC_2016_L3pin.nc
 
 [Global]
     study = "Carbon Partitioning"
@@ -63,7 +63,7 @@ netCDFv3 = False
     [[Fc]]
         [[[xl]]]
             sheet    = Data
-            name     = Fco2
+            name     = Fc_co2
         [[[Attr]]]
             ancillary_variables = "Fc_wpl QC flag"
             long_name = "Flux of carbon, Raw uncorrected, CO2 flux, rotated to natural wind coordinates and frequency response corrected, WPL corrected Fc"

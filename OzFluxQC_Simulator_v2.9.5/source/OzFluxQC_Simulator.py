@@ -291,28 +291,35 @@ class qcgui(Tkinter.Frame):
         self.do_progress(text='Doing L3 QC & Corrections ...')
         self.ds3 = qcls.l3qc(self.cf,self.ds2)
         self.do_progress(text='Finished L3')
-        txtstr = ' Finished L3: Standard processing for site: '
-        txtstr = txtstr+self.ds3.globalattributes['site_name'].replace(' ','')
-        log.info(txtstr)
-        self.do_progress(text='Saving L3 QC & Corrected NetCDF data ...')                     # put up the progress message
-        outfilename = qcio.get_outfilename_from_cf(self.cf,'L3')
-        if len(outfilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
-        ncFile = qcio.nc_open_write(outfilename)
-        log.info(' Writing netCDF file')
-        qcio.nc_write_series(ncFile,self.ds3)                   # save the L3 data
-        if qcutils.cfkeycheck(self.cf,Base='Output',ThisOne='nc'):
-            outfilename2 = qcio.get_outfilename_from_cf(self.cf,'L3_Corrected')
-            self.ds3x = copy.deepcopy(self.ds3)
-            self.ds3x.globalattributes['Level'] = 'L3_Corrected'
-            if len(outfilename2)==0: self.do_progress(text='An error occurred, check the console ...'); return
-            ncFile = qcio.nc_open_write(outfilename2)
-            outputlist = qcio.get_outputlist_from_cf(self.cf,'nc')
+        try:
+            txtstr = ' Finished L3: Standard processing for site: '
+            txtstr = txtstr+self.ds3.globalattributes['site_name'].replace(' ','')
+            log.info(txtstr)
+            
+            self.do_progress(text='Saving L3 QC & Corrected NetCDF data ...')                     # put up the progress message
+            outfilename = qcio.get_outfilename_from_cf(self.cf,'L3')
+            if len(outfilename)==0: self.do_progress(text='An error occurred, check the console ...'); return
+            ncFile = qcio.nc_open_write(outfilename)
             log.info(' Writing netCDF file')
-            qcio.nc_write_series(ncFile,self.ds3x,outputlist=outputlist)
-        self.do_progress(text='Finished saving L3 QC & Corrected NetCDF data')              # tell the user we are done
-        log.info(' Finished saving L3 QC & Corrected NetCDF data')
-        print '\a'
-
+            qcio.nc_write_series(ncFile,self.ds3)                   # save the L3 data
+            if qcutils.cfkeycheck(self.cf,Base='Output',ThisOne='nc'):
+                outfilename2 = qcio.get_outfilename_from_cf(self.cf,'L3_Corrected')
+                self.ds3x = copy.deepcopy(self.ds3)
+                self.ds3x.globalattributes['Level'] = 'L3_Corrected'
+                if len(outfilename2)==0: self.do_progress(text='An error occurred, check the console ...'); return
+                ncFile = qcio.nc_open_write(outfilename2)
+                outputlist = qcio.get_outputlist_from_cf(self.cf,'nc')
+                log.info(' Writing netCDF file')
+                qcio.nc_write_series(ncFile,self.ds3x,outputlist=outputlist)
+            self.do_progress(text='Finished saving L3 QC & Corrected NetCDF data')              # tell the user we are done
+            log.info(' Finished saving L3 QC & Corrected NetCDF data')
+            print '\a'
+        except:
+            txtstr = ' Interupted L3: Error prevented completion for site: '
+            txtstr = txtstr+self.ds2.globalattributes['site_name'].replace(' ','')
+            log.info(txtstr)
+            print '\a'
+    
     def do_l4to6qc(self):
         """
             Call qcls.l4qc_gapfill function

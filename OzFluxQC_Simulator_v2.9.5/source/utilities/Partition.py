@@ -16,7 +16,7 @@
 
 """
     Partition Data Main GUI
-    Used to NEE into GPP and ER
+    Used to partition NEE into GPP and CE (CE = ER + abiotic decomposition)
     
     Nighttime ER:  determined from exponential relationship between temperature (nocturnal mean) and Fc (nocturnal sum) on nights without missing observations; binned in soil moisture classes
     Daytime ER:  determined from light response curve between Fsi and Fc; binned in temperature classes
@@ -49,7 +49,7 @@ class qcgui(Tkinter.Frame):
     def createWidgets(self):
         self.process2Label = Tkinter.Label(self,text='L3: ER_night')
         self.process2Label.grid(row=0,column=1,columnspan=1)
-        self.process3Label = Tkinter.Label(self,text='L6: ER_dark PD ER_day ER & GPP')
+        self.process3Label = Tkinter.Label(self,text='L6: ER_dark PD CE_day CE & GPP')
         self.process3Label.grid(row=0,column=2,columnspan=1)
         self.process3Label = Tkinter.Label(self,text='L3: Conditional correlation')
         self.process3Label.grid(row=0,column=3,columnspan=1)
@@ -67,7 +67,7 @@ class qcgui(Tkinter.Frame):
         self.initiateLabel.grid(row=2,column=0,columnspan=1)
         self.doL3Button = Tkinter.Button (self, text="ER_night", command=self.do_l3_er_night )
         self.doL3Button.grid(row=2,column=1,columnspan=1)
-        self.doL6aButton = Tkinter.Button (self, text="Day ER & GPP", command=self.do_l6_partition )
+        self.doL6aButton = Tkinter.Button (self, text="Day CE & GPP", command=self.do_l6_partition )
         self.doL6aButton.grid(row=2,column=2,columnspan=1)
         
         self.filesave2Label = Tkinter.Label(self,text='-> Xcel')

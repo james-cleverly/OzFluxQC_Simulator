@@ -4,11 +4,11 @@
 [Files]
     [[L6]]
         in_file_path = ../AliceSpringsMulga/level3_intermediates/
-        in_filename = ASM_EC_2013_FullPreFilled.xls
+        in_filename = ASM_EC_2016_FullPreFilled.xls
         in_headerrow  = 10
         in_firstdatarow = 11
         out_file_path = ncData/ASM/
-        out_filename = ASM_EC_2013_L6int.nc
+        out_filename = ASM_EC_2016_L6int.nc
 
 [Global]
     contact  = "james.cleverly@uts.edu.au"
@@ -17,17 +17,11 @@
     license_type = "TERN-BY"
     license_url = "http://www.tern.org.au/datalicence/TERN-BY/1.0"
     canopy_height = "6.5m"
-    comment01 = "GPP & Re corrected 2 March 2013, consistent with reference2"
-    comment02 = "Re-analysis 31 July 2013:  Cross-sensor sigma-v re-defined to crosswind sigma-v.  Correction to crosswind footprint distribution and rotation of covariances contributing to momentum transfer."
-    comment03 = "Re-analysis 13 Aug 2013:  Met data gaps on 14/6/2013 filled using SOLO ANN between ASM and nearby TTE.  Gaps filled:  (Fg, Fsd, Fn, Ts[by linear interpolation], q, Ta, VPD); TTE training data:  (Fg, Fn, Ts, Sws, Ta, q, VPD).  Fluxes re-filled using SOLO and gap-filled met variables (not including Sws)"
-    comment04 = "27 Aug 2013:  Penman-Monteith inversion variables consistent with reference3"
-    comment05 = "Re-analysis 26 Sep 2013:  Units error in WPL corrected.  Error resulted in < 1% bias error in Fc and < 0.5% in Fe"
-    comment06 = "Re-analysis 28 Oct 2013:  Correction of error in computation of rhod (error:  computing total density of air, not partial density of the dry component)"
-    comment07 = "30 Oct 2013:  Carbon flux outputs converted at L3 and L4:  Fc [mgC m-2 s-1], Fco2 [mgCO2 m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
-    comment08 = "Re-analysis 15 Nov 2013:  L4 gap fill using corrected fluxes"
+    comment07 = "Carbon flux outputs:  Fc [mgC m-2 s-1], Fco2 [mgCO2 m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
     comment10 = "1 Jan 2014:  Units for Fc and Fco2 corrected"
     comment11 = "17 July 2014:  Carbon flux outputs converted at L3 and L4:  Fc [mgCO2 m-2 s-1], Fc_co2 [mgCO2 m-2 s-1], Fc_c [mgC m-2 s-1], NEE [umol m-2 s-1], NEP = -NEE"
     comment13 = "16 Dec 2015: L6 semantics updated to follow Chapin et al. 2006: NEE = ER - GPP; ER: ecosystem respiration (equivalent to ecosystem decomposition)"
+    comment14 = "11 May 2016: L6 semantics updated to Cleverly et al. (2016a, b; submitted to Biogeosciences): NEE = CE - GPP = (ER + CE) - GPP; CE:  ecosystem-scale CO2 efflux; ER: ecosystem respiration; GPP: gross primary production"
     conventions = "CF-1.6"
     conventions_names = "CF convention standard names table version 27, 28 Nov 2013, audited 4 Jan 2015"
     data_url = "http://data.ozflux.org.au"
@@ -54,7 +48,7 @@
     site = "Alice Springs Mulga, Northern Territory, Australia"
     soil = "red kandosol, sandy loam"
     source = "13.7m flux tower plus array of soil sensors"
-    title = "Flux tower data set from the Alice Springs Mulga site for the calendar year 2013"
+    title = "Flux tower data set from the Alice Springs Mulga site for the calendar year 2016"
     time_step = 30
     time_zone = "Australia/Darwin"
     tower_height = "13.7 m"
@@ -64,7 +58,7 @@
     vegetation3 = "C3 understorey grass:  perennial Thyridolepsis mitchelliana (Window mulga-grass)"
     vegetation4 = "C4 understorey grasses:  perennial Eragrostis eriopoda (Naked woolybutt) and annual Eriachne pulchella ssp pulchella (Pretty wanderrie)"
     version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J, and P Isaac (2015), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.14083."
+    version_citation = "Cleverly, J, and P Isaac (2016), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.50109."
 
 [Output]
     DefaultXl = False
@@ -1299,13 +1293,13 @@
             long_name = "Rainfall, 30 minute total"
             units    = "mm"
             standard_name = "rainfall_amount"
-    [[ER]]
+    [[CE]]
         [[[xl]]]
             sheet    = Data
-            name     = ER
+            name     = CE
         [[[Attr]]]
-            ancillary_variables = "ER QC flag"
-            long_name = "Ecosystem respiration gapfilled using modelled from Q10 response curve binned by soil volumetric moisture content class (night) and intercept of light response curve binned by temperature class (day)"
+            ancillary_variables = "CE QC flag"
+            long_name = "Ecosystem CO2 efflux gapfilled using modelled from Q10 response curve binned by soil volumetric moisture content class (night) and intercept of light response curve binned by temperature class (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
     [[ER_night]]
@@ -1326,22 +1320,22 @@
             long_name = "Ecosystem dark respiration from the intercept of a light response curve (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
-    [[ER_day]]
+    [[CE_day]]
         [[[xl]]]
             sheet    = Data
-            name     = ER_day
+            name     = CE_day
         [[[Attr]]]
-            ancillary_variables = "ER_day QC flag"
-            long_name = "Daytime ecosystem decomposition attributed to biotic respiration (ER_bio) and physical decomposition (PD)"
+            ancillary_variables = "CE_day QC flag"
+            long_name = "Daytime ecosystem CO2 efflux attributed to biotic respiration (ER) and physical decomposition (PD)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
-    [[ER_NEEmax]]
+    [[CE_NEEmax]]
         [[[xl]]]
             sheet    = Data
-            name     = ER_NEEmax
+            name     = CE_NEEmax
         [[[Attr]]]
-            ancillary_variables = "ER_NEEmax QC flag"
-            long_name = "Daytime ecosystem decomposition attributed to maximal NEE rates in the absence of GPP as a function of temperature"
+            ancillary_variables = "CE_NEEmax QC flag"
+            long_name = "Daytime ecosystem CO2 efflux attributed to maximal NEE rates in the absence of GPP as a function of temperature"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
     [[GPP]]
@@ -1350,7 +1344,7 @@
             name     = GPP
         [[[Attr]]]
             ancillary_variables = "GPP QC flag"
-            long_name = "Gross primary production, determined as ER - Fc (day)"
+            long_name = "Gross primary production, determined as CE - Fc (day)"
             units    = "umol/(m2 s)"
             standard_name = "not defined"
     [[Ta_1147cm]]
@@ -1714,24 +1708,51 @@
             units    = "mm/30min"
             standard_name = "lwe_water_evaporation_rate"
             Level = "L3"
-    [[zi]]
+    [[red_in]]
         [[[xl]]]
             sheet    = Data
-            name     = zi
+            name     = red_in
         [[[Attr]]]
-            long_name = "Height of the convective boundary layer, output from BOM TAPM"
-            units    = "m"
-            ancillary_variables = "zi QC flag"
-            standard_name = "atmosphere_boundary_layer_thickness"
-    [[xr]]
-        [[[xl]]]
-            sheet    = Data
-            name     = xr
-        [[[Attr]]]
-            long_name = "integrated footprint in the direction of the wind"
-            units    = "m"
-            ancillary_variables = "xr QC flag"
+            ancillary_variables = "red_in QC flag"
+            long_name = "Red in (NDVI sensor)"
+            units    = "none"
             standard_name = "not defined"
+    [[nIR_in]]
+        [[[xl]]]
+            sheet    = Data
+            name     = nIR_in
+        [[[Attr]]]
+            ancillary_variables = "nIR_in QC flag"
+            long_name = "Near infrared in (NDVI sensor)"
+            units    = "none"
+            standard_name = "not defined"
+    [[red_ref]]
+        [[[xl]]]
+            sheet    = Data
+            name     = red_ref
+        [[[Attr]]]
+            ancillary_variables = "red_ref QC flag"
+            long_name = "Red reference (NDVI sensor)"
+            units    = "none"
+            standard_name = "not defined"
+    [[nIR_ref]]
+        [[[xl]]]
+            sheet    = Data
+            name     = nIR_ref
+        [[[Attr]]]
+            ancillary_variables = "nIR_ref QC flag"
+            long_name = "Near infrared reference (NDVI sensor)"
+            units    = "none"
+            standard_name = "not defined"
+    [[NDVI]]
+        [[[xl]]]
+            sheet    = Data
+            name     = NDVI
+        [[[Attr]]]
+            ancillary_variables = "NDVI QC flag"
+            long_name = "Normalised vegetation difference index (NDVI)"
+            units    = "none"
+            standard_name = "normalized_difference_vegetation_index"
     [[w_Sd]]
         [[[xl]]]
             sheet    = Data
@@ -1760,3 +1781,118 @@
             units    = "m"
             ancillary_variables = "v_Sd QC flag"
             standard_name = "not defined"
+    [[Ws_WS4_200cm]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Ws_WS4_200cm
+        [[[Attr]]]
+            ancillary_variables = "Ws_WS4_200cm QC flag"
+            long_name = "Wind speed (WindSonic4) at 2m"
+            units    = "m/s"
+            standard_name = "wind_speed"
+    [[Ws_WS4_200cm_Sd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Ws_WS4_200cm_Sd
+        [[[Attr]]]
+            ancillary_variables = "Ws_WS4_200cm_Sd QC flag"
+            long_name = "Standard deviation of wind speed (WindSonic4) at 2m"
+            units    = "m/s"
+            standard_name = "not defined"
+    [[Wd_WS4_200cm]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Wd_WS4_200cm
+        [[[Attr]]]
+            ancillary_variables = "Wd_WS4_200cm QC flag"
+            long_name = "Wind direction (WindSonic4) at 2m"
+            units    = "deg"
+            standard_name = "wind_from_direction"
+    [[Wd_WS4_200cm_Sd]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Wd_WS4_200cm_Sd
+        [[[Attr]]]
+            ancillary_variables = "Wd_WS4_200cm_Sd QC flag"
+            long_name = "Standard deviation of wind direction (WindSonic4) at 2m"
+            units    = "deg"
+            standard_name = "not defined"
+    [[Diag_WS4]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Diag_WS4
+        [[[Attr]]]
+            ancillary_variables = "Diag_WS4 QC flag"
+            long_name = "WindSonic4 diagnostic value"
+            units    = "none"
+            standard_name = "not defined"
+    [[Fn_02]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fn_02
+        [[[Attr]]]
+            ancillary_variables = "Fn_02 QC flag"
+            long_name = "Net radiation"
+            units    = "W/m2"
+            instrument = "Kipp and Zonen CNR4"
+            standard_name = "surface_net_downwawrd_radiative_flux"
+    [[Flu_02]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Flu_02
+        [[[Attr]]]
+            ancillary_variables = "Flu_02 QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Up-welling long wave"
+            standard_name = "surface_upwelling_longwave_flux_in_air"
+            units = "W/m2"
+    [[Fld_02]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fld_02
+        [[[Attr]]]
+            ancillary_variables = "Fld_02 QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Down-welling long wave"
+            standard_name = "surface_downwelling_longwave_flux_in_air"
+            units = "W/m2"
+    [[Fsd_02]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fsd_02
+        [[[Attr]]]
+            ancillary_variables = "Fsd_02 QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Down-welling short wave"
+            standard_name = "surface_downwelling_shortwave_flux_in_air"
+            units = "W/m2"
+    [[Fsu_02]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Fsu_02
+        [[[Attr]]]
+            ancillary_variables = "Fsu_02 QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "Up-welling short wave"
+            standard_name = "surface_upwelling_shortwave_flux_in_air"
+            units = "W/m2"
+    [[Tb_Fl_02]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Tb_Fl_02
+        [[[Attr]]]
+            ancillary_variables = "Tb_Fl_02 QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "CNR4 body temperature, used for computing Fld and Flu"
+            standard_name = "not defined"
+            units = "C"
+    [[Tb_Fl]]
+        [[[xl]]]
+            sheet    = Data
+            name     = Tb_Fl
+        [[[Attr]]]
+            ancillary_variables = "Tb_Fl QC flag"
+            instrument = "Kipp and Zonen CNR1"
+            long_name = "CNR1 body temperature, used for computing Fld and Flu"
+            standard_name = "not defined"
+            units = "C"

@@ -61,17 +61,17 @@ def l3partition(cf,ds2):
     
 
 def l6partition(cf,ds5):
-    '''Processing OzFlux_Level4 data to partition daytime ER and GPP'''
+    '''Processing OzFlux_Level4 data to partition daytime ER, CE and GPP'''
     # make a copy of the OzFlux_Level4 data
     ds6 = copy.deepcopy(ds5)
     ds6.globalattributes['Level'] = 'L6'
     # prep nighttime ER observations
     pts.ER_nightL6(cf,ds6,'ER_night_gapfilled')
     if 'AliceSpringsMulga' in ds6.globalattributes['site_name']:
-        pts.DayERGPP_ASM(cf,ds6,'Fc')
+        pts.DayCEGPP_ASM(cf,ds6,'Fc')
     elif 'TiTreeEast' in ds6.globalattributes['site_name']:
         pts.DayERdark_TTE(cf,ds6,'Fc')
-        pts.DayPD_ER_GPP_TTE(cf,ds6,'NEE')
+        pts.DayPD_CE_GPP_TTE(cf,ds6,'NEE')
     else:
         log.error(' Site designation undefined in ds6.globalattributes:xl_filename')
     

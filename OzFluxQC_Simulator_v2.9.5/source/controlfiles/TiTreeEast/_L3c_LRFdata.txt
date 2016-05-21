@@ -6,10 +6,10 @@
 
 [Files]
     [[Partitioning]]
-        ncFilePath = ncData/TTE/
-        ncFileName = TTE_EC_2015_L4part.nc
-        xlFilePath = ../TiTreeEast/level5partitioning/
-        xlFileName = TTE_EC_2015_Night_data.xls
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2016_L4part.nc
+        xlFilePath = ../../TiTreeEast/level5partitioning/
+        xlFileName = TTE_EC_2016_Night_data.xls
 
 [Params]
     firstMonth = 1

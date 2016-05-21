@@ -297,12 +297,22 @@ def l3qc(cf,ds2):
         # interpolate over any ramaining gaps up to 3 hours in length
         qcts.AverageSeriesByElements(cf,ds3,'Ts')
         qcts.AverageSeriesByElements(cf,ds3,'Sws')
-        for ThisOne in ['Fg_grass_tmp','Fg_spinifex_tmp','Fg_mulga_tmp','Ts_spinifex_0cm_tmp','Ts_mulga_0cm_tmp','Sws_spinifex_0cm_tmp','Sws_mulga_0cm_tmp','Sws_grass_0cm_tmp']:
-            qcts.MergeSeries(cf,ds3,ThisOne,[0,10])
-            qcts.InterpolateOverMissing(cf,ds3,series=ThisOne,maxlen=6)
+        for ThisOne in ['Fg_grass_tmp','Fg_spinifex_tmp','Fg_mulga_tmp','Ts_spinifex_0cm_tmp','Ts_mulga_0cm_tmp','Sws_spinifex_0cm_tmp','Sws_mulga_0cm_tmp','Sws_grass_0cm_tmp','Fg_bs_tmp','Fg_ms_tmp','Fg_mu_tmp','Ts_bs_tmp','Ts_ms_tmp','Ts_mu_tmp','Sws_bs_tmp','Sws_ms_tmp','Sws_mu_tmp']:
+            if qcutils.cfkeycheck(cf, ThisOne=ThisOne):
+                qcts.MergeSeries(cf,ds3,ThisOne,[0,10])
+                qcts.InterpolateOverMissing(cf,ds3,series=ThisOne,maxlen=6)
         
-        qcts.AverageSeriesByElements(cf,ds3,'Ts_tmp')
-        qcts.AverageSeriesByElements(cf,ds3,'Sws_tmp')
+        if qcutils.cfkeycheck(cf, ThisOne='Ts_tmp'):
+            qcts.AverageSeriesByElements(cf,ds3,'Ts_tmp')
+        else:
+            log.error('  Ts_tmp not specified in controlfile')
+            return
+        
+        if qcutils.cfkeycheck(cf, ThisOne='Sws_tmp'):
+            qcts.AverageSeriesByElements(cf,ds3,'Sws_tmp')
+        else:
+            log.error('  Sws_tmp not specified in controlfile')
+            return
         
     # correct the measured soil heat flux for storage in the soil layer above the sensor
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='Corrections') and cf['Functions']['Corrections'] == 'True':
@@ -311,14 +321,23 @@ def l3qc(cf,ds2):
         except:
             ds3.globalattributes['L3Functions'] = 'CorrectFgForStorage'
         
-        if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='PostCorrectSoilAverage') and cf['Functions']['PostCorrectSoilAverage'] == 'True':
+        if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='IndividualFgCorrection') and cf['Functions']['IndividualFgCorrection'] == 'True':
             qcts.CorrectIndividualFgForStorage(cf,ds3)
-            qcts.AverageSeriesByElements(cf,ds3,'Fg')
             qcts.CorrectIndividualFgForStorage(cf,ds3,level='_tmp')
-            qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
-        else:
             qcts.AverageSeriesByElements(cf,ds3,'Fg')
-            qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
+            if qcutils.cfkeycheck(cf, ThisOne='Fg_tmp'):
+                qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
+            else:
+                log.error('  Fg_tmp not specified in controlfile')
+                return
+        else:
+            if qcutils.cfkeycheck(cf, ThisOne='Fg_tmp'):
+                qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
+            else:
+                log.error('  Fg_tmp not specified in controlfile')
+                return
+            
+            qcts.AverageSeriesByElements(cf,ds3,'Fg')
             qcts.CorrectGroupFgForStorage(cf,ds3)
             qcts.CorrectGroupFgForStorage(cf,ds3,level='_tmp')
     
@@ -639,7 +658,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
     for ThisOne in ['NEE','NEP','Fc','Fc_co2','Fc_c','Fe','Fh']:
         if ThisOne in ds4x.series.keys() and ThisOne in ds3.series.keys():
             ds4x.series[ThisOne] = ds3.series[ThisOne].copy()
-    for ThisOne in ['GPP','ER']:
+    for ThisOne in ['GPP','CE','ER_night','ER_dark','CE_day','CE_NEEmax','ER_bio','PD','ER_n','ER_LRF']:
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
@@ -668,7 +687,7 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
             qcio.get_seriesstats(cf,ds5)
     if OutLevel == 'L6':
         ds5z = copy.deepcopy(ds5)
-        for ThisOne in ['GPP','ER']:
+        for ThisOne in ['GPP','CE','ER_night','ER_dark','CE_day','CE_NEEmax','ER_bio','PD','ER_n','ER_LRF']:
             if ThisOne in ds3x.series.keys():
                 ds5z.series[ThisOne] = ds3x.series[ThisOne].copy()
         ds6,z = l6qc(cf,ds5z,z)

@@ -250,109 +250,109 @@ def conditional_correlation(cf,ds):
     log.info(' Cov(wc)up: '+str(cov_up_wc))
     log.info(' Cor(cq)up:  '+str(corr_up_cq))
     
-    # determine ER*up and GPP**up
-    ERindex = numpy.ma.where(cov_up_wc>0)[0]
-    if len(ERindex) > 0:
-        ERstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
+    # determine CE*up and GPP**up
+    CEindex = numpy.ma.where(cov_up_wc>0)[0]
+    if len(CEindex) > 0:
+        CEstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
         GPPstarstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-        ERstar_up[ERindex] = scale_up_cq[ERindex]*cov_up_wc[ERindex]
-        GPPstarstar_up[ERindex] = (1-scale_up_cq[ERindex])*cov_up_wc[ERindex]
-        ERstar_up0 = numpy.mean(ERstar_up[ERindex])
-        GPPstarstar_up0 = numpy.mean(GPPstarstar_up[ERindex])
+        CEstar_up[CEindex] = scale_up_cq[CEindex]*cov_up_wc[CEindex]
+        GPPstarstar_up[CEindex] = (1-scale_up_cq[CEindex])*cov_up_wc[CEindex]
+        CEstar_up0 = numpy.mean(CEstar_up[CEindex])
+        GPPstarstar_up0 = numpy.mean(GPPstarstar_up[CEindex])
     else:
-        ERstar_up0 = 0
+        CEstar_up0 = 0
         GPPstarstar_up0 = 0
     
-    # determine GPP*up and ER**up
+    # determine GPP*up and CE**up
     GPPindex = numpy.ma.where(cov_up_wc<0)[0]
     if len(GPPindex) > 0:
         GPPstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
-        ERstarstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
+        CEstarstar_up = numpy.ma.zeros(n_scales,dtype=numpy.float64) -9999
         GPPstar_up[GPPindex] = (1-scale_up_cq[GPPindex])*-cov_up_wc[GPPindex]
-        ERstarstar_up[GPPindex] = scale_up_cq[GPPindex]*-cov_up_wc[GPPindex]
+        CEstarstar_up[GPPindex] = scale_up_cq[GPPindex]*-cov_up_wc[GPPindex]
         GPPstar_up0 = numpy.mean(GPPstar_up[GPPindex])
-        ERstarstar_up0 = numpy.mean(ERstarstar_up[GPPindex])
+        CEstarstar_up0 = numpy.mean(CEstarstar_up[GPPindex])
     else:
         GPPstar_up0 = 0
-        ERstarstar_up0 = 0
+        CEstarstar_up0 = 0
     
-    ERstar = (ERstar_up0 + ERstarstar_up0) / 2
+    CEstar = (CEstar_up0 + CEstarstar_up0) / 2
     GPPstar = (GPPstar_up0 + GPPstarstar_up0) / 2
     
     # determine the scaling parameter between C uptake and emissions:
-    # (GPP*up + GPP**up) = alpha(ER*up + ER**up)
-    alpha = ERstar / GPPstar
+    # (GPP*up + GPP**up) = alpha(CE*up + CE**up)
+    alpha = CEstar / GPPstar
     log.info(' GPP*up: '+str(GPPstar_up0))
     log.info(' GPP**up:  '+str(GPPstarstar_up0))
-    log.info(' ER*up: '+str(ERstar_up0))
-    log.info(' ER**up:  '+str(ERstarstar_up0))
+    log.info(' CE*up: '+str(CEstar_up0))
+    log.info(' CE**up:  '+str(CEstarstar_up0))
     
-    net = ERstar - GPPstar
-    gross = ERstar + GPPstar
+    net = CEstar - GPPstar
+    gross = CEstar + GPPstar
     delta = NEE - net
     if delta < 0:
         GPPstarhat = GPPstar - delta
-        ERstarhat = ERstar
+        CEstarhat = CEstar
     else:
         GPPstarhat = GPPstar
-        ERstarhat = ERstar + delta
-    grosshat = ERstarhat + GPPstarhat
-    alphahat = ERstarhat / GPPstarhat
+        CEstarhat = CEstar + delta
+    grosshat = CEstarhat + GPPstarhat
+    alphahat = CEstarhat / GPPstarhat
     
-    # ER0: SR+PD
+    # CE0: SR+PD
     if NEE > 0:
         # case 1:  GPP from 1/alpha-hat
         GPP0_1 = NEE + (NEE/alphahat)
-        ER0_1 = NEE + GPP0_1
-        if ER0_1 > dER:
-            ER_1 = ER0_1
+        CE0_1 = NEE + GPP0_1
+        if CE0_1 > dER:
+            CE_1 = CE0_1
             GPP_1 = GPP0_1
         else:
-            ER_1 = dER
-            GPP_1 = ER_1 - NEE
-        PD_1 = ER_1 - dER
+            CE_1 = dER
+            GPP_1 = CE_1 - NEE
+        PD_1 = CE_1 - dER
         # case 2:  RE from alpha-hat
-        ER0_2 = NEE + (NEE*alphahat)
-        if ER0_2 > dER:
-            ER_2 = ER0_2
+        CE0_2 = NEE + (NEE*alphahat)
+        if CE0_2 > dER:
+            CE_2 = CE0_2
         else:
-            ER_2 = dER
-        GPP_2 = -(NEE-ER_2)
-        PD_2 = ER_2 - dER
-        if ER_1 > ER_2:
+            CE_2 = dER
+        GPP_2 = -(NEE-CE_2)
+        PD_2 = CE_2 - dER
+        if CE_1 > CE_2:
             PD = PD_2
-            ER = ER_2
+            CE = CE_2
             GPP = GPP_2
         else:
             PD = PD_1
-            ER = ER_1
+            CE = CE_1
             GPP = GPP_1
     else:
         # case 1:  GPP from 1/alpha-hat
         GPP0_1 = -NEE + (-NEE/alphahat)
-        ER0_1 = NEE + GPP0_1
-        if ER0_1 > dER:
-            ER_1 = ER0_1
+        CE0_1 = NEE + GPP0_1
+        if CE0_1 > dER:
+            CE_1 = CE0_1
             GPP_1 = GPP0_1
         else:
-            ER_1 = dER
-            GPP_1 = ER_1 - NEE
-        PD_1 = ER_1 - dER
+            CE_1 = dER
+            GPP_1 = CE_1 - NEE
+        PD_1 = CE_1 - dER
         # case 2:  RE from alpha-hat
-        ER0_2 = NEE + (NEE*alphahat)
-        if ER0_2 > dER:
-            ER_2 = ER0_2
+        CE0_2 = NEE + (NEE*alphahat)
+        if CE0_2 > dER:
+            CE_2 = CE0_2
         else:
-            ER_2 = dER
-        GPP_2 = -(NEE-ER_2)
-        PD_2 = ER_2 - dER
-        if ER_1 > ER_2:
+            CE_2 = dER
+        GPP_2 = -(NEE-CE_2)
+        PD_2 = CE_2 - dER
+        if CE_1 > CE_2:
             PD = PD_2
-            ER = ER_2
+            CE = CE_2
             GPP = GPP_2
         else:
             PD = PD_1
-            ER = ER_1
+            CE = CE_1
             GPP = GPP_1
     
     filename = str(cf['Files']['L1']['in_filename'])
@@ -360,16 +360,16 @@ def conditional_correlation(cf,ds):
     log.info(' net:  '+str(net))
     log.info(' gross:  '+str(gross))
     log.info(' delta:  '+str(delta))
-    log.info(' ER*:  '+str(ERstar))
+    log.info(' CE*:  '+str(CEstar))
     log.info(' GPP*:  '+str(GPPstar))
-    log.info(' ER*hat:  '+str(ERstarhat))
+    log.info(' CE*hat:  '+str(CEstarhat))
     log.info(' GPP*hat:  '+str(GPPstarhat))
     log.info(' alpha_hat: '+str(alphahat))
     log.info(' gross_hat:  '+str(grosshat))
     log.info('  PD case 1:  '+str(PD_1))
     log.info('  PD case 2:  '+str(PD_2))
-    log.info('  ER case 1:  '+str(ER_1))
-    log.info('  ER case 2:  '+str(ER_2))
+    log.info('  CE case 1:  '+str(CE_1))
+    log.info('  CE case 2:  '+str(CE_2))
     log.info('  GPP case 1:  '+str(GPP_1))
     log.info('  GPP case 2:  '+str(GPP_2))
     log.info(str(filename))
@@ -381,10 +381,10 @@ def conditional_correlation(cf,ds):
     log.info(str(nRecs))
     print "\n"
     print filename+"\n"
-    print " NEE:  "+str(NEE)+"\n dER:  "+str(dER)+"\n  PD:  "+str(PD)+"\n  ER:  "+str(ER)+"\n GPP:  "+str(GPP)+"\n\n"
+    print " NEE:  "+str(NEE)+"\n dER:  "+str(dER)+"\n  PD:  "+str(PD)+"\n  CE:  "+str(CE)+"\n GPP:  "+str(GPP)+"\n\n"
 
-def DayERGPP_ASM(cf,ds,Fc_in):
-    log.info('Beginning: Daytime ER/GPP partitioning')
+def DayCEGPP_ASM(cf,ds,Fc_in):
+    log.info('Beginning: Daytime CE/GPP partitioning')
     Fcmg,Fc_flag = putils.GetSeriesasMA(ds,Fc_in)
     Fc = Fcmg / c.Mco2
     ER_night,ER_night_flag = putils.GetSeriesasMA(ds,'ER_night')
@@ -392,16 +392,16 @@ def DayERGPP_ASM(cf,ds,Fc_in):
     Fsd,f = putils.GetSeriesasMA(ds,'Fsd')
     nRecs = len(Fcmg)
     
-    ER_umol = numpy.ma.zeros(nRecs,numpy.float64) -9999
-    ER_day = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    CE_umol = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    CE_day = numpy.ma.zeros(nRecs,numpy.float64) -9999
     ER_dark = numpy.ma.zeros(nRecs,numpy.float64) -9999
-    ER_NEEmax = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    CE_NEEmax = numpy.ma.zeros(nRecs,numpy.float64) -9999
     GPP = numpy.ma.zeros(nRecs,numpy.float64)
     NEE_day = numpy.ma.zeros(nRecs,numpy.float64) + Fc
-    ER_day_flag = numpy.zeros(nRecs,numpy.int32)
+    CE_day_flag = numpy.zeros(nRecs,numpy.int32)
     ER_dark_flag = numpy.zeros(nRecs,numpy.int32)
-    ER_NEEmax_flag = numpy.zeros(nRecs,numpy.int32)
-    ER_umol_flag = numpy.zeros(nRecs,numpy.int32)
+    CE_NEEmax_flag = numpy.zeros(nRecs,numpy.int32)
+    CE_umol_flag = numpy.zeros(nRecs,numpy.int32)
     GPP_flag = numpy.zeros(nRecs,numpy.int32)
     NEE_day_flag = numpy.zeros(nRecs,numpy.int32) + Fc_flag
     
@@ -412,12 +412,12 @@ def DayERGPP_ASM(cf,ds,Fc_in):
     Fsd_max_index = numpy.where(Fsd > 500)[0]
     ER_dark_Ts_low_index = numpy.where((Ts < 27.5) & (Fsd > 1))[0]
     ER_dark_Ts_high_index = numpy.where((Ts > 27.5) & (Fsd > 1))[0]
-    ER_NEEmax_Ts_low_index = numpy.where((Ts < 36.75) & (Fsd > 500))[0]
-    ER_NEEmax_Ts_high_index = numpy.where((Ts > 36.75) & (Fsd > 500))[0]
+    CE_NEEmax_Ts_low_index = numpy.where((Ts < 36.75) & (Fsd > 500))[0]
+    CE_NEEmax_Ts_high_index = numpy.where((Ts > 36.75) & (Fsd > 500))[0]
     ER_dark_flag[ER_dark_Ts_low_index] = numpy.int32(100)
     ER_dark_flag[ER_dark_Ts_high_index] = numpy.int32(100)
-    ER_NEEmax_flag[ER_NEEmax_Ts_low_index] = numpy.int32(100)
-    ER_NEEmax_flag[ER_NEEmax_Ts_high_index] = numpy.int32(100)
+    CE_NEEmax_flag[CE_NEEmax_Ts_low_index] = numpy.int32(100)
+    CE_NEEmax_flag[CE_NEEmax_Ts_high_index] = numpy.int32(100)
     
     a_dark_low = 0.3687931
     b_dark_low = 0.005857659
@@ -430,53 +430,53 @@ def DayERGPP_ASM(cf,ds,Fc_in):
     
     ER_dark[ER_dark_Ts_low_index] = a_dark_low * numpy.exp(b_dark_low * Ts[ER_dark_Ts_low_index])
     ER_dark[ER_dark_Ts_high_index] = a_dark_high * numpy.exp(b_dark_high * Ts[ER_dark_Ts_high_index])
-    ER_NEEmax[ER_NEEmax_Ts_low_index] = a_max_low * numpy.exp(b_max_low * Ts[ER_NEEmax_Ts_low_index])
-    ER_NEEmax[ER_NEEmax_Ts_high_index] = a_max_high * numpy.exp(b_max_high * Ts[ER_NEEmax_Ts_high_index])
-    ER_day[Fsd_dark_index] = ER_dark[Fsd_dark_index]
-    ER_day[Fsd_max_index] = ER_NEEmax[Fsd_max_index]
+    CE_NEEmax[CE_NEEmax_Ts_low_index] = a_max_low * numpy.exp(b_max_low * Ts[CE_NEEmax_Ts_low_index])
+    CE_NEEmax[CE_NEEmax_Ts_high_index] = a_max_high * numpy.exp(b_max_high * Ts[CE_NEEmax_Ts_high_index])
+    CE_day[Fsd_dark_index] = ER_dark[Fsd_dark_index]
+    CE_day[Fsd_max_index] = CE_NEEmax[Fsd_max_index]
     
     Fc_day = numpy.ma.masked_where(Fsd < 1,Fc)
-    max_index = numpy.where(Fc_day > ER_day)[0]
-    submax_index = numpy.where(Fc_day < ER_day)[0]
-    bad_index = numpy.where(ER_day == -9999)[0]
+    max_index = numpy.where(Fc_day > CE_day)[0]
+    submax_index = numpy.where(Fc_day < CE_day)[0]
+    bad_index = numpy.where(CE_day == -9999)[0]
     GPP[max_index] = 0
-    ER_day[max_index] = Fc_day[max_index]
-    ER_day_flag[max_index] = numpy.int32(120)
+    CE_day[max_index] = Fc_day[max_index]
+    CE_day_flag[max_index] = numpy.int32(120)
     GPP_flag[max_index] = numpy.int32(120)
-    GPP[submax_index] = ER_day[submax_index] - Fc_day[submax_index]
-    ER_day_flag[submax_index] = numpy.int32(100)
+    GPP[submax_index] = CE_day[submax_index] - Fc_day[submax_index]
+    CE_day_flag[submax_index] = numpy.int32(100)
     GPP_flag[submax_index] = numpy.int32(100)
     GPP[bad_index] = numpy.float64(-9999)
-    ER_day_flag[bad_index] = Fc_flag[bad_index]
+    CE_day_flag[bad_index] = Fc_flag[bad_index]
     GPP_flag[bad_index] = Fc_flag[bad_index]
     
     ER_dark[night_index] = numpy.float64(0)
-    ER_day[night_index] = numpy.float64(0)
-    ER_NEEmax[night_index] = numpy.float64(0)
+    CE_day[night_index] = numpy.float64(0)
+    CE_NEEmax[night_index] = numpy.float64(0)
     GPP[night_index] = numpy.float64(0)
     ER_dark_flag[night_index] = numpy.int32(110)
-    ER_day_flag[night_index] = numpy.int32(110)
-    ER_NEEmax_flag[night_index] = numpy.int32(110)
+    CE_day_flag[night_index] = numpy.int32(110)
+    CE_NEEmax_flag[night_index] = numpy.int32(110)
     GPP_flag[night_index] = numpy.int32(110)
-    noNEEmax_index = numpy.where(ER_NEEmax_flag == 0)[0]
-    ER_NEEmax[noNEEmax_index] = numpy.float64(0)
+    noNEEmax_index = numpy.where(CE_NEEmax_flag == 0)[0]
+    CE_NEEmax[noNEEmax_index] = numpy.float64(0)
     
-    ER_umol[day_index] = ER_day[day_index]
-    ER_umol_flag[day_index] = ER_day_flag[day_index]
-    ER_umol[night_index] = ER_night[night_index]
-    ER_umol_flag[night_index] = ER_night_flag[night_index]
+    CE_umol[day_index] = CE_day[day_index]
+    CE_umol_flag[day_index] = CE_day_flag[day_index]
+    CE_umol[night_index] = ER_night[night_index]
+    CE_umol_flag[night_index] = ER_night_flag[night_index]
     
     NEE_day[night_index] = numpy.float64(0)
     NEE_day_flag[night_index] = numpy.int32(110)
     
     putils.CreateSeries(ds,'NEE_day',NEE_day,Flag=NEE_day_flag,Descr='Daytime net ecosystem exchange of carbon',Units='umol/(m2 s)')
-    putils.CreateSeries(ds,'ER_day',ER_day,Flag=ER_day_flag,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'CE_day',CE_day,Flag=CE_day_flag,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'ER_dark',ER_dark,Flag=ER_dark_flag,Descr='Daytime dark ecosystem respiration',Units='umol/(m2 s)')
-    putils.CreateSeries(ds,'ER_NEEmax',ER_NEEmax,Flag=ER_NEEmax_flag,Descr='Daytime ecosystem respiration from NEEmax-Ts function',Units='umol/(m2 s)')
-    putils.CreateSeries(ds,'ER',ER_umol,Flag=ER_umol_flag,Descr='Ecosystem respiration',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'CE_NEEmax',CE_NEEmax,Flag=CE_NEEmax_flag,Descr='Daytime ecosystem respiration from NEEmax-Ts function',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'CE',CE_umol,Flag=CE_umol_flag,Descr='Ecosystem respiration',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'GPP',GPP,Flag=GPP_flag,Descr='Ecosystem Gross Primary Production',Units='umol/(m2 s)')
     
-    log.info('Day ER and GPP: All done')
+    log.info('Day CE and GPP: All done')
 
 def DayERdark_TTE(cf,ds,Fc_in,PD='False'):
     log.info('Beginning: ER_night and ER_dark partitioning')
@@ -484,14 +484,12 @@ def DayERdark_TTE(cf,ds,Fc_in,PD='False'):
     
     Fcmg,Fc_flag = putils.GetSeriesasMA(ds,Fc_in)
     Fc = Fcmg / c.Mco2
-    ER_umol,ER_flag = putils.GetSeriesasMA(ds,'ER_night')
     Ts,f = putils.GetSeriesasMA(ds,'Ts')
     Fsd,f = putils.GetSeriesasMA(ds,'Fsd')
     Sws,f = putils.GetSeriesasMA(ds,'Sws')
     Hdh,f = putils.GetSeriesasMA(ds,'Hdh')
     nRecs = len(Fcmg)
     
-    ER_day = numpy.ma.zeros(nRecs,numpy.float64)
     ER_dark = numpy.ma.zeros(nRecs,numpy.float64) + c.missing_value
     ER_darkFlag = numpy.ma.zeros(nRecs,numpy.float64) + 1
     
@@ -574,8 +572,8 @@ def DayERdark_TTE(cf,ds,Fc_in,PD='False'):
     
     log.info('Night ER and day ER_dark: All done')
 
-def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
-    log.info('Beginning: Daytime PD/ER/GPP partitioning')
+def DayPD_CE_GPP_TTE(cf,ds,Fc_in):
+    log.info('Beginning: Daytime PD/ER/CE/GPP partitioning')
     
     Fsd,f = putils.GetSeriesasMA(ds,'Fsd')
     Fc,Fc_flag = putils.GetSeriesasMA(ds,'Fc')
@@ -587,12 +585,14 @@ def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
     MergeSeries(cf,ds,'ER_bio',[0,10,20,30,40,50,60,70,80,90,100,120,130,140,150,160,170,180,190,200])
     ER_bio,ER_bio_flag = putils.GetSeriesasMA(ds,'ER_bio')
     
-    ER_day = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    CE_umol = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    CE_day = numpy.ma.zeros(nRecs,numpy.float64) -9999
     PD = numpy.ma.zeros(nRecs,numpy.float64) -9999
     GPP = numpy.ma.zeros(nRecs,numpy.float64) -9999
+    CE_umol_flag = numpy.zeros(nRecs,numpy.int32)
     GPP_flag = numpy.zeros(nRecs,numpy.int32)
     PD_flag = numpy.zeros(nRecs,numpy.int32)
-    ERday_flag = numpy.zeros(nRecs,numpy.int32)
+    CEday_flag = numpy.zeros(nRecs,numpy.int32)
     
     PDm_posNEE = 2.370716
     PDb_posNEE = -9.616950E-2
@@ -603,14 +603,14 @@ def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
     PD[posmonth_index] = (PDm_posNEE * NEE[posmonth_index]) + PDb_posNEE
     PD[negmonth_index] = 0
     
-    ER_day = PD + ER_dark
-    GPP = ER_day - NEE
+    CE_day = PD + ER_dark
+    GPP = CE_day - NEE
     
     Fc_day = numpy.ma.masked_where(Fsd < 1,Fc)
     nightflag = numpy.where(Fsd < 1)[0]
     GPP.mask = Fc_day.mask
     PD.mask = Fc_day.mask
-    ER_day.mask = Fc_day.mask
+    CE_day.mask = Fc_day.mask
     ER_dark.mask = Fc_day.mask
     
     for i in range(nRecs):
@@ -618,60 +618,68 @@ def DayPD_ER_GPP_TTE(cf,ds,Fc_in):
             if i in nightflag:
                 PD[i] = 0
                 GPP[i] = 0
-                ER_day[i] = 0
+                CE_day[i] = 0
                 ER_dark[i] = 0
                 GPP.mask[i] = False
                 PD.mask[i] = False
-                ER_day.mask[i] = False
+                CE_day.mask[i] = False
                 ER_dark.mask[i] = False
                 GPP_flag[i] = numpy.int32(110)
                 PD_flag[i] = numpy.int32(110)
-                ERday_flag[i] = numpy.int32(110)
+                CEday_flag[i] = numpy.int32(110)
                 dER_flag[i] = numpy.int32(110)
             else:
                 PD[i] = -9999
                 GPP[i] = -9999
-                ER_day[i] = -9999
+                CE_day[i] = -9999
                 GPP.mask[i] = True
                 PD.mask[i] = True
-                ER_day.mask[i] = True
+                CE_day.mask[i] = True
                 GPP_flag[i] = Fc_flag[i]
                 PD_flag[i] = Fc_flag[i]
-                ERday_flag[i] = Fc_flag[i]
+                CEday_flag[i] = Fc_flag[i]
         else:
-            if ER_day[i] == -9999:
+            if CE_day[i] == -9999:
                 GPP[i] = -9999
                 PD[i] = -9999
                 GPP.mask[i] = True
                 PD.mask[i] = True
-                ER_day.mask[i] = True
+                CE_day.mask[i] = True
                 GPP_flag[i] = numpy.int32(151)
                 PD_flag[i] = numpy.int32(151)
-                ERday_flag[i] = numpy.int32(151)
+                CEday_flag[i] = numpy.int32(151)
             else:
                 GPP.mask[i] = False
                 PD.mask[i] = False
-                ER_day.mask[i] = False
+                CE_day.mask[i] = False
                 GPP_flag[i] = numpy.int32(150)
                 PD_flag[i] = numpy.int32(150)
-                ERday_flag[i] = numpy.int32(150)
+                CEday_flag[i] = numpy.int32(150)
     
+    day_index = numpy.where(Fsd > 1)[0]
     night_index = numpy.where(Fsd < 1)[0]
+    
+    CE_umol[day_index] = CE_day[day_index]
+    CE_umol_flag[day_index] = CEday_flag[day_index]
+    CE_umol[night_index] = ER_night[night_index]
+    CE_umol_flag[night_index] = nER_flag[night_index]
+    
     NEE_day[night_index] = numpy.float64(0)
     NEE_day_flag[night_index] = numpy.int32(110)
     
     putils.CreateSeries(ds,'NEE_day',NEE_day,Flag=NEE_day_flag,Descr='Daytime net ecosystem exchange of carbon',Units='umol/(m2 s)')
-    putils.CreateSeries(ds,'ER_day',ER_day,Flag=0,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
+    putils.CreateSeries(ds,'CE_day',CE_day,Flag=0,Descr='Daytime ecosystem respiration',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'GPP',GPP,Flag=0,Descr='Ecosystem Gross Primary Production',Units='umol/(m2 s)')
     putils.CreateSeries(ds,'PD',PD,Flag=0,Descr='Ecosystem decomposition by way of photodegradation',Units='umol/(m2 s)')
-    ds.series['ER_day']['Flag'] = ERday_flag
+    putils.CreateSeries(ds,'CE',CE_umol,Flag=CE_umol_flag,Descr='Ecosystem respiration',Units='umol/(m2 s)')
+    ds.series['CE_day']['Flag'] = CEday_flag
     ds.series['PD']['Flag'] = PD_flag
     ds.series['GPP']['Flag'] = GPP_flag
-    MergeSeries(cf,ds,'ER',[0,10,20,30,40,50,60,70,80,90,100,120,130,140,150,160,170,180,190,200])
-    for ThisOne in ['ER_night','ER_dark','ER_bio','ER_day','ER','PD','GPP']:
+    ds.series['CE']['Flag'] = CE_umol_flag
+    for ThisOne in ['ER_night','ER_dark','ER_bio','CE_day','CE','PD','GPP']:
         baddataflag = numpy.where((ds.series[ThisOne]['Data'] == -9999) & (numpy.mod(ds.series[ThisOne]['Flag'],10)==0))[0]
         ds.series[ThisOne]['Flag'][baddataflag] = numpy.int32(151)
-    log.info('Day PD, ER and GPP: All done')
+    log.info('Day PD, CE and GPP: All done')
 
 def dark_efflux_sink(Sws,Ts,Fsd,Fc,Fc_flag):
     nRecs = len(Sws)
@@ -769,12 +777,12 @@ def do_attributes(cf,ds):
         ds.globalattributes['Flag086'] = 'GapFilling: L6 Range Check'
         ds.globalattributes['Flag087'] = 'GapFilling: L6 Diurnal SD Check'
         ds.globalattributes['Flag090'] = 'Partitioning Night: ER computed from exponential temperature response curves'
-        ds.globalattributes['Flag100'] = 'Partitioning Day: GPP/ER computed from light-response curves, GPP = ER - Fc'
+        ds.globalattributes['Flag100'] = 'Partitioning Day: GPP/CE computed from light-response curves, GPP = CE - Fc'
         ds.globalattributes['Flag110'] = 'Partitioning Day: GPP night mask'
-        ds.globalattributes['Flag120'] = 'Partitioning Day: Fc > ER, GPP = 0, ER = Fc'
+        ds.globalattributes['Flag120'] = 'Partitioning Day: Fc > CE, GPP = 0, CE = Fc'
         ds.globalattributes['Flag130'] = 'Partitioning Day: ER_dark from sink period (+NEP) light response curves'
         ds.globalattributes['Flag140'] = 'Partitioning Day: ER_dark from source  period (+NEE) light response curves'
-        ds.globalattributes['Flag150'] = 'Partitioning Day: PD, ER_day & GPP from conditional correlation'
+        ds.globalattributes['Flag150'] = 'Partitioning Day: PD, CE_day & GPP from conditional correlation'
         ds.globalattributes['Flag151'] = 'Partitioning Day: no solution from conditional correlation'
         ds.globalattributes['Flag161'] = 'Footprint: Date filter'
         ds.globalattributes['Flag162'] = 'Footprint: no solution'
@@ -1180,6 +1188,7 @@ def ER_nightL6(cf,ds,ER_in):
     ds.series['ER_night']['Flag'] = night_flag
     
     log.info('Night ER: All done')
+
 def MergeSeries(cf,ds,series,okflags):
     """
         Merge two series of data to produce one series containing the best data from both.

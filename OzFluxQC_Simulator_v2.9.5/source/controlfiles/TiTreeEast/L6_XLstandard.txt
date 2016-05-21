@@ -5,9 +5,9 @@
 [Files]
     [[L6_CPartitioned]]
         in_file_path = ../TiTreeEast/level6/
-        in_filename = TTE_EC_2015_L6_CPartitioned.nc
+        in_filename = TTE_EC_2016_L6_CPartitioned.nc
         out_file_path = ../TiTreeEast/level6/
-        out_filename = TTE_EC_2015_L6_CPartitioned.xls
+        out_filename = TTE_EC_2016_L6_CPartitioned.xls
 
 [Output]
     DefaultXl = False

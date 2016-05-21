@@ -7,13 +7,13 @@
 [Files]
     [[L6]]
         ncFilePath = ../ncData/TTE/
-        ncFileName = TTE_EC_2015_L6part.nc
+        ncFileName = TTE_EC_2016_L6part.nc
     [[Partitioning]]
         xlFilePath = ../../TiTreeEast/level3_intermediates/Partitioning/
-        xlFileName = TTE_EC_2015_L6_PD_ER_GPP.xls
+        xlFileName = TTE_EC_2016_L6_PD_ER_CE_GPP.xls
 
 [Output]
-    Partitioning = "['GPP', 'ER', 'ER_night', 'ER_bio', 'ER_dark', 'ER_day', 'PD', 'NEE_day']"
+    Partitioning = "['GPP', 'CE', 'ER_night', 'ER_bio', 'ER_dark', 'CE_day', 'PD', 'NEE_day']"
     Format = Subset   # Full (default) or Subset
     DefaultXl = False
 

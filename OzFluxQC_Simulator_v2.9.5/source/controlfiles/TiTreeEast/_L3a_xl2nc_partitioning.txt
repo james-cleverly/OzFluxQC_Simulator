@@ -6,12 +6,12 @@
 
 [Files]
     [[L3]]
-        xlFilePath = ../TiTreeEast/level4/
-        xlFileName = TTE_EC_2015_L4_MetFilled.xls
-        xlHeaderRow  = 3
-        xl1stDataRow = 4
-        ncFilePath = ncData/TTE/
-        ncFileName = TTE_EC_2015_L4pin.nc
+        xlFilePath = ../../TiTreeEast/level3_intermediates/
+        xlFileName = TTE_EC_2016_L3_Corrected0.xls
+        xlHeaderRow  = 10
+        xl1stDataRow = 11
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2016_L4pin.nc
 
 [Global]
     study = "Carbon Partitioning"
@@ -45,7 +45,7 @@
     [[xlDateTime]]
         [[[xl]]]
             sheet    = Data
-            name     = xlDateTime
+            name     = TIMESTAMP
         [[[Attr]]]
             ancillary_variables = ""
             long_name = "Date/time in Excel format"

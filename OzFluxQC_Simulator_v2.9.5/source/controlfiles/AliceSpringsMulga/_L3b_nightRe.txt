@@ -6,18 +6,18 @@ netCDFv3 = False
 
 [Files]
     [[L3]]
-        ncFilePath = ncData/ASM/
-        ncFileName = ASM_EC_2013_L3pin.nc
-        xlFilePath = ../AliceSpringsMulga/level5partitioning/
-        xlFileName = ASM_EC_2013_NightRe.xls
+        ncFilePath = ../ncData/ASM/
+        ncFileName = ASM_EC_2016_L3pin.nc
+        xlFilePath = ../../AliceSpringsMulga/level3_intermediates/Partitioning/
+        xlFileName = ASM_EC_2016_NightER.xls
     [[Partitioning]]
-        ncFilePath = ncData/ASM/
-        ncFileName = ASM_EC_2013_L3part.nc
-        xlFilePath = ../AliceSpringsMulga/level5partitioning/
-        xlFileName = ASM_EC_2013_DayFc.xls
+        ncFilePath = ../ncData/ASM/
+        ncFileName = ASM_EC_2016_L3part.nc
+        xlFilePath = ../../AliceSpringsMulga/level6partitioning/
+        xlFileName = ASM_EC_2016_DayFc.xls
 
 [Params]
-firstMonth = 12
+firstMonth = 1
 secondMonth = 12
 
 [Output]

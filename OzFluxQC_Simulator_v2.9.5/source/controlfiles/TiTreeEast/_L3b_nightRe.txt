@@ -6,15 +6,15 @@
 
 [Files]
     [[L3]]
-        ncFilePath = ncData/TTE/
-        ncFileName = TTE_EC_2015_L4pin.nc
-        xlFilePath = ../TiTreeEast/level6partitioning/
-        xlFileName = TTE_EC_2015_NightER.xls
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2016_L4pin.nc
+        xlFilePath = ../../TiTreeEast/level3_intermediates/Partitioning/
+        xlFileName = TTE_EC_2016_NightER.xls
     [[Partitioning]]
-        ncFilePath = ncData/TTE/
-        ncFileName = TTE_EC_2015_L4part.nc
-        xlFilePath = ../TiTreeEast/level6partitioning/
-        xlFileName = TTE_EC_2015_DayFc.xls
+        ncFilePath = ../ncData/TTE/
+        ncFileName = TTE_EC_2016_L4part.nc
+        xlFilePath = ../../TiTreeEast/level6partitioning/
+        xlFileName = TTE_EC_2016_DayFc.xls
 
 [Params]
     firstMonth = 1

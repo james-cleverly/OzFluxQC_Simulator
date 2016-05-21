@@ -5,11 +5,11 @@
 [Files]
     [[L1]]
         in_file_path = ../TiTreeEast/level1/
-        in_filename = TTE_EC_2015.xls
+        in_filename = TTE_EC_2016.xls
         in_headerrow  = 2
         in_firstdatarow = 5
         out_file_path = ncData/TTE/
-        out_filename = TTE_EC_2015_L1.nc
+        out_filename = TTE_EC_2016_L1.nc
 
 [Global]
     contact  = "james.cleverly@uts.edu.au"
@@ -37,9 +37,9 @@
     reference2 = "Cleverly, J, D Eamus, E Van Gorsel, C Chen, R Rumman, Q Luo, NR Coupe, L Li, N Kljun, R Faux, Q Yu, and A Huete (2016), Productivity and evapotranspiration of two contrasting semiarid ecosystems following the 2011 global carbon land sink anomaly, Agric. For. Meteor., 220, 151-159, doi: 10.1016/j.agrformet.2016.01.086."
     site_name = "TiTreeEast"
     site = "Ti Tree East, Northern Territory, Australia"
-    soil = "red kandosol, loamy sand"
+    soil = "red kandosol, sand"
     source = "10m flux tower plus array of soil sensors"
-    title = "Flux tower data set from the Ti Tree East site for the calendar year 2015"
+    title = "Flux tower data set from the Ti Tree East site for the calendar year 2016"
     time_step = 30
     time_zone = "Australia/Darwin"
     tower_height = "10 m"
@@ -47,7 +47,7 @@
     vegetation1 = "Mulga trees with grassy interspaces and understorey"
     vegetation2 = "Corymbia/Triodia savanna"
     version = "OzFluxQC Simulator v.2.9.5, https://github.com/james-cleverly/OzFluxQC_Simulator"
-    version_citation = "Cleverly, J, and P Isaac (2016), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.46671."
+    version_citation = "Cleverly, J, and P Isaac (2016), OzFluxQC Simulator version 2.9.5, GitHub respository, github.com/james-cleverly/OzFluxQC_Simulator, doi: 10.5281/zenodo.50109."
 
 [Output]
     DefaultXl = False
@@ -364,15 +364,6 @@
         [[[Attr]]]
             ancillary_variables = "Fg_grass QC flag"
             long_name = "Soil heat flux under grass, 8 cm depth"
-            units    = "W/m2"
-            standard_name = "downward_heat_flux_in_soil"
-    [[Fg_x]]
-        [[[xl]]]
-            sheet    = slow_core
-            name     = Fg_x
-        [[[Attr]]]
-            ancillary_variables = "Fg_x QC flag"
-            long_name = "Soil heat flux under grass pre-merged, 8 cm depth"
             units    = "W/m2"
             standard_name = "downward_heat_flux_in_soil"
     [[Sws_spinifex_100cm]]
@@ -861,3 +852,13 @@
             long_name = "atmospheric vapour pressure (HMP) at 9.81 m height"
             units    = "kPa"
             standard_name = "water_vapor_partial_pressure_in_air"
+    [[Tb_Fl]]
+        [[[xl]]]
+            sheet    = slow_core
+            name     = Tb_CNR4_Avg
+        [[[Attr]]]
+            ancillary_variables = "Tb_Fl QC flag"
+            instrument = "Kipp and Zonen CNR4"
+            long_name = "CNR4 body temperature, used for computing Fld and Flu"
+            standard_name = "not defined"
+            units = "C"
