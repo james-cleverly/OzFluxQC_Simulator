@@ -297,22 +297,16 @@ def l3qc(cf,ds2):
         # interpolate over any ramaining gaps up to 3 hours in length
         qcts.AverageSeriesByElements(cf,ds3,'Ts')
         qcts.AverageSeriesByElements(cf,ds3,'Sws')
-        for ThisOne in ['Fg_grass_tmp','Fg_spinifex_tmp','Fg_mulga_tmp','Ts_spinifex_0cm_tmp','Ts_mulga_0cm_tmp','Sws_spinifex_0cm_tmp','Sws_mulga_0cm_tmp','Sws_grass_0cm_tmp','Fg_bs_tmp','Fg_ms_tmp','Fg_mu_tmp','Ts_bs_tmp','Ts_ms_tmp','Ts_mu_tmp','Sws_bs_tmp','Sws_ms_tmp','Sws_mu_tmp']:
+        for ThisOne in ['Fg_x_tmp','Fg_grass_tmp','Fg_spinifex_tmp','Fg_mulga_tmp','Ts_spinifex_0cm_tmp','Ts_mulga_0cm_tmp','Sws_spinifex_0cm_tmp','Sws_mulga_0cm_tmp','Sws_grass_0cm_tmp','Fg_bs_tmp','Fg_ms_tmp','Fg_mu_tmp','Ts_bs_tmp','Ts_ms_tmp','Ts_mu_tmp','Sws_bs_tmp','Sws_ms_tmp','Sws_mu_tmp']:
             if qcutils.cfkeycheck(cf, ThisOne=ThisOne):
                 qcts.MergeSeries(cf,ds3,ThisOne,[0,10])
                 qcts.InterpolateOverMissing(cf,ds3,series=ThisOne,maxlen=6)
         
         if qcutils.cfkeycheck(cf, ThisOne='Ts_tmp'):
             qcts.AverageSeriesByElements(cf,ds3,'Ts_tmp')
-        else:
-            log.error('  Ts_tmp not specified in controlfile')
-            return
         
         if qcutils.cfkeycheck(cf, ThisOne='Sws_tmp'):
             qcts.AverageSeriesByElements(cf,ds3,'Sws_tmp')
-        else:
-            log.error('  Sws_tmp not specified in controlfile')
-            return
         
     # correct the measured soil heat flux for storage in the soil layer above the sensor
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='Corrections') and cf['Functions']['Corrections'] == 'True':
@@ -323,23 +317,21 @@ def l3qc(cf,ds2):
         
         if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='IndividualFgCorrection') and cf['Functions']['IndividualFgCorrection'] == 'True':
             qcts.CorrectIndividualFgForStorage(cf,ds3)
-            qcts.CorrectIndividualFgForStorage(cf,ds3,level='_tmp')
             qcts.AverageSeriesByElements(cf,ds3,'Fg')
             if qcutils.cfkeycheck(cf, ThisOne='Fg_tmp'):
+                qcts.CorrectIndividualFgForStorage(cf,ds3,level='_tmp')
                 qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
             else:
-                log.error('  Fg_tmp not specified in controlfile')
-                return
+                log.warn('Fg_tmp not run')
         else:
             if qcutils.cfkeycheck(cf, ThisOne='Fg_tmp'):
                 qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
+                qcts.CorrectGroupFgForStorage(cf,ds3,level='_tmp')
             else:
-                log.error('  Fg_tmp not specified in controlfile')
-                return
-            
+                log.warn('Fg_tmp not run')
+           
             qcts.AverageSeriesByElements(cf,ds3,'Fg')
             qcts.CorrectGroupFgForStorage(cf,ds3)
-            qcts.CorrectGroupFgForStorage(cf,ds3,level='_tmp')
     
     # calculate the available energy
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='CalculateAvailableEnergy') and cf['Functions']['CalculateAvailableEnergy'] == 'True':

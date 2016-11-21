@@ -2562,58 +2562,6 @@ def extrapolate_humidity(zq_ref,zq_high,zq_low,q_high,q_low,fqh,fql):
     qref[index] = q_high[index] - ((zq_high - zq_ref) / slope[index])
     return qref
 
-def Fc_WPL(cf,ds,Fc_wpl_out='Fc',Fc_raw_in='Fc',Fh_in='Fh',Fe_in='Fe',Ta_in='Ta',Ah_in='Ah',Cc_in='Cc',ps_in='ps'):
-    """
-        Apply Webb, Pearman and Leuning correction to carbon flux.  This
-        correction is necessary to account for flux effects on density
-        measurements.  Original formulation: Campbell Scientific
-        
-        Usage qcts.Fc_WPL(ds,Fc_wpl_out,Fc_raw_in,Fh_in,Fe_in,Ta_in,Ah_in,Cc_in,ps_in)
-        ds: data structure
-        Fc_wpl_out: output corrected carbon flux variable to ds.  Example: 'Fc'
-        Fc_raw_in: input carbon flux in ds.  Example: 'Fc'
-        Fh_in: input sensible heat flux in ds.  Example: 'Fh'
-        Fe_raw_in: input uncorrected latent heat flux in ds.  Example: 'Fe_raw'
-        Ta_in: input air temperature in ds.  Example: 'Ta'
-        Ah_in: input absolute humidity in ds.  Example: 'Ah'
-        Cc_in: input co2 density in ds.  Example: 'Cc'
-        ps_in: input atmospheric pressure in ds.  Example: 'ps'
-        
-        Used for fluxes that are raw or rotated.
-        
-        Pre-requisite: CalculateFluxes, CalculateFluxes_Unrotated or CalculateFluxesRM
-        Pre-requisite: FhvtoFh
-        Pre-requisite: Fe_WPL
-        
-        Accepts meteorological constants or variables
-        """
-    log.info(' Applying WPL correction to Fc')
-    Fc_raw,Fc_raw_flag,Fc_raw_attr = qcutils.GetSeriesasMA(ds,Fc_raw_in)
-    Fh,f,a = qcutils.GetSeriesasMA(ds,Fh_in)
-    Fe,f,a = qcutils.GetSeriesasMA(ds,Fe_in)
-    Ta,f,a = qcutils.GetSeriesasMA(ds,Ta_in)
-    TaK = Ta+c.C2K                                # air temperature from C to K
-    Ah,f,a = qcutils.GetSeriesasMA(ds,Ah_in)
-    Ah = Ah*c.g2kg                                # absolute humidity from g/m3 to kg/m3
-    Cc,f,a = qcutils.GetSeriesasMA(ds,Cc_in)
-    ps,f,a = qcutils.GetSeriesasMA(ds,ps_in)
-    rhod,f,a = qcutils.GetSeriesasMA(ds,'rhod')
-    RhoCp,f,a = qcutils.GetSeriesasMA(ds,'RhoCp')
-    Lv,f,a = qcutils.GetSeriesasMA(ds,'Lv')
-    sigma = Ah/rhod
-    co2_wpl_Fe = (c.mu/(1+c.mu*sigma))*(Cc/rhod)*(Fe/Lv)
-    co2_wpl_Fh = (Cc/TaK)*(Fh/RhoCp)
-    Fc_wpl_data = Fc_raw+co2_wpl_Fe+co2_wpl_Fh
-    Fc_wpl_flag = numpy.zeros(len(Fc_wpl_data),dtype=numpy.int32)
-    index = numpy.where(numpy.ma.getmaskarray(Fc_wpl_data)==True)[0]
-    Fc_wpl_flag[index] = numpy.int32(14)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL corrected Fc',units='mg/m2/s')
-    qcutils.CreateSeries(ds,Fc_wpl_out,Fc_wpl_data,Flag=Fc_wpl_flag,Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL correction to Fc due to Fe',units='mg/m2/s')
-    qcutils.CreateSeries(ds,'co2_wpl_Fe',co2_wpl_Fe,Flag=Fc_wpl_flag,Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL correction to Fc due to Fh',units='mg/m2/s')
-    qcutils.CreateSeries(ds,'co2_wpl_Fh',co2_wpl_Fh,Flag=Fc_wpl_flag,Attr=attr)
-
 def Fc_WPLcov(cf,ds,Fc_wpl_out='Fc',wC_out='wC',wC_in='wC',Fh_in='Fh',wA_in='wA',Ta_in='Ta',Ah_in='Ah',Cc_in='Cc_7500_Av',ps_in='ps'):
     """
         Apply Webb, Pearman and Leuning correction to carbon flux using the
@@ -2688,65 +2636,6 @@ def Fc_WPLcov(cf,ds,Fc_wpl_out='Fc',wC_out='wC',wC_in='wC',Fh_in='Fh',wA_in='wA'
             mask = numpy.ma.getmask(testseries)
             index = numpy.where((numpy.mod(f,10)==0) & (mask.astype(numpy.int32)==1))    # find the elements with flag = 0, 10, 20 etc and masked (check for masked data with good data flag)
             ds.series[ThisOne]['Flag'][index] = numpy.int32(14)
-
-def Fe_WPL(cf,ds,Fe_wpl_out='Fe',Fe_raw_in='Fe',Fh_in='Fh',Ta_in='Ta',Ah_in='Ah',ps_in='ps'):
-    """
-        Apply Webb, Pearman and Leuning correction to vapour flux.  This
-        correction is necessary to account for flux effects on density
-        measurements.  Original formulation: Campbell Scientific
-        
-        Usage qcts.Fe_WPL(ds,Fe_wpl_out,Fe_raw_in,Fh_in,Ta_in,Ah_in,ps_in)
-        ds: data structure
-        Fe_wpl_out: output corrected water vapour flux variable to ds.  Example: 'Fe'
-        Fe_raw_in: input water vapour flux in ds.  Example: 'Fe'
-        Fh_in: input sensible heat flux in ds.  Example: 'Fh'
-        Ta_in: input air temperature in ds.  Example: 'Ta'
-        Ah_in: input absolute humidity in ds.  Example: 'Ah'
-        ps_in: input atmospheric pressure in ds.  Example: 'ps'
-        
-        Used for fluxes that are raw or rotated.
-        
-        Pre-requisite: CalculateFluxes, CalculateFluxes_Unrotated or CalculateFluxesRM
-        Pre-requisite: FhvtoFh
-        
-        Accepts meteorological constants or variables
-        """
-    log.info(' Applying WPL correction to Fe')
-    if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='EWPL'):
-        Eargs = ast.literal_eval(cf['FunctionArgs']['EWPL'])
-        Fe_wpl_out = Eargs[0]
-        Fe_raw_in = Eargs[1]
-        Fh_in = Eargs[2]
-        Ta_in = Eargs[3]
-        Ah_in = Eargs[4]
-        ps_in = Eargs[5]
-    Fe_raw,Fe_raw_flag,Fe_raw_attr = qcutils.GetSeriesasMA(ds,Fe_raw_in)
-    Fh,f,a = qcutils.GetSeriesasMA(ds,Fh_in)
-    Ta,f,a = qcutils.GetSeriesasMA(ds,Ta_in)
-    TaK = Ta + c.C2K                              # air temperature from C to K
-    Ah,f,a = qcutils.GetSeriesasMA(ds,Ah_in)
-    ps,f,a = qcutils.GetSeriesasMA(ds,ps_in)
-    rhod,f,a = qcutils.GetSeriesasMA(ds,'rhod')     # density dry air
-    rhom,f,a = qcutils.GetSeriesasMA(ds,'rhom')     # density moist air
-    RhoCp,f,a = qcutils.GetSeriesasMA(ds,'RhoCp')
-    Lv,f,a = qcutils.GetSeriesasMA(ds,'Lv')
-    Ah = Ah*c.g2kg                                # absolute humidity from g/m3 to kg/m3
-    sigma = Ah/rhod
-    h2o_wpl_Fe = c.mu*sigma*Fe_raw
-    h2o_wpl_Fh = (1+c.mu*sigma)*Ah*Lv*(Fh/RhoCp)/TaK
-    Fe_wpl_data = Fe_raw+h2o_wpl_Fe+h2o_wpl_Fh
-    Fe_wpl_flag = numpy.zeros(len(Fe_wpl_data),dtype=numpy.int32)
-    mask = numpy.ma.getmask(Fe_wpl_data)
-    index = numpy.where(numpy.ma.getmaskarray(Fe_wpl_data)==True)[0]
-    Fe_wpl_flag[index] = numpy.int32(14)
-    attr = qcutils.MakeAttributeDictionary(long_name='WPL corrected Fe',units='W/m2',standard_name='surface_upward_latent_heat_flux')
-    qcutils.CreateSeries(ds,Fe_wpl_out,Fe_wpl_data,Flag=Fe_wpl_flag,Attr=attr)
-    attr = qcutils.MakeAttributeDictionary(long_name='Fe (uncorrected for WPL)',units='W/m2')
-    qcutils.CreateSeries(ds,'Fe_raw',Fe_raw,Flag=Fe_raw_flag,Attr=attr)
-    if qcutils.cfoptionskey(cf,Key='RelaxFeWPL'):
-        ReplaceWhereMissing(ds.series['Fe'],ds.series['Fe'],ds.series['Fe_raw'],FlagValue=20)
-        if 'RelaxFeWPL' not in ds.globalattributes['Functions']:
-            ds.globalattributes['Functions'] = ds.globalattributes['Functions']+', RelaxFeWPL'
 
 def Fe_WPLcov(cf,ds,Fe_wpl_out='Fe',wA_in='wA',Fh_in='Fh',Ta_in='Ta',Ah_in='Ah',ps_in='ps',wA_out='wA'):
     """
@@ -3402,7 +3291,7 @@ def get_canopyresistance(cf,ds,Uavg,uindex,PMin,Level,critFsd,critFe):
     ra = (numpy.log((zm - d) / z0m) * numpy.log((zm - d) / z0v)) / (((c.k) ** 2) * Uavg)
     rc = ((((((delta * (Fn - Fg) / (Lv)) + (rhom * Cpm * (VPD / ((Lv) * ra)))) / (Fe / (Lv))) - delta) / gamma) - 1) * ra
     rcindex = numpy.ma.where(rc < 0)[0]
-    Gc = (1 / rc) * (Ah * 1000) / 18
+    Gc = (1 / rc) * (rhom * 1000) * (1000 / 18)
     if 'ram' not in ds.series.keys():
         attr = qcutils.MakeAttributeDictionary(long_name='Aerodynamic resistance from drag coefficient, Allen/Jensen formulation, '+Level,units='s/m')
     else:
@@ -3661,7 +3550,7 @@ def get_rstGst(cf,ds,PMin,rav):
     
     rst = ((((((delta * (Fn - Fg) / (Lv)) + (rhom * Cpm * (VPD / ((Lv) * rav)))) / (Fe / (Lv))) - delta) / gamma) - 1) * rav
     rstindex = numpy.ma.where(rst < 0)[0]
-    Gst = (1 / rst) * (Ah * 1000) / 18
+    Gst = (1 / rst) * (rhom * 1000) * (1000 / 18)
     Gstindex = numpy.ma.where(Gst < 0)[0]
     return rst, rstindex, Gst, Gstindex
 

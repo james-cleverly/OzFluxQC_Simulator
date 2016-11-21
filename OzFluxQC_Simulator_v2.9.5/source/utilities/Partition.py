@@ -49,9 +49,9 @@ class qcgui(Tkinter.Frame):
     def createWidgets(self):
         self.process2Label = Tkinter.Label(self,text='L3: ER_night')
         self.process2Label.grid(row=0,column=1,columnspan=1)
-        self.process3Label = Tkinter.Label(self,text='L6: ER_dark PD CE_day CE & GPP')
+        self.process3Label = Tkinter.Label(self,text='L6: ER & GPP')
         self.process3Label.grid(row=0,column=2,columnspan=1)
-        self.process3Label = Tkinter.Label(self,text='L3: Conditional correlation')
+        self.process3Label = Tkinter.Label(self,text='L6: ER + AD & GPP (gaps)')
         self.process3Label.grid(row=0,column=3,columnspan=1)
         
         self.fileloadLabel = Tkinter.Label(self,text='Xcel ->')
@@ -60,8 +60,8 @@ class qcgui(Tkinter.Frame):
         self.doxl2nc1Button.grid(row=1,column=1,columnspan=1)
         self.doxl2nc2Button = Tkinter.Button (self, text="Load Gapfilled Data", command=self.do_xl2ncCall )
         self.doxl2nc2Button.grid(row=1,column=2,columnspan=1)
-        self.doxl2nc2Button = Tkinter.Button (self, text="Conditional Correlation 10Hz", command=self.do_cc )
-        self.doxl2nc2Button.grid(row=1,column=3,columnspan=1)
+        #self.doxl2nc2Button = Tkinter.Button (self, text="Conditional Correlation 10Hz", command=self.do_cc )
+        #self.doxl2nc2Button.grid(row=1,column=3,columnspan=1)
         
         self.initiateLabel = Tkinter.Label(self,text='Process Data')
         self.initiateLabel.grid(row=2,column=0,columnspan=1)
