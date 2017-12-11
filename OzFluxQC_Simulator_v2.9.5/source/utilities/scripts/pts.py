@@ -404,34 +404,350 @@ def DayCEGPP_ASM(cf,ds,Fc_in):
     CE_umol_flag = numpy.zeros(nRecs,numpy.int32)
     GPP_flag = numpy.zeros(nRecs,numpy.int32)
     NEE_day_flag = numpy.zeros(nRecs,numpy.int32) + Fc_flag
+    a_dark_low = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    b_dark_low = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    t_opt_dark = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    a_dark_high = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    b_dark_high = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    a_max_low = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    b_max_low = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    t_opt1_max = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    a_max_high = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    b_max_high = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    a_max_mid1 = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    b_max_mid1 = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    t_min_max = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    a_max_mid2 = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    b_max_mid2 = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    t_opt2_max = numpy.zeros(nRecs,numpy.float64) + c.missing_value
+    double_peak = numpy.zeros(nRecs,numpy.int32)
     
     # calculate ecosystem respiration in umol/(m2 s) modeled from light response curve (Fc-Fsd)
     day_index = numpy.where(Fsd > 1)[0]
     night_index = numpy.where(Fsd < 1)[0]
     Fsd_dark_index = numpy.where((Fsd < 500) & (Fsd > 1))[0]
     Fsd_max_index = numpy.where(Fsd > 500)[0]
-    ER_dark_Ts_low_index = numpy.where((Ts < 27.5) & (Fsd > 1))[0]
-    ER_dark_Ts_high_index = numpy.where((Ts > 27.5) & (Fsd > 1))[0]
-    CE_NEEmax_Ts_low_index = numpy.where((Ts < 36.75) & (Fsd > 500))[0]
-    CE_NEEmax_Ts_high_index = numpy.where((Ts > 36.75) & (Fsd > 500))[0]
+    
+    year2010_index = numpy.where(ds.series['Year']['Data'] == 2010)[0]
+    year2011a_index = numpy.where((ds.series['Year']['Data'] == 2011) & (ds.series['Month']['Data'] < 9))[0]
+    year2011b_index = numpy.where((ds.series['Year']['Data'] == 2011) & (ds.series['Month']['Data'] > 8))[0]
+    year2012a_index = numpy.where((ds.series['Year']['Data'] == 2012) & (ds.series['Month']['Data'] < 9))[0]
+    year2012b_index = numpy.where((ds.series['Year']['Data'] == 2012) & (ds.series['Month']['Data'] > 8))[0]
+    year2013a_index = numpy.where((ds.series['Year']['Data'] == 2013) & (ds.series['Month']['Data'] < 9))[0]
+    year2013b_index = numpy.where((ds.series['Year']['Data'] == 2013) & (ds.series['Month']['Data'] > 8))[0]
+    year2014_index = numpy.where(ds.series['Year']['Data'] == 2014)[0]
+    year2015a_index = numpy.where((ds.series['Year']['Data'] == 2015) & (ds.series['Month']['Data'] < 9))[0]
+    year2015b_index = numpy.where((ds.series['Year']['Data'] == 2015) & (ds.series['Month']['Data'] > 8))[0]
+    year2016_index = numpy.where(ds.series['Year']['Data'] == 2016)[0]
+    year2017a_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 1))[0]
+    year2017b_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 2))[0]
+    year2017c_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 3))[0]
+    year2017d_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 4))[0]
+    year2017e_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 5))[0]
+    year2017f_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 6))[0]
+    year2017g_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 7))[0]
+    year2017h_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 8))[0]
+    year2017i_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 9))[0]
+    year2017j_index = numpy.where((ds.series['Year']['Data'] == 2017) & (ds.series['Month']['Data'] == 10))[0]
+    
+    if (len(year2010_index)>0):
+        a_dark_low[year2010_index] = 2.733632E-1
+        b_dark_low[year2010_index] = 7.473461E-2
+        t_opt_dark[year2010_index] = 27.8
+        a_dark_high[year2010_index] = 7.608090E+0
+        b_dark_high[year2010_index] = -4.489662E-2
+        a_max_low[year2010_index] = 1.024196E+0
+        b_max_low[year2010_index] = 3.778732E-2
+        t_opt1_max[year2010_index] = 44.35
+        a_max_high[year2010_index] = 2.288693E+7
+        b_max_high[year2010_index] = -3.437756E-1
+    
+    if (len(year2011a_index)>0):
+        a_dark_low[year2011a_index] = 2.733632E-1
+        b_dark_low[year2011a_index] = 7.473461E-2
+        t_opt_dark[year2011a_index] = 27.8
+        a_dark_high[year2011a_index] = 7.608090E+0
+        b_dark_high[year2011a_index] = -4.489662E-2
+        a_max_low[year2011a_index] = 1.024196E+0
+        b_max_low[year2011a_index] = 3.778732E-2
+        t_opt1_max[year2011a_index] = 44.35
+        a_max_high[year2011a_index] = 2.288693E+7
+        b_max_high[year2011a_index] = -3.437756E-1
+    
+    if (len(year2011b_index)>0):
+        a_dark_low[year2011b_index] = 2.034582E-1
+        b_dark_low[year2011b_index] = 5.699653E-2
+        t_opt_dark[year2011b_index] = 28.25
+        a_dark_high[year2011b_index] = 4.185254E+0
+        b_dark_high[year2011b_index] = -5.004414E-2
+        double_peak[year2011b_index] = 1
+        a_max_low[year2011b_index] = 2.865925E-2
+        b_max_low[year2011b_index] = 2.199047E-1
+        t_opt1_max[year2011b_index] = 23.45
+        a_max_mid1[year2011b_index] = 2.027642E+1
+        b_max_mid1[year2011b_index] = -6.000669E-2
+        t_min_max[year2011b_index] = 29.4
+        a_max_mid2[year2011b_index] = 9.888056E-1
+        b_max_mid2[year2011b_index] = 4.276222E-2
+        t_opt2_max[year2011b_index] = 38.2
+        a_max_high[year2011b_index] = 1.786739E+1
+        b_max_high[year2011b_index] = -3.301434E-2
+    
+    if (len(year2012a_index)>0):
+        a_dark_low[year2012a_index] = 2.034582E-1
+        b_dark_low[year2012a_index] = 5.699653E-2
+        t_opt_dark[year2012a_index] = 28.25
+        a_dark_high[year2012a_index] = 4.185254E+0
+        b_dark_high[year2012a_index] = -5.004414E-2
+        double_peak[year2011b_index] = 1
+        a_max_low[year2012a_index] = 2.865925E-2
+        b_max_low[year2012a_index] = 2.199047E-1
+        t_opt1_max[year2012a_index] = 23.45
+        a_max_mid1[year2012a_index] = 2.027642E+1
+        b_max_mid1[year2012a_index] = -6.000669E-2
+        t_min_max[year2012a_index] = 29.4
+        a_max_mid2[year2012a_index] = 9.888056E-1
+        b_max_mid2[year2012a_index] = 4.276222E-2
+        t_opt2_max[year2012a_index] = 38.2
+        a_max_high[year2012a_index] = 1.786739E+1
+        b_max_high[year2012a_index] = -3.301434E-2
+    
+    if (len(year2012b_index)>0):
+        a_dark_low[year2012b_index] = 1.649040E-1
+        b_dark_low[year2012b_index] = 4.906209E-2
+        t_opt_dark[year2012b_index] = 27.9
+        a_dark_high[year2012b_index] = 2.911544E+0
+        b_dark_high[year2012b_index] = -5.410930E-2
+        a_max_low[year2012b_index] = 1.024196E+0
+        b_max_low[year2012b_index] = 3.778732E-2
+        t_opt1_max[year2012b_index] = 44.35
+        a_max_high[year2012b_index] = 2.288693E+7
+        b_max_high[year2012b_index] = -3.437756E-1
+    
+    if (len(year2013a_index)>0):
+        a_dark_low[year2013a_index] = 1.649040E-1
+        b_dark_low[year2013a_index] = 4.906209E-2
+        t_opt_dark[year2013a_index] = 27.9
+        a_dark_high[year2013a_index] = 2.911544E+0
+        b_dark_high[year2013a_index] = -5.410930E-2
+        a_max_low[year2013a_index] = 1.024196E+0
+        b_max_low[year2013a_index] = 3.778732E-2
+        t_opt1_max[year2013a_index] = 44.35
+        a_max_high[year2013a_index] = 2.288693E+7
+        b_max_high[year2013a_index] = -3.437756E-1
+    
+    if (len(year2013b_index)>0):
+        a_dark_low[year2013b_index] = 2.034582E-1
+        b_dark_low[year2013b_index] = 5.699653E-2
+        t_opt_dark[year2013b_index] = 28.25
+        a_dark_high[year2013b_index] = 4.185254E+0
+        b_dark_high[year2013b_index] = -5.004414E-2
+        a_max_low[year2013b_index] = 7.075630E-2
+        b_max_low[year2013b_index] = 1.222877E-1
+        t_opt1_max[year2013b_index] = 32.2
+        a_max_high[year2013b_index] = 2.478086E+1
+        b_max_high[year2013b_index] = -5.965407E-2
+    
+    if (len(year2014_index)>0):
+        a_dark_low[year2014_index] = 2.034582E-1
+        b_dark_low[year2014_index] = 5.699653E-2
+        t_opt_dark[year2014_index] = 28.25
+        a_dark_high[year2014_index] = 4.185254E+0
+        b_dark_high[year2014_index] = -5.004414E-2
+        a_max_low[year2014_index] = 7.075630E-2
+        b_max_low[year2014_index] = 1.222877E-1
+        t_opt1_max[year2014_index] = 32.2
+        a_max_high[year2014_index] = 2.478086E+1
+        b_max_high[year2014_index] = -5.965407E-2
+    
+    if (len(year2015a_index)>0):
+        a_dark_low[year2015a_index] = 2.034582E-1
+        b_dark_low[year2015a_index] = 5.699653E-2
+        t_opt_dark[year2015a_index] = 28.25
+        a_dark_high[year2015a_index] = 4.185254E+0
+        b_dark_high[year2015a_index] = -5.004414E-2
+        a_max_low[year2015a_index] = 7.075630E-2
+        b_max_low[year2015a_index] = 1.222877E-1
+        t_opt1_max[year2015a_index] = 32.2
+        a_max_high[year2015a_index] = 2.478086E+1
+        b_max_high[year2015a_index] = -5.965407E-2
+    
+    if (len(year2015b_index)>0):
+        a_dark_low[year2015b_index] = 2.034582E-1
+        b_dark_low[year2015b_index] = 5.699653E-2
+        t_opt_dark[year2015b_index] = 28.25
+        a_dark_high[year2015b_index] = 4.185254E+0
+        b_dark_high[year2015b_index] = -5.004414E-2
+        a_max_low[year2015b_index] = 1.024196E+0
+        b_max_low[year2015b_index] = 3.778732E-2
+        t_opt1_max[year2015b_index] = 44.35
+        a_max_high[year2015b_index] = 2.288693E+7
+        b_max_high[year2015b_index] = -3.437756E-1
+    
+    if (len(year2016_index)>0):
+        a_dark_low[year2016_index] = 2.034582E-1
+        b_dark_low[year2016_index] = 5.699653E-2
+        t_opt_dark[year2016_index] = 28.25
+        a_dark_high[year2016_index] = 4.185254E+0
+        b_dark_high[year2016_index] = -5.004414E-2
+        a_max_low[year2016_index] = 1.024196E+0
+        b_max_low[year2016_index] = 3.778732E-2
+        t_opt1_max[year2016_index] = 44.35
+        a_max_high[year2016_index] = 2.288693E+7
+        b_max_high[year2016_index] = -3.437756E-1
+    
+    if (len(year2017a_index)>0):
+        a_dark_low[year2017a_index] = 5.58824E+0
+        b_dark_low[year2017a_index] = -2.717019E-2
+        t_opt_dark[year2017a_index] = 55
+        a_dark_high[year2017a_index] = 5.58824E+0
+        b_dark_high[year2017a_index] = -2.717019E-2
+        a_max_low[year2017a_index] = 1.024196E+0
+        b_max_low[year2017a_index] = 3.778732E-2
+        t_opt1_max[year2017a_index] = 44.35
+        a_max_high[year2017a_index] = 2.288693E+7
+        b_max_high[year2017a_index] = -3.437756E-1
+    
+    if (len(year2017b_index)>0):
+        a_dark_low[year2017b_index] = 1.626676E+1
+        b_dark_low[year2017b_index] = -6.791466E-2
+        t_opt_dark[year2017b_index] = 55
+        a_dark_high[year2017b_index] = 1.626676E+1
+        b_dark_high[year2017b_index] = -6.791466E-2
+        a_max_low[year2017b_index] = 1.024196E+0
+        b_max_low[year2017b_index] = 3.778732E-2
+        t_opt1_max[year2017b_index] = 44.35
+        a_max_high[year2017b_index] = 2.288693E+7
+        b_max_high[year2017b_index] = -3.437756E-1
+    
+    if (len(year2017c_index)>0):
+        a_dark_low[year2017c_index] = 3.324386E+1
+        b_dark_low[year2017c_index] = -9.605714E-2
+        t_opt_dark[year2017c_index] = 55
+        a_dark_high[year2017c_index] = 3.324386E+1
+        b_dark_high[year2017c_index] = -9.605714E-2
+        a_max_low[year2017c_index] = 1.024196E+0
+        b_max_low[year2017c_index] = 3.778732E-2
+        t_opt1_max[year2017c_index] = 44.35
+        a_max_high[year2017c_index] = 2.288693E+7
+        b_max_high[year2017c_index] = -3.437756E-1
+    
+    if (len(year2017d_index)>0):
+        a_dark_low[year2017d_index] = 4.941531E+0
+        b_dark_low[year2017d_index] = -5.679562E-2
+        t_opt_dark[year2017d_index] = 55
+        a_dark_high[year2017d_index] = 4.941531E+0
+        b_dark_high[year2017d_index] = -5.679562E-2
+        a_max_low[year2017d_index] = 1.024196E+0
+        b_max_low[year2017d_index] = 3.778732E-2
+        t_opt1_max[year2017d_index] = 44.35
+        a_max_high[year2017d_index] = 2.288693E+7
+        b_max_high[year2017d_index] = -3.437756E-1
+    
+    if (len(year2017e_index)>0):
+        a_dark_low[year2017e_index] = 1.264069E+0
+        b_dark_low[year2017e_index] = 6.704564E-3
+        t_opt_dark[year2017e_index] = 23.7
+        a_dark_high[year2017e_index] = 8.304850E+1
+        b_dark_high[year2017e_index] = -1.698815E-1
+        a_max_low[year2017e_index] = 1.024196E+0
+        b_max_low[year2017e_index] = 3.778732E-2
+        t_opt1_max[year2017e_index] = 44.35
+        a_max_high[year2017e_index] = 2.288693E+7
+        b_max_high[year2017e_index] = -3.437756E-1
+    
+    if (len(year2017f_index)>0):
+        a_dark_low[year2017f_index] = 4.902996E+0
+        b_dark_low[year2017f_index] = -1.534015E-1
+        t_opt_dark[year2017f_index] = 55
+        a_dark_high[year2017f_index] = 4.902996E+0
+        b_dark_high[year2017f_index] = -1.534015E-1
+        a_max_low[year2017f_index] = 1.024196E+0
+        b_max_low[year2017f_index] = 3.778732E-2
+        t_opt1_max[year2017f_index] = 44.35
+        a_max_high[year2017f_index] = 2.288693E+7
+        b_max_high[year2017f_index] = -3.437756E-1
+    
+    if (len(year2017g_index)>0):
+        a_dark_low[year2017g_index] = 1.018235E+1
+        b_dark_low[year2017g_index] = -2.037039E-1
+        t_opt_dark[year2017g_index] = 55
+        a_dark_high[year2017g_index] = 1.018235E+1
+        b_dark_high[year2017g_index] = -2.037039E-1
+        a_max_low[year2017g_index] = 1.024196E+0
+        b_max_low[year2017g_index] = 3.778732E-2
+        t_opt1_max[year2017g_index] = 44.35
+        a_max_high[year2017g_index] = 2.288693E+7
+        b_max_high[year2017g_index] = -3.437756E-1
+    
+    if (len(year2017h_index)>0):
+        a_dark_low[year2017h_index] = 8.596158E+0
+        b_dark_low[year2017h_index] = -1.665504E-1
+        t_opt_dark[year2017h_index] = 55
+        a_dark_high[year2017h_index] = 8.596158E+0
+        b_dark_high[year2017h_index] = -1.665504E-1
+        a_max_low[year2017h_index] = 1.024196E+0
+        b_max_low[year2017h_index] = 3.778732E-2
+        t_opt1_max[year2017h_index] = 44.35
+        a_max_high[year2017h_index] = 2.288693E+7
+        b_max_high[year2017h_index] = -3.437756E-1
+    
+    if (len(year2017i_index)>0):
+        a_dark_low[year2017i_index] = 5.403240E+0
+        b_dark_low[year2017i_index] = -1.277043E-1
+        t_opt_dark[year2017i_index] = 55
+        a_dark_high[year2017i_index] = 5.403240E+0
+        b_dark_high[year2017i_index] = -1.277043E-1
+        a_max_low[year2017i_index] = 1.024196E+0
+        b_max_low[year2017i_index] = 3.778732E-2
+        t_opt1_max[year2017i_index] = 44.35
+        a_max_high[year2017i_index] = 2.288693E+7
+        b_max_high[year2017i_index] = -3.437756E-1
+    
+    if (len(year2017j_index)>0):
+        a_dark_low[year2017j_index] = 2.438706E+0
+        b_dark_low[year2017j_index] = -8.205721E-2
+        t_opt_dark[year2017j_index] = 55
+        a_dark_high[year2017j_index] = 2.438706E+0
+        b_dark_high[year2017j_index] = -8.205721E-2
+        a_max_low[year2017j_index] = 1.024196E+0
+        b_max_low[year2017j_index] = 3.778732E-2
+        t_opt1_max[year2017j_index] = 44.35
+        a_max_high[year2017j_index] = 2.288693E+7
+        b_max_high[year2017j_index] = -3.437756E-1
+    
+    ER_dark_Ts_low_index = numpy.where((Ts < t_opt_dark) & (Fsd > 1))[0]
+    ER_dark_Ts_high_index = numpy.where((Ts > t_opt_dark) & (Fsd > 1))[0]
     ER_dark_flag[ER_dark_Ts_low_index] = numpy.int32(100)
     ER_dark_flag[ER_dark_Ts_high_index] = numpy.int32(100)
+    ER_dark[ER_dark_Ts_low_index] = a_dark_low[ER_dark_Ts_low_index] * numpy.exp(b_dark_low[ER_dark_Ts_low_index] * Ts[ER_dark_Ts_low_index])
+    ER_dark[ER_dark_Ts_high_index] = a_dark_high[ER_dark_Ts_high_index] * numpy.exp(b_dark_high[ER_dark_Ts_high_index] * Ts[ER_dark_Ts_high_index])
+    
+    double_peak_index = numpy.where(double_peak == 1)[0]
+    single_peak_index = numpy.where(double_peak == 0)[0]
+    CE_NEEmax_Ts_low_index = numpy.where((Ts < t_opt1_max) & (Fsd > 500))[0]
     CE_NEEmax_flag[CE_NEEmax_Ts_low_index] = numpy.int32(100)
-    CE_NEEmax_flag[CE_NEEmax_Ts_high_index] = numpy.int32(100)
+    CE_NEEmax[CE_NEEmax_Ts_low_index] = a_max_low[CE_NEEmax_Ts_low_index] * numpy.exp(b_max_low[CE_NEEmax_Ts_low_index] * Ts[CE_NEEmax_Ts_low_index])
+
+    if (len(double_peak_index>0)):
+        CE_NEEmax_Ts_mid1_index = numpy.where((double_peak == 1) & ((Ts < t_min_max) & (Ts > t_opt1_max)) & (Fsd > 500))[0]
+        CE_NEEmax_Ts_mid2_index = numpy.where((double_peak == 1) & ((Ts < t_opt2_max) & (Ts > t_min_max)) & (Fsd > 500))[0]
+        CE_NEEmax_flag[CE_NEEmax_Ts_mid1_index] = numpy.int32(100)
+        CE_NEEmax_flag[CE_NEEmax_Ts_mid2_index] = numpy.int32(100)
+        CE_NEEmax[CE_NEEmax_Ts_mid1_index] = a_max_mid1[CE_NEEmax_Ts_mid1_index] * numpy.exp(b_max_mid1[CE_NEEmax_Ts_mid1_index] * Ts[CE_NEEmax_Ts_mid1_index])
+        CE_NEEmax[CE_NEEmax_Ts_mid2_index] = a_max_mid2[CE_NEEmax_Ts_mid2_index] * numpy.exp(b_max_mid2[CE_NEEmax_Ts_mid2_index] * Ts[CE_NEEmax_Ts_mid2_index])
+        CE_NEEmax_Ts_high_index = numpy.where((double_peak == 1) & (Ts > t_opt2_max) & (Fsd > 500))[0]
+        CE_NEEmax_flag[CE_NEEmax_Ts_high_index] = numpy.int32(100)
+        CE_NEEmax[CE_NEEmax_Ts_high_index] = a_max_high[CE_NEEmax_Ts_high_index] * numpy.exp(b_max_high[CE_NEEmax_Ts_high_index] * Ts[CE_NEEmax_Ts_high_index])
+        if (len(single_peak_index>0)):
+            CE_NEEmax_Ts_high_index = numpy.where((double_peak == 0) & (Ts > t_opt1_max) & (Fsd > 500))[0]
+            CE_NEEmax_flag[CE_NEEmax_Ts_high_index] = numpy.int32(100)
+            CE_NEEmax[CE_NEEmax_Ts_high_index] = a_max_high[CE_NEEmax_Ts_high_index] * numpy.exp(b_max_high[CE_NEEmax_Ts_high_index] * Ts[CE_NEEmax_Ts_high_index])
+    else:
+        CE_NEEmax_Ts_high_index = numpy.where((Ts > t_opt1_max) & (Fsd > 500))[0]
+        CE_NEEmax_flag[CE_NEEmax_Ts_high_index] = numpy.int32(100)
+        CE_NEEmax[CE_NEEmax_Ts_high_index] = a_max_high[CE_NEEmax_Ts_high_index] * numpy.exp(b_max_high[CE_NEEmax_Ts_high_index] * Ts[CE_NEEmax_Ts_high_index])
     
-    a_dark_low = 0.3687931
-    b_dark_low = 0.005857659
-    a_dark_high = 12.28563
-    b_dark_high = -0.06888701
-    a_max_low = 0.4060834
-    b_max_low = 0.06666102
-    a_max_high = 29.96834
-    b_max_high = -0.05043531
-    
-    ER_dark[ER_dark_Ts_low_index] = a_dark_low * numpy.exp(b_dark_low * Ts[ER_dark_Ts_low_index])
-    ER_dark[ER_dark_Ts_high_index] = a_dark_high * numpy.exp(b_dark_high * Ts[ER_dark_Ts_high_index])
-    CE_NEEmax[CE_NEEmax_Ts_low_index] = a_max_low * numpy.exp(b_max_low * Ts[CE_NEEmax_Ts_low_index])
-    CE_NEEmax[CE_NEEmax_Ts_high_index] = a_max_high * numpy.exp(b_max_high * Ts[CE_NEEmax_Ts_high_index])
     CE_day[Fsd_dark_index] = ER_dark[Fsd_dark_index]
     CE_day[Fsd_max_index] = CE_NEEmax[Fsd_max_index]
     
