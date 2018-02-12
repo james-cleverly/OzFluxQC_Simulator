@@ -295,18 +295,8 @@ def l3qc(cf,ds2):
                 ds3.globalattributes['L3Functions'] = 'SoilAverage'
             
         # interpolate over any ramaining gaps up to 3 hours in length
-        qcts.AverageSeriesByElements(cf,ds3,'Ts')
-        qcts.AverageSeriesByElements(cf,ds3,'Sws')
-        for ThisOne in ['Fg_x_tmp','Fg_grass_tmp','Fg_spinifex_tmp','Fg_mulga_tmp','Ts_spinifex_0cm_tmp','Ts_mulga_0cm_tmp','Sws_spinifex_0cm_tmp','Sws_mulga_0cm_tmp','Sws_grass_0cm_tmp','Fg_bs_tmp','Fg_ms_tmp','Fg_mu_tmp','Ts_bs_tmp','Ts_ms_tmp','Ts_mu_tmp','Sws_bs_tmp','Sws_ms_tmp','Sws_mu_tmp']:
-            if qcutils.cfkeycheck(cf, ThisOne=ThisOne):
-                qcts.MergeSeries(cf,ds3,ThisOne,[0,10])
-                qcts.InterpolateOverMissing(cf,ds3,series=ThisOne,maxlen=6)
-        
-        if qcutils.cfkeycheck(cf, ThisOne='Ts_tmp'):
-            qcts.AverageSeriesByElements(cf,ds3,'Ts_tmp')
-        
-        if qcutils.cfkeycheck(cf, ThisOne='Sws_tmp'):
-            qcts.AverageSeriesByElements(cf,ds3,'Sws_tmp')
+        qcts.AverageSeriesByElementsI(cf,ds3,'Ts')
+        qcts.AverageSeriesByElementsI(cf,ds3,'Sws')
         
     # correct the measured soil heat flux for storage in the soil layer above the sensor
     if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='Corrections') and cf['Functions']['Corrections'] == 'True':
@@ -317,20 +307,9 @@ def l3qc(cf,ds2):
         
         if qcutils.cfkeycheck(cf,Base='Functions',ThisOne='IndividualFgCorrection') and cf['Functions']['IndividualFgCorrection'] == 'True':
             qcts.CorrectIndividualFgForStorage(cf,ds3)
-            qcts.AverageSeriesByElements(cf,ds3,'Fg')
-            if qcutils.cfkeycheck(cf, ThisOne='Fg_tmp'):
-                qcts.CorrectIndividualFgForStorage(cf,ds3,level='_tmp')
-                qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
-            else:
-                log.warn('Fg_tmp not run')
+            qcts.AverageSeriesByElementsI(cf,ds3,'Fg')
         else:
-            if qcutils.cfkeycheck(cf, ThisOne='Fg_tmp'):
-                qcts.AverageSeriesByElements(cf,ds3,'Fg_tmp')
-                qcts.CorrectGroupFgForStorage(cf,ds3,level='_tmp')
-            else:
-                log.warn('Fg_tmp not run')
-           
-            qcts.AverageSeriesByElements(cf,ds3,'Fg')
+            qcts.AverageSeriesByElementsI(cf,ds3,'Fg')
             qcts.CorrectGroupFgForStorage(cf,ds3)
     
     # calculate the available energy
@@ -654,9 +633,6 @@ def l4to6qc(cf,ds3,AttrLevel,InLevel,OutLevel):
         if ThisOne in ds4x.series.keys():
             ds4x.series[ThisOne]['Data'] = numpy.ones(len(ds4x.series[ThisOne]['Data']),dtype=numpy.float64) * numpy.float64(c.missing_value)
             ds4x.series[ThisOne]['Flag'] = numpy.ones(len(ds4x.series[ThisOne]['Data']), dtype=numpy.int32)
-    for ThisOne in ['dTs_tmp','Fg_tmp','Ts_tmp','Sws_tmp']:
-        var, var_flag, var_attr = qcutils.GetSeriesasMA(ds3,ThisOne)
-        qcutils.CreateSeries(ds4x,ThisOne,var,Flag=var_flag,Attr=var_attr)
     if InLevel == 'L4' or AttrLevel == 'L3':
         ds4,x = l4qc(cf,ds4x,InLevel,x)
         qcutils.get_coverage_individual(ds4)

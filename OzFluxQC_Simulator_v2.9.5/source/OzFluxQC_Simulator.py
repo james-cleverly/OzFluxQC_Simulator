@@ -305,12 +305,13 @@ class qcgui(Tkinter.Frame):
             if qcutils.cfkeycheck(self.cf,Base='Output',ThisOne='nc'):
                 outfilename2 = qcio.get_outfilename_from_cf(self.cf,'L3_Corrected')
                 self.ds3x = copy.deepcopy(self.ds3)
-                self.ds3x.globalattributes['Level'] = 'L3_Corrected'
+                self.ds3y = qcio.convert_L3Corrected(self.ds3x)
+                self.ds3y.globalattributes['Level'] = 'L3_Corrected'
                 if len(outfilename2)==0: self.do_progress(text='An error occurred, check the console ...'); return
                 ncFile = qcio.nc_open_write(outfilename2)
                 outputlist = qcio.get_outputlist_from_cf(self.cf,'nc')
                 log.info(' Writing netCDF file')
-                qcio.nc_write_series(ncFile,self.ds3x,outputlist=outputlist)
+                qcio.nc_write_series(ncFile,self.ds3y,outputlist=outputlist)
             self.do_progress(text='Finished saving L3 QC & Corrected NetCDF data')              # tell the user we are done
             log.info(' Finished saving L3 QC & Corrected NetCDF data')
             print '\a'

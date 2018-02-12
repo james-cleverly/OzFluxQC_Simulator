@@ -71,6 +71,20 @@ def convert_v27tov28():
     ncFile = nc_open_write(ncV28name,nctype='NETCDF4')
     nc_write_series(ncFile, ds)
 
+def convert_L3Corrected(ds):
+    for ThisOne in ['Fg','Fa','Ts','dTs','Sws','Fg_bs','Fg_ms','Fg_mu','Sws_bs','Sws_ms','Sws_mu','Ts_bs','Ts_ms','Ts_mu','dTs_bs','dTs_ms','dTs_mu','svwc_s_baresoil','svwc_s_understory','svwc_s_mulga']:
+        index = numpy.where(ds.series[ThisOne]['Flag']>10)[0]
+        if len(index) > 0:
+            ds.series[ThisOne]['Data'][index] = numpy.float64(c.missing_value)
+            ds.series[ThisOne]['Flag'][index] = numpy.int32(1)
+    
+    # write the percentage of good data as a variable attribute
+    qcutils.get_coverage_individual(ds)
+    # write the percentage of good data for groups
+    qcutils.get_coverage_groups(ds)
+    return ds
+
+
 def copy_datastructure(cf,ds_in):
     '''
     Return a copy of a data structure based on the following rules:

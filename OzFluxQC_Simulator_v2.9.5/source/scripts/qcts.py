@@ -274,6 +274,53 @@ def AverageSeriesByElements(cf,ds,Av_out):
     attr = qcutils.MakeAttributeDictionary(long_name=DStr,units=UStr,standard_name=SStr)
     qcutils.CreateSeries(ds,Av_out,Av_data,Flag=Mn_flag,Attr=attr)
 
+def AverageSeriesByElementsI(cf,ds,Av_out):
+    """
+        Calculates the average of multiple time series.  Multiple time series
+        are entered and a single time series representing the average at each
+        observational period is returned.
+        
+        Usage qcts.AverageSeriesByElements(cf,ds,Av_out)
+        cf: control file object (must contain an entry for Av_out)
+        ds: data structure
+        Av_out: output variable to ds.  Example: 'Fg'
+        Series_in: input variable series in ds.  Example: ['Fg_8cma','Fg_8cmb']
+        """
+    if Av_out not in cf['Variables'].keys(): return
+    if Av_out in ds.averageserieslist: return
+    srclist, standardname = qcutils.GetAverageSeriesKeys(cf,Av_out)
+    log.info(' Averaging series in '+str(srclist)+' into '+Av_out)
+    nSeries = len(srclist)
+    if nSeries==0:
+        log.error('  AverageSeriesByElements: no input series specified for'+str(Av_out))
+        return
+    if nSeries==1:
+        tmp_data = ds.series[srclist[0]]['Data'].copy()
+        tmp_flag = ds.series[srclist[0]]['Flag'].copy()
+        tmp_attr = ds.series[srclist[0]]['Attr'].copy()
+        Av_data = numpy.ma.masked_where(tmp_data==numpy.float64(c.missing_value),tmp_data)
+        Mn_flag = tmp_flag
+        SeriesNameString = srclist[0]
+    else:
+        tmp_data = ds.series[srclist[0]]['Data'].copy()
+        tmp_flag = ds.series[srclist[0]]['Flag'].copy()
+        tmp_attr = ds.series[srclist[0]]['Attr'].copy()
+        SeriesNameString = srclist[0]
+        srclist.remove(srclist[0])
+        for ThisOne in srclist:
+            SeriesNameString = SeriesNameString+', '+ThisOne
+            tmp_data = numpy.vstack((tmp_data,ds.series[ThisOne]['Data'].copy()))
+            tmp_flag = numpy.vstack((tmp_flag,ds.series[ThisOne]['Flag'].copy()))
+        tmp_data = numpy.ma.masked_where(tmp_data==numpy.float64(c.missing_value),tmp_data)
+        Av_data = numpy.ma.average(tmp_data,axis=0)
+        Mx_flag = numpy.max(tmp_flag,axis=0)
+    ds.averageserieslist.append(Av_out)
+    DStr = 'Element-wise average of series '+SeriesNameString
+    UStr = ds.series[srclist[0]]['Attr']['units']
+    SStr = ds.series[srclist[0]]['Attr']['standard_name']
+    attr = qcutils.MakeAttributeDictionary(long_name=DStr,units=UStr,standard_name=SStr)
+    qcutils.CreateSeries(ds,Av_out,Av_data,Flag=Mx_flag,Attr=attr)
+
 def BypassTcorr(cf,ds):
     if qcutils.cfkeycheck(cf,Base='Soil',ThisOne='BypassTcorrList'):
         subkeys = ast.literal_eval(cf['Soil']['BypassTcorrList'])
@@ -1734,26 +1781,6 @@ def ConvertFcJason(cf,ds,Fco2_in='Fc'):
 def CorrectIndividualFgForStorage(cf,ds,level='standard'):
     log.info(' Correcting soil heat flux for storage')
     zzz = 0
-    if level == '_tmp':
-        if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs_tmp'):
-            List = cf['FunctionArgs']['CFgArgs_tmp'].keys()
-            for i in range(len(List)):
-                CFgArgs = ast.literal_eval(cf['FunctionArgs']['CFgArgs_tmp'][str(i)])
-                if len(CFgArgs) == 4:
-                    CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3])
-                elif len(CFgArgs) == 5:
-                    for ThisOne in ['dTs_spinifex_tmp','dTs_mulga_tmp','dTs_grass_tmp','dTs_bs_tmp','dTs_ms_tmp','dTs_mu_tmp']:
-                        if qcutils.cfkeycheck(cf, ThisOne=ThisOne):
-                            qcts.MergeSeries(cf,ds,ThisOne,[0,10])
-                            qcts.InterpolateOverMissing(cf,ds,series=ThisOne,maxlen=6)
-                    
-                    CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3],dTs_in=CFgArgs[4])
-                    zzz = 1
-                else:
-                    log.error('  CorrectFg: bad parameters, check controlfile'); return
-            if zzz == 1: qcts.AverageSeriesByElements(cf,ds,'dTs_tmp')
-            return
-    
     if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs'):
         List = cf['FunctionArgs']['CFgArgs'].keys()
         for i in range(len(List)):
@@ -1765,7 +1792,7 @@ def CorrectIndividualFgForStorage(cf,ds,level='standard'):
                 zzz = 1
             else:
                 log.error('  CorrectFg: bad parameters, check controlfile'); return
-        if zzz == 1: qcts.AverageSeriesByElements(cf,ds,'dTs')
+        if zzz == 1: qcts.AverageSeriesByElementsI(cf,ds,'dTs')
         return
     
     log.warn('  Correct Individual Fg for Storage:  no arguments provided, running default pre-storage average')
@@ -1773,28 +1800,6 @@ def CorrectIndividualFgForStorage(cf,ds,level='standard'):
     CorrectFgForStorage(cf,ds)
 
 def CorrectGroupFgForStorage(cf,ds,level='standard'):
-    if level == '_tmp':
-        if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs_tmp'):
-            CFgArgs = ast.literal_eval(cf['FunctionArgs']['CFgArgs_tmp'])
-            if len(CFgArgs) == 1:
-                for ThisOne in ['dTs_spinifex_tmp','dTs_mulga_tmp']:
-                    qcts.MergeSeries(cf,ds,ThisOne,[0,10])
-                    qcts.InterpolateOverMissing(cf,ds,series=ThisOne,maxlen=6)
-                qcts.AverageSeriesByElements(cf,ds,'dTs_tmp')
-                log.info(' Correcting soil heat flux for storage')
-                qcts.CorrectFgForStorage(cf,ds,dTs_in=CFgArgs[0])
-            elif len(CFgArgs) == 4:
-                log.info(' Correcting soil heat flux for storage')
-                CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3])
-            elif len(CFgArgs) == 5:
-                for ThisOne in ['dTs_spinifex_tmp','dTs_mulga_tmp']:
-                    qcts.MergeSeries(cf,ds,ThisOne,[0,10])
-                    qcts.InterpolateOverMissing(cf,ds,series=ThisOne,maxlen=6)
-                qcts.AverageSeriesByElements(cf,ds,'dTs_tmp')
-                log.info(' Correcting soil heat flux for storage')
-                CorrectFgForStorage(cf,ds,Fg_out=CFgArgs[0],Fg_in=CFgArgs[1],Ts_in=CFgArgs[2],Sws_in=CFgArgs[3],dTs_in=CFgArgs[4])
-            return
-    
     if qcutils.cfkeycheck(cf,Base='FunctionArgs',ThisOne='CFgArgs'):
         CFgArgs = ast.literal_eval(cf['FunctionArgs']['CFgArgs'])
         if len(CFgArgs) == 1:
